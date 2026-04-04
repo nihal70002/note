@@ -4,13 +4,13 @@ import { Filter, ChevronDown } from 'lucide-react';
 
 const products = [
   { id: '1', name: 'The Minimalist Grid', price: 28.00, image: '/product.png', category: 'Journals', isNew: true },
-  { id: '2', name: 'Midnight Leather', price: 45.00, image: '/hero.png', category: 'Premium', isNew: false },
-  { id: '3', name: 'Taupe Linen Planner', price: 32.00, image: '/product.png', category: 'Planners', isNew: true },
-  { id: '4', name: 'Pocket Ideas Book', price: 18.00, image: '/hero.png', category: 'Pocket', isNew: false },
-  { id: '5', name: 'Weekly Overview', price: 24.00, image: '/product.png', category: 'Planners', isNew: false },
-  { id: '6', name: 'Dotted Sketch Pad', price: 22.00, image: '/hero.png', category: 'Creative', isNew: false },
-  { id: '7', name: 'Morning Pages', price: 26.00, image: '/product.png', category: 'Journals', isNew: true },
-  { id: '8', name: 'The Master Collection', price: 85.00, image: '/hero.png', category: 'Premium', isNew: false },
+  { id: '2', name: 'Midnight Leather', price: 45.00, image: '/product1.png', category: 'Premium', isNew: false },
+  { id: '3', name: 'Taupe Linen Planner', price: 32.00, image: '/product2.png', category: 'Planners', isNew: true },
+  { id: '4', name: 'Pocket Ideas Book', price: 18.00, image: '/product3.png', category: 'Pocket', isNew: false },
+  { id: '5', name: 'Weekly Overview', price: 24.00, image: '/product4.png', category: 'Planners', isNew: false },
+  { id: '6', name: 'Dotted Sketch Pad', price: 22.00, image: '/product5.png', category: 'Creative', isNew: false },
+  { id: '7', name: 'Morning Pages', price: 26.00, image: '/product6.png', category: 'Journals', isNew: true },
+  { id: '8', name: 'The Master Collection', price: 85.00, image: '/product7.png', category: 'Premium', isNew: false },
 ];
 
 const Shop = () => {

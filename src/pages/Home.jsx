@@ -8,7 +8,7 @@ const Home = () => {
       <section className="relative h-[90vh] flex items-center justify-center -mt-16">
         <div className="absolute inset-0 w-full h-full">
           <div className="absolute inset-0 bg-ink/20 z-10" />
-          <img src="/hero.png" alt="Aesthetic Journal" className="w-full h-full object-cover" />
+          <img src="/product3.png" alt="Aesthetic Journal" className="w-full h-full object-cover" />
         </div>
         
         <div className="relative z-20 text-center text-paper px-6 flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -37,7 +37,7 @@ const Home = () => {
           </Link>
           <Link to="/shop" className="group relative aspect-[4/3] overflow-hidden rounded-sm">
             <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors z-10 duration-500" />
-            <img src="/hero.png" alt="Planners" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-out" />
+            <img src="/product5.png" alt="Planners" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-out" />
             <div className="absolute inset-0 flex items-center justify-center z-20">
               <span className="bg-paper/90 backdrop-blur-sm text-ink px-8 py-4 font-serif text-xl tracking-widest uppercase">Goal Planners</span>
             </div>
@@ -57,9 +57,9 @@ const Home = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             <ProductCard id="1" name="The Minimalist Grid" price={28.00} image="/product.png" isNew={true} />
-            <ProductCard id="2" name="Midnight Leather Journal" price={45.00} image="/hero.png" isNew={false} />
-            <ProductCard id="3" name="Taupe Linen Planner" price={32.00} image="/product.png" isNew={true} />
-            <ProductCard id="4" name="Pocket Ideas Book" price={18.00} image="/hero.png" isNew={false} />
+            <ProductCard id="2" name="Midnight Leather Journal" price={45.00} image="/product4.png" isNew={false} />
+            <ProductCard id="3" name="Taupe Linen Planner" price={32.00} image="/product2.png" isNew={true} />
+            <ProductCard id="4" name="Pocket Ideas Book" price={18.00} image="/product3.png" isNew={false} />
           </div>
         </div>
       </section>
