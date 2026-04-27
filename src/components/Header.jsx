@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Feather, ShoppingCart, Menu, X } from 'lucide-react';
+import { Feather, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import CartSidebar from './CartSidebar';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
+  const { totalItems } = useCart();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +34,7 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <Feather className="w-6 h-6 text-ink group-hover:rotate-12 transition-transform duration-300" />
-          <span className="font-serif font-semibold text-xl tracking-wider">AESTHETIC</span>
+          <span className="font-serif font-semibold text-xl tracking-wider">PAPERCUES</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -46,9 +52,30 @@ const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className="relative p-2 text-ink hover:opacity-70 transition-opacity">
+          {user ? (
+            <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
+              <Link to="/profile" className="text-sm font-medium text-ink hover:text-taupe transition-colors">Hi, {user.username}</Link>
+              {user.role === 'Admin' && (
+                <Link to="/admin" className="text-sm text-taupe hover:text-ink transition-colors">Admin</Link>
+              )}
+              <button onClick={logout} className="text-sm text-red-500 hover:text-red-700 transition-colors">Logout</button>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
+              <Link to="/login" className="text-sm uppercase tracking-widest text-ink hover:text-taupe transition-colors">Login</Link>
+            </div>
+          )}
+
+          <button 
+            className="relative p-2 text-ink hover:opacity-70 transition-opacity"
+            onClick={() => setCartOpen(true)}
+          >
             <ShoppingCart className="w-5 h-5" />
-            <span className="absolute top-0 right-0 bg-taupe text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 bg-taupe text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                {totalItems}
+              </span>
+            )}
           </button>
           <button 
             className="md:hidden p-2 text-ink"
@@ -74,6 +101,8 @@ const Header = () => {
           ))}
         </div>
       )}
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 };

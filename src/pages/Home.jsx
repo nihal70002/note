@@ -1,7 +1,21 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 
 const Home = () => {
+  const [newArrivals, setNewArrivals] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5009/api/products')
+      .then(res => res.json())
+      .then(data => {
+        // Just take the first 4 for home page, or filter by isNew
+        const arrivals = data.filter(p => p.isNew).slice(0, 4);
+        // Fallback if not enough new products
+        setNewArrivals(arrivals.length > 0 ? arrivals : data.slice(0, 4));
+      })
+      .catch(err => console.error(err));
+  }, []);
   return (
     <div>
       {/* Hero Section */}
@@ -56,10 +70,9 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-            <ProductCard id="1" name="The Minimalist Grid" price={28.00} image="/product.png" isNew={true} />
-            <ProductCard id="2" name="Midnight Leather Journal" price={45.00} image="/product4.png" isNew={false} />
-            <ProductCard id="3" name="Taupe Linen Planner" price={32.00} image="/product2.png" isNew={true} />
-            <ProductCard id="4" name="Pocket Ideas Book" price={18.00} image="/product3.png" isNew={false} />
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} {...product} />
+            ))}
           </div>
         </div>
       </section>

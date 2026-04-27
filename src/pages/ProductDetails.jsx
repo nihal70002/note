@@ -1,10 +1,51 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Heart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [mainImage, setMainImage] = useState(null);
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    fetch(`http://localhost:5009/api/products/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Product not found');
+        return res.json();
+      })
+      .then(data => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [id]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product.id, quantity);
+      // Optional: add a toast or redirect
+      // navigate('/cart');
+    }
+  };
+
+  if (loading) {
+    return <div className="container mx-auto py-24 text-center text-taupe">Loading product details...</div>;
+  }
+
+  if (!product) {
+    return <div className="container mx-auto py-24 text-center text-taupe">Product not found.</div>;
+  }
+
+  const availableImages = [product.image, product.image2, product.image3, product.image4, product.image5].filter(Boolean);
+  const displayImage = mainImage || product.image || "/product.png";
 
   return (
     <div className="container mx-auto px-6 md:px-12 py-12 lg:py-20">
@@ -12,27 +53,35 @@ const ProductDetails = () => {
         {/* Images */}
         <div className="flex-1 space-y-6">
           <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden">
-             <img src="/product.png" alt="Aesthetic Journal" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+             <img src={displayImage} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden"><img src="/hero.png" alt="Detail 1" className="w-full h-full object-cover" /></div>
-            <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden"><img src="/hero.png" alt="Detail 2" className="w-full h-full object-cover" /></div>
-          </div>
+          {availableImages.length > 1 && (
+            <div className="grid grid-cols-4 gap-4">
+              {availableImages.map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${displayImage === img ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
+                  onClick={() => setMainImage(img)}
+                >
+                  <img src={img} alt={`${product.name} detail ${idx + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Details */}
         <div className="flex-1 lg:pl-12 flex flex-col justify-center animate-in fade-in slide-in-from-right-8 duration-700">
           <div className="mb-8">
              <div className="flex justify-between items-start mb-2">
-               <h1 className="font-serif text-4xl text-ink">The Minimalist Grid {id ? `(${id})` : ''}</h1>
+               <h1 className="font-serif text-4xl text-ink">{product.name}</h1>
                <button className="p-2 text-ink/70 hover:text-ink transition-colors">
                  <Heart className="w-6 h-6" />
                </button>
              </div>
-             <p className="text-xl text-taupe mb-6">$28.00</p>
+             <p className="text-xl text-taupe mb-6">${product.price.toFixed(2)}</p>
              <p className="text-ink/80 leading-relaxed mb-8">
-               A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. 
-               The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover.
+               {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
              
              <div className="border-t border-b border-taupe/20 py-6 mb-8 flex items-center justify-between">
@@ -48,7 +97,7 @@ const ProductDetails = () => {
                </div>
              </div>
 
-             <button className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4">
+             <button onClick={handleAddToCart} className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4">
                Add to Cart
              </button>
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over $50</p>

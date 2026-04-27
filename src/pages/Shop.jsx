@@ -1,20 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
 
-const products = [
-  { id: '1', name: 'The Minimalist Grid', price: 28.00, image: '/product.png', category: 'Journals', isNew: true },
-  { id: '2', name: 'Midnight Leather', price: 45.00, image: '/product1.png', category: 'Premium', isNew: false },
-  { id: '3', name: 'Taupe Linen Planner', price: 32.00, image: '/product2.png', category: 'Planners', isNew: true },
-  { id: '4', name: 'Pocket Ideas Book', price: 18.00, image: '/product3.png', category: 'Pocket', isNew: false },
-  { id: '5', name: 'Weekly Overview', price: 24.00, image: '/product4.png', category: 'Planners', isNew: false },
-  { id: '6', name: 'Dotted Sketch Pad', price: 22.00, image: '/product5.png', category: 'Creative', isNew: false },
-  { id: '7', name: 'Morning Pages', price: 26.00, image: '/product6.png', category: 'Journals', isNew: true },
-  { id: '8', name: 'The Master Collection', price: 85.00, image: '/product7.png', category: 'Premium', isNew: false },
-];
+
 
 const Shop = () => {
+  const [products, setProducts] = useState([]);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:5009/api/products')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch products', err);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="container mx-auto px-6 md:px-12 py-12">
@@ -46,9 +52,13 @@ const Shop = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-        {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
+        {loading ? (
+          <p className="col-span-full text-center text-taupe py-12">Loading collection...</p>
+        ) : (
+          products.map((product) => (
+            <ProductCard key={product.id} {...product} />
+          ))
+        )}
       </div>
     </div>
   );
