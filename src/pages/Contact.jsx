@@ -1,9 +1,9 @@
 const Contact = () => {
   return (
-    <div className="container mx-auto px-6 md:px-12 py-12 lg:py-24">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-24">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 lg:gap-24">
         <div>
-          <h1 className="font-serif text-4xl md:text-5xl text-ink mb-6">Get in Touch</h1>
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-ink mb-6">Get in Touch</h1>
           <p className="text-ink/70 mb-12 max-w-md">
             Whether you have a question about our journals, need help with an order, or just want to share your journaling journey, we'd love to hear from you.
           </p>
@@ -24,7 +24,7 @@ const Contact = () => {
           </div>
         </div>
 
-        <div className="bg-cream/20 p-8 md:p-12">
+        <div className="bg-cream/20 p-5 sm:p-8 md:p-12">
           <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

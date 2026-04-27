@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Plus, Minus, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,8 +30,6 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product.id, quantity);
-      // Optional: add a toast or redirect
-      // navigate('/cart');
     }
   };
 
@@ -48,15 +45,15 @@ const ProductDetails = () => {
   const displayImage = mainImage || product.image || "/product.png";
 
   return (
-    <div className="container mx-auto px-6 md:px-12 py-12 lg:py-20">
-      <div className="flex flex-col lg:flex-row gap-16">
+    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20">
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Images */}
         <div className="flex-1 space-y-6">
           <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden">
              <img src={displayImage} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
           </div>
           {availableImages.length > 1 && (
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-3 sm:gap-4">
               {availableImages.map((img, idx) => (
                 <div 
                   key={idx} 
@@ -73,8 +70,8 @@ const ProductDetails = () => {
         {/* Details */}
         <div className="flex-1 lg:pl-12 flex flex-col justify-center animate-in fade-in slide-in-from-right-8 duration-700">
           <div className="mb-8">
-             <div className="flex justify-between items-start mb-2">
-               <h1 className="font-serif text-4xl text-ink">{product.name}</h1>
+             <div className="flex justify-between items-start gap-4 mb-2">
+               <h1 className="font-serif text-3xl sm:text-4xl text-ink">{product.name}</h1>
                <button className="p-2 text-ink/70 hover:text-ink transition-colors">
                  <Heart className="w-6 h-6" />
                </button>
@@ -84,7 +81,7 @@ const ProductDetails = () => {
                {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
              
-             <div className="border-t border-b border-taupe/20 py-6 mb-8 flex items-center justify-between">
+             <div className="border-t border-b border-taupe/20 py-6 mb-8 flex items-center justify-between gap-4">
                <span className="text-sm uppercase tracking-widest text-ink font-medium">Quantity</span>
                <div className="flex items-center gap-6 border border-taupe/30 rounded-full px-4 py-2">
                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink hover:text-taupe">
@@ -103,7 +100,7 @@ const ProductDetails = () => {
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over $50</p>
           </div>
           
-          <div className="space-y-6 mt-12 bg-cream/30 p-8 rounded-sm">
+          <div className="space-y-6 mt-8 sm:mt-12 bg-cream/30 p-5 sm:p-8 rounded-sm">
              <div>
                <h4 className="font-serif text-lg text-ink mb-2">Specifications</h4>
                <ul className="text-sm text-ink/70 space-y-2">

@@ -46,48 +46,50 @@ const ProductsList = () => {
   if (loading) return <div>Loading products...</div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="font-serif text-3xl text-ink">Products</h1>
-        <Link to="/admin/products/add" className="btn-primary text-sm px-6 py-2">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <h1 className="font-serif text-2xl sm:text-3xl text-ink">Products</h1>
+        <Link to="/admin/products/add" className="btn-primary text-sm px-6 py-2 text-center">
           Add New Product
         </Link>
       </div>
 
       <div className="bg-paper rounded-sm shadow-sm border border-taupe/10 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-cream/30 border-b border-taupe/20">
-              <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Image</th>
-              <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Name</th>
-              <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Category</th>
-              <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Price</th>
-              <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-b border-taupe/10 hover:bg-cream/10 transition-colors">
-                <td className="py-4 px-6">
-                  <div className="w-12 h-16 bg-cream/50 rounded-sm overflow-hidden">
-                    <img src={product.image || "/product.png"} alt={product.name} className="w-full h-full object-cover" />
-                  </div>
-                </td>
-                <td className="py-4 px-6 font-medium text-ink">{product.name}</td>
-                <td className="py-4 px-6 text-taupe">{product.category}</td>
-                <td className="py-4 px-6 text-taupe">${product.price.toFixed(2)}</td>
-                <td className="py-4 px-6 text-right space-x-4">
-                  <Link to={`/admin/products/edit/${product.id}`} className="text-ink hover:text-ink/70 inline-block">
-                    <Edit className="w-4 h-4" />
-                  </Link>
-                  <button onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-left border-collapse">
+            <thead>
+              <tr className="bg-cream/30 border-b border-taupe/20">
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Image</th>
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Name</th>
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Category</th>
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Price</th>
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} className="border-b border-taupe/10 hover:bg-cream/10 transition-colors">
+                  <td className="py-4 px-6">
+                    <div className="w-12 h-16 bg-cream/50 rounded-sm overflow-hidden">
+                      <img src={product.image || "/product.png"} alt={product.name} className="w-full h-full object-cover" />
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 font-medium text-ink">{product.name}</td>
+                  <td className="py-4 px-6 text-taupe">{product.category}</td>
+                  <td className="py-4 px-6 text-taupe">${product.price.toFixed(2)}</td>
+                  <td className="py-4 px-6 text-right space-x-4">
+                    <Link to={`/admin/products/edit/${product.id}`} className="text-ink hover:text-ink/70 inline-block">
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

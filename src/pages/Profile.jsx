@@ -57,7 +57,7 @@ const Profile = () => {
         const errData = await response.json();
         setPasswordMsg({ type: 'error', text: errData.message || 'Failed to change password.' });
       }
-    } catch (error) {
+    } catch {
       setPasswordMsg({ type: 'error', text: 'An error occurred.' });
     }
   };
@@ -65,36 +65,36 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 bg-ink text-paper rounded-full flex items-center justify-center font-serif text-2xl">
+    <div className="max-w-4xl mx-auto py-10 sm:py-12 px-4 sm:px-6">
+      <div className="flex items-center gap-4 mb-8 min-w-0">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-ink text-paper rounded-full flex items-center justify-center font-serif text-2xl flex-shrink-0">
           {(user.username || user.email || 'U').charAt(0).toUpperCase()}
         </div>
         <div>
           <h1 className="font-serif text-3xl text-ink">My Profile</h1>
-          <p className="text-taupe">{user.email}</p>
+          <p className="text-taupe break-all">{user.email}</p>
         </div>
       </div>
 
       <div className="bg-paper rounded-sm shadow-sm border border-taupe/10 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
         {/* Sidebar Tabs */}
-        <div className="w-full md:w-64 bg-cream/30 border-r border-taupe/10 flex flex-col">
+        <div className="w-full md:w-64 bg-cream/30 md:border-r border-b md:border-b-0 border-taupe/10 flex md:flex-col overflow-x-auto">
           <button 
             onClick={() => setActiveTab('orders')}
-            className={`flex items-center gap-3 px-6 py-4 text-sm uppercase tracking-wider font-medium transition-colors border-l-4 ${activeTab === 'orders' ? 'border-ink bg-paper text-ink' : 'border-transparent text-taupe hover:bg-paper hover:text-ink'}`}
+            className={`flex items-center gap-3 px-5 sm:px-6 py-4 text-sm uppercase tracking-wider font-medium transition-colors border-l-4 whitespace-nowrap ${activeTab === 'orders' ? 'border-ink bg-paper text-ink' : 'border-transparent text-taupe hover:bg-paper hover:text-ink'}`}
           >
             <Package className="w-4 h-4" /> My Orders
           </button>
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`flex items-center gap-3 px-6 py-4 text-sm uppercase tracking-wider font-medium transition-colors border-l-4 ${activeTab === 'settings' ? 'border-ink bg-paper text-ink' : 'border-transparent text-taupe hover:bg-paper hover:text-ink'}`}
+            className={`flex items-center gap-3 px-5 sm:px-6 py-4 text-sm uppercase tracking-wider font-medium transition-colors border-l-4 whitespace-nowrap ${activeTab === 'settings' ? 'border-ink bg-paper text-ink' : 'border-transparent text-taupe hover:bg-paper hover:text-ink'}`}
           >
             <Settings className="w-4 h-4" /> Settings
           </button>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-5 sm:p-8 min-w-0">
           {activeTab === 'orders' && (
             <div>
               <h2 className="font-serif text-2xl text-ink mb-6">Order History</h2>
@@ -108,7 +108,7 @@ const Profile = () => {
                 <div className="space-y-6">
                   {orders.map(order => (
                     <div key={order.id} className="border border-taupe/20 rounded-sm overflow-hidden">
-                      <div className="bg-cream/50 px-6 py-4 flex justify-between items-center border-b border-taupe/20">
+                      <div className="bg-cream/50 px-4 sm:px-6 py-4 grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-taupe/20">
                         <div>
                           <p className="text-sm text-taupe uppercase tracking-wider mb-1">Order Placed</p>
                           <p className="font-medium text-ink">{new Date(order.orderDate).toLocaleDateString()}</p>

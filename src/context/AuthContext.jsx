@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+/* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
+import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
@@ -11,6 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const logout = useCallback(() => {
+    setToken(null);
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
     if (token) {
@@ -33,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
     setLoading(false);
-  }, [token]);
+  }, [token, logout]);
 
   const login = async (email, password) => {
     try {
@@ -77,11 +83,6 @@ export const AuthProvider = ({ children }) => {
       console.error('Register error:', error);
       return false;
     }
-  };
-
-  const logout = () => {
-    setToken(null);
-    navigate('/login');
   };
 
   return (

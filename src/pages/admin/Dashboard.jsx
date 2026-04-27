@@ -29,32 +29,32 @@ const Dashboard = () => {
   if (!stats) return <div>Error loading stats</div>;
 
   return (
-    <div>
-      <h1 className="font-serif text-3xl text-ink mb-8">Dashboard Overview</h1>
+    <div className="max-w-6xl mx-auto">
+      <h1 className="font-serif text-2xl sm:text-3xl text-ink mb-6 sm:mb-8">Dashboard Overview</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <div className="bg-paper p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4">
-          <div className="p-4 bg-cream/50 rounded-full">
-            <DollarSign className="w-8 h-8 text-ink" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        <div className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0">
+          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
+            <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-widest text-taupe">Total Revenue</p>
-            <p className="font-serif text-3xl text-ink">${stats.totalRevenue?.toFixed(2) || '0.00'}</p>
+            <p className="font-serif text-2xl sm:text-3xl text-ink break-words">${stats.totalRevenue?.toFixed(2) || '0.00'}</p>
           </div>
         </div>
 
-        <div className="bg-paper p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4">
-          <div className="p-4 bg-cream/50 rounded-full">
-            <ShoppingBag className="w-8 h-8 text-ink" />
+        <div className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0">
+          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
+            <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-widest text-taupe">Total Orders</p>
-            <p className="font-serif text-3xl text-ink">{stats.totalOrders || 0}</p>
+            <p className="font-serif text-2xl sm:text-3xl text-ink">{stats.totalOrders || 0}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-paper p-6 rounded-sm shadow-sm border border-taupe/10">
+      <div className="bg-paper p-4 sm:p-6 rounded-sm shadow-sm border border-taupe/10 overflow-hidden">
         <h2 className="font-serif text-xl text-ink mb-6">Sales (Last 7 Days)</h2>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">

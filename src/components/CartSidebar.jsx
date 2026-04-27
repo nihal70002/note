@@ -27,8 +27,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
       
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-paper shadow-2xl z-50 animate-in slide-in-from-right duration-300 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-taupe/20">
-          <h2 className="font-serif text-2xl text-ink">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
+          <h2 className="font-serif text-xl sm:text-2xl text-ink">
             {isCheckoutStep ? 'Shipping Details' : 'Your Cart'}
           </h2>
           <button onClick={() => {
@@ -40,7 +40,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
           {isCheckoutStep ? (
             <div className="space-y-4">
               <div>
@@ -78,14 +78,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
               </div>
             ) : (
               cart.items.map((item) => (
-                <div key={item.id} className="flex gap-4">
-                  <div className="w-24 h-32 bg-cream/50 rounded-sm overflow-hidden flex-shrink-0">
+                <div key={item.id} className="flex gap-3 sm:gap-4">
+                  <div className="w-20 h-28 sm:w-24 sm:h-32 bg-cream/50 rounded-sm overflow-hidden flex-shrink-0">
                     <img src={item.product?.image || "/product.png"} alt={item.product?.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>
                       <div className="flex justify-between items-start">
-                        <h3 className="font-serif text-lg text-ink line-clamp-2">{item.product?.name}</h3>
+                        <h3 className="font-serif text-base sm:text-lg text-ink line-clamp-2">{item.product?.name}</h3>
                         <button 
                           onClick={() => removeFromCart(item.id)}
                           className="text-taupe hover:text-red-500 transition-colors p-1"
@@ -124,7 +124,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         {cart?.items?.length > 0 && (
-          <div className="p-6 border-t border-taupe/20 bg-cream/30">
+          <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
             <div className="flex justify-between items-center mb-6 text-lg font-serif">
               <span>Subtotal</span>
               <span>${totalPrice.toFixed(2)}</span>

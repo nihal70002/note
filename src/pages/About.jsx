@@ -1,13 +1,13 @@
 const About = () => {
   return (
-    <div className="container mx-auto px-6 md:px-12 py-12">
-      <div className="max-w-3xl mx-auto text-center mb-20 space-y-6">
+    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
+      <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-20 space-y-6">
         <span className="text-sm font-bold uppercase tracking-widest text-taupe block">Our Story</span>
-        <h1 className="font-serif text-5xl md:text-6xl text-ink">A Canvas for Your Mind</h1>
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-ink">A Canvas for Your Mind</h1>
         <div className="h-[1px] w-24 bg-taupe/30 mx-auto mt-8"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-center mb-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center mb-16 sm:mb-24">
         <div className="aspect-[4/5] bg-cream/50 overflow-hidden rounded-sm">
           <img src="/hero.png" alt="Craftsmanship" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
         </div>

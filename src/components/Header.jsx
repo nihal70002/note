@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Feather, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { Feather, ShoppingCart, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import CartSidebar from './CartSidebar';
@@ -30,11 +30,11 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass-header py-3' : 'bg-transparent py-5'}`}>
-      <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <Feather className="w-6 h-6 text-ink group-hover:rotate-12 transition-transform duration-300" />
-          <span className="font-serif font-semibold text-xl tracking-wider">PAPERCUES</span>
+          <span className="font-serif font-semibold text-lg sm:text-xl tracking-wider">PAPERCUES</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -51,7 +51,7 @@ const Header = () => {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
               <Link to="/profile" className="text-sm font-medium text-ink hover:text-taupe transition-colors">Hi, {user.username}</Link>
@@ -88,7 +88,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-paper border-b border-taupe/10 glass-header p-6 flex flex-col gap-4 shadow-lg animate-in fade-in slide-in-from-top-4">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-paper border-b border-taupe/10 glass-header p-5 flex flex-col gap-4 shadow-lg animate-in fade-in slide-in-from-top-4">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -99,6 +99,27 @@ const Header = () => {
               {link.name}
             </Link>
           ))}
+          <div className="pt-2 border-t border-taupe/10 flex flex-col gap-3">
+            {user ? (
+              <>
+                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-ink">
+                  Hi, {user.username}
+                </Link>
+                {user.role === 'Admin' && (
+                  <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-taupe">
+                    Admin
+                  </Link>
+                )}
+                <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left text-sm uppercase tracking-widest text-red-500">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-ink">
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       )}
       {/* Cart Sidebar */}

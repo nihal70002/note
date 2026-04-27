@@ -4,7 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-paper text-ink font-sans antialiased selection:bg-taupe selection:text-white;
+    @apply bg-paper text-ink font-sans antialiased selection:bg-taupe selection:text-white overflow-x-hidden;
+  }
+
+  img, video, canvas, svg {
+    @apply max-w-full;
   }
   
   h1, h2, h3, h4, h5, h6 {

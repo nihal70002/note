@@ -6,10 +6,16 @@ const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const [filterStatus, setFilterStatus] = useState("All");
 
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  const filteredOrders =
+  filterStatus === "All"
+    ? orders
+    : orders.filter(order => order.status === filterStatus);
 
   const fetchOrders = async () => {
     try {
@@ -18,7 +24,23 @@ const OrdersList = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setOrders(data);
+        const statusPriority = {
+  Pending: 1,
+  Processing: 2,
+  Shipped: 3,
+  Delivered: 4
+};
+
+const sortedOrders = data.sort((a, b) => {
+  if (statusPriority[a.status] !== statusPriority[b.status]) {
+    return statusPriority[a.status] - statusPriority[b.status];
+  }
+
+  // If same status → newest first
+  return new Date(b.orderDate) - new Date(a.orderDate);
+});
+
+setOrders(sortedOrders);
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
@@ -94,9 +116,27 @@ const OrdersList = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="font-serif text-3xl text-ink">Manage Orders</h1>
+      <div className="flex justify-between items-center mb-6 sm:mb-8">
+        <h1 className="font-serif text-2xl sm:text-3xl text-ink">Manage Orders</h1>
       </div>
+
+
+
+      <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2">
+  {["All", "Pending", "Processing", "Shipped", "Delivered"].map(status => (
+    <button
+      key={status}
+      onClick={() => setFilterStatus(status)}
+      className={`px-3 py-1 rounded text-sm ${
+        filterStatus === status
+          ? "bg-ink text-white"
+          : "bg-gray-200"
+      }`}
+    >
+      {status}
+    </button>
+  ))}
+</div>
 
       <div className="bg-paper rounded-sm shadow-sm border border-taupe/10 overflow-hidden">
         {orders.length === 0 ? (
@@ -106,7 +146,7 @@ const OrdersList = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[820px] text-left border-collapse">
               <thead>
                 <tr className="bg-cream/50 border-b border-taupe/20 text-xs uppercase tracking-widest text-taupe">
                   <th className="p-4 font-medium">Order ID</th>
@@ -118,7 +158,7 @@ const OrdersList = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-taupe/10">
-                {orders.map(order => (
+                {filteredOrders.map(order => (
                   <tr key={order.id} className="hover:bg-cream/20 transition-colors">
                     <td className="p-4 text-sm font-medium text-ink">#{order.id}</td>
                     <td className="p-4 text-sm text-ink">{new Date(order.orderDate).toLocaleDateString()}</td>

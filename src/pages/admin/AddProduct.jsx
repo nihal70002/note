@@ -73,16 +73,16 @@ const AddProduct = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="font-serif text-3xl text-ink mb-8">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
+      <h1 className="font-serif text-2xl sm:text-3xl text-ink mb-6 sm:mb-8">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
 
-      <div className="bg-paper p-8 rounded-sm shadow-sm border border-taupe/10">
+      <div className="bg-paper p-5 sm:p-8 rounded-sm shadow-sm border border-taupe/10">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Name</label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Price ($)</label>
               <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
@@ -132,7 +132,7 @@ const AddProduct = () => {
             <label htmlFor="isNew" className="text-sm font-medium text-ink uppercase tracking-wider">Mark as New Arrival</label>
           </div>
 
-          <div className="pt-4 flex gap-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4">
             <button type="submit" className="btn-primary flex-1 py-3 text-sm tracking-widest">
               {isEdit ? 'Update Product' : 'Create Product'}
             </button>

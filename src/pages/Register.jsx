@@ -22,9 +22,9 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream/30 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cream/30 flex flex-col justify-center px-4 py-10 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-serif text-ink">Create an account</h2>
+        <h2 className="mt-6 text-center text-3xl sm:text-4xl font-serif text-ink">Create an account</h2>
         <p className="mt-2 text-center text-sm text-taupe">
           Or{' '}
           <Link to="/login" className="font-medium text-ink hover:text-ink/70 uppercase tracking-widest border-b border-ink/30 pb-0.5">
@@ -34,7 +34,7 @@ const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-paper py-8 px-4 shadow sm:rounded-sm sm:px-10">
+        <div className="bg-paper py-8 px-5 shadow rounded-sm sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             
