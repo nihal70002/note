@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Package } from 'lucide-react';
 
@@ -6,7 +7,20 @@ const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
-  const [filterStatus, setFilterStatus] = useState("All");
+  const [searchParams] = useSearchParams();
+  const [filterStatus, setFilterStatus] = useState(searchParams.get('status') || "All");
+
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
+  const getAddress = (order) => {
+    const parts = [
+      order.addressLine1,
+      order.addressLine2,
+      order.city,
+      order.state,
+      order.pincode
+    ].filter(Boolean);
+    return parts.length > 0 ? parts.join(', ') : order.deliveryAddress;
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -75,31 +89,186 @@ setOrders(sortedOrders);
         <head>
           <title>Shipping Label - Order #${order.id}</title>
           <style>
-            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; margin: 0; color: #1a1a1a; }
-            .label { border: 2px solid #1a1a1a; padding: 40px; width: 450px; max-width: 100%; border-radius: 12px; margin: 0 auto; box-sizing: border-box; }
-            h2 { margin-top: 0; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; text-align: center; font-size: 24px; }
-            .detail { margin-bottom: 16px; font-size: 16px; line-height: 1.5; }
-            .strong { font-weight: 700; display: inline-block; width: 100px; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
-            .value { display: inline-block; vertical-align: top; max-width: 250px; }
-            .footer { margin-top: 30px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+            * { box-sizing: border-box; }
+            body {
+              margin: 0;
+              padding: 24px;
+              color: #111;
+              background: #fff;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+            .label {
+              width: 4in;
+              min-height: 5.7in;
+              margin: 0 auto;
+              padding: 18px;
+              border: 2px solid #111;
+              border-radius: 10px;
+            }
+            .topbar {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              gap: 12px;
+              padding-bottom: 12px;
+              border-bottom: 2px solid #111;
+            }
+            .brand {
+              font-size: 17px;
+              font-weight: 800;
+              letter-spacing: 1.5px;
+              text-transform: uppercase;
+            }
+            .tag {
+              margin-top: 4px;
+              font-size: 8px;
+              letter-spacing: 1.2px;
+              text-transform: uppercase;
+              color: #666;
+            }
+            .order-chip {
+              border: 1px solid #111;
+              border-radius: 999px;
+              padding: 6px 10px;
+              font-size: 10px;
+              font-weight: 700;
+              white-space: nowrap;
+            }
+            .meta {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px;
+              margin: 14px 0;
+            }
+            .meta-card,
+            .ship-card {
+              border: 1px solid #cfcfcf;
+              border-radius: 8px;
+              padding: 10px;
+            }
+            .label-text {
+              display: block;
+              margin-bottom: 4px;
+              font-size: 8px;
+              font-weight: 800;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+              color: #555;
+            }
+            .meta-value {
+              font-size: 12px;
+              font-weight: 700;
+            }
+            .ship-card {
+              border: 2px solid #111;
+              background: #fafafa;
+            }
+            .name {
+              margin: 0 0 8px;
+              font-size: 20px;
+              line-height: 1.15;
+              font-weight: 800;
+              text-transform: uppercase;
+            }
+            .address {
+              margin: 0;
+              font-size: 14px;
+              line-height: 1.45;
+              font-weight: 600;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px;
+              margin-top: 10px;
+            }
+            .pincode {
+              border: 2px solid #111;
+              border-radius: 8px;
+              padding: 10px;
+              text-align: center;
+            }
+            .pincode strong {
+              display: block;
+              font-size: 20px;
+              letter-spacing: 1px;
+            }
+            .barcode {
+              margin-top: 14px;
+              height: 52px;
+              border: 1px solid #111;
+              border-radius: 6px;
+              background: repeating-linear-gradient(
+                90deg,
+                #111 0 2px,
+                #fff 2px 5px,
+                #111 5px 6px,
+                #fff 6px 10px
+              );
+            }
+            .footer {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 10px;
+              margin-top: 12px;
+              padding-top: 10px;
+              border-top: 1px dashed #999;
+              font-size: 9px;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+              color: #555;
+            }
             @media print {
+              @page { size: 4in 6in; margin: 0.12in; }
               body { padding: 0; }
-              .label { border: none; padding: 20px; width: 100%; max-width: 4in; height: 6in; margin: 0; }
+              .label { width: 100%; min-height: auto; margin: 0; }
             }
           </style>
         </head>
         <body>
           <div class="label">
-            <h2>Shipping Label</h2>
-            <div class="detail"><span class="strong">Order #:</span> <span class="value">${order.id}</span></div>
-            <div class="detail"><span class="strong">Date:</span> <span class="value">${new Date(order.orderDate).toLocaleDateString()}</span></div>
-            <hr style="margin: 24px 0; border: 0; border-top: 1px solid #ccc;" />
-            <div class="detail"><span class="strong">Ship To:</span> <span class="value" style="font-weight: 600; font-size: 18px;">${order.fullName || 'N/A'}</span></div>
-            <div class="detail"><span class="strong">Phone:</span> <span class="value">${order.phoneNumber || 'N/A'}</span></div>
-            <div class="detail"><span class="strong">Address:</span> <span class="value">${order.deliveryAddress || 'N/A'}</span></div>
-            <div class="detail"><span class="strong">Landmark:</span> <span class="value">${order.landmark || 'N/A'}</span></div>
-            <div class="detail"><span class="strong">Pincode:</span> <span class="value" style="font-size: 18px; font-weight: 600; letter-spacing: 1px;">${order.pincode || 'N/A'}</span></div>
-            <div class="footer">Aesthetic Store Delivery</div>
+            <div class="topbar">
+              <div>
+                <div class="brand">PAPERCUES</div>
+                <div class="tag">Premium stationery delivery</div>
+              </div>
+              <div class="order-chip">Order #${order.id}</div>
+            </div>
+
+            <div class="meta">
+              <div class="meta-card">
+                <span class="label-text">Order Date</span>
+                <div class="meta-value">${new Date(order.orderDate).toLocaleDateString()}</div>
+              </div>
+              <div class="meta-card">
+                <span class="label-text">Service</span>
+                <div class="meta-value">Standard</div>
+              </div>
+            </div>
+
+            <div class="ship-card">
+              <span class="label-text">Ship To</span>
+              <h2 class="name">${order.fullName || 'N/A'}</h2>
+              <p class="address">${getAddress(order) || 'N/A'}</p>
+              ${order.landmark ? `<p class="address">Landmark: ${order.landmark}</p>` : ''}
+              <div class="grid">
+                <div>
+                  <span class="label-text">Phone</span>
+                  <div class="meta-value">${order.phoneNumber || 'N/A'}</div>
+                </div>
+                <div class="pincode">
+                  <span class="label-text">Pincode</span>
+                  <strong>${order.pincode || 'N/A'}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="barcode"></div>
+            <div class="footer">
+              <span>Handle with care</span>
+              <span>Papercues Dispatch</span>
+            </div>
           </div>
           <script>
             window.onload = function() { window.print(); window.close(); }
@@ -166,14 +335,14 @@ setOrders(sortedOrders);
                       {order.fullName ? (
                         <>
                           <div className="font-medium text-ink">{order.fullName}</div>
-                          <div className="text-xs truncate">{order.deliveryAddress}</div>
-                          <div className="text-xs">{order.pincode} • {order.phoneNumber}</div>
+                          <div className="text-xs truncate">{getAddress(order)}</div>
+                          <div className="text-xs">{order.phoneNumber}{order.alternatePhoneNumber ? ` / ${order.alternatePhoneNumber}` : ''}</div>
                         </>
                       ) : (
                         <span className="italic text-taupe/50">No details</span>
                       )}
                     </td>
-                    <td className="p-4 text-sm text-ink">${order.totalAmount.toFixed(2)}</td>
+                    <td className="p-4 text-sm text-ink">{formatINR(order.totalAmount)}</td>
                     <td className="p-4">
                       <span className={`inline-block px-3 py-1 text-[10px] font-medium uppercase tracking-wider rounded-full ${
                         order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :

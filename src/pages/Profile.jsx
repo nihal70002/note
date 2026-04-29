@@ -12,6 +12,7 @@ const Profile = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordMsg, setPasswordMsg] = useState({ type: '', text: '' });
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
     if (activeTab === 'orders') {
@@ -59,6 +60,21 @@ const Profile = () => {
       }
     } catch {
       setPasswordMsg({ type: 'error', text: 'An error occurred.' });
+    }
+  };
+
+  const cancelOrder = async (orderId) => {
+    try {
+      const response = await fetch(`http://localhost:5009/api/orders/${orderId}/cancel`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        fetchOrders();
+      }
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
     }
   };
 
@@ -115,7 +131,7 @@ const Profile = () => {
                         </div>
                         <div>
                           <p className="text-sm text-taupe uppercase tracking-wider mb-1">Total</p>
-                          <p className="font-medium text-ink">${order.totalAmount.toFixed(2)}</p>
+                          <p className="font-medium text-ink">{formatINR(order.totalAmount)}</p>
                         </div>
                         <div>
                           <p className="text-sm text-taupe uppercase tracking-wider mb-1">Status</p>
@@ -128,6 +144,14 @@ const Profile = () => {
                             {order.status}
                           </span>
                         </div>
+                        {order.status === 'Pending' && (
+                          <button
+                            onClick={() => cancelOrder(order.id)}
+                            className="text-xs uppercase tracking-widest text-red-600 border border-red-200 px-3 py-2 hover:bg-red-50"
+                          >
+                            Cancel
+                          </button>
+                        )}
                       </div>
                       <div className="p-6">
                         <ul className="space-y-4">
@@ -138,7 +162,7 @@ const Profile = () => {
                               </div>
                               <div className="flex-1">
                                 <h4 className="font-medium text-ink">{item.product?.name}</h4>
-                                <p className="text-sm text-taupe">Qty: {item.quantity} × ${item.price.toFixed(2)}</p>
+                                <p className="text-sm text-taupe">Qty: {item.quantity} × {formatINR(item.price)}</p>
                               </div>
                             </li>
                           ))}

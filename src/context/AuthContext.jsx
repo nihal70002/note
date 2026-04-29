@@ -41,7 +41,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, [token, logout]);
 
-  const login = async (email, password) => {
+  const login = async (email, password, options = {}) => {
+    const { redirect = true } = options;
+
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
@@ -57,10 +59,12 @@ export const AuthProvider = ({ children }) => {
         const payload = JSON.parse(atob(data.token.split('.')[1]));
         const role = payload.Role || payload.role || "User";
         
-        if (role === 'Admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
+        if (redirect) {
+          if (role === 'Admin') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
         }
         return true;
       }

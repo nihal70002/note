@@ -16,10 +16,13 @@ const AddProduct = () => {
     image3: '',
     image4: '',
     image5: '',
+    videoUrl: '',
     category: 'Journals',
+    stock: 25,
     isNew: false,
     description: ''
   });
+  const [uploadingField, setUploadingField] = useState('');
 
   useEffect(() => {
     if (isEdit) {
@@ -43,6 +46,40 @@ const AddProduct = () => {
     }));
   };
 
+  const handleFileUpload = async (fieldName, file) => {
+    if (!file) return;
+
+    setUploadingField(fieldName);
+    try {
+      const payload = new FormData();
+      payload.append('file', file);
+      payload.append('folder', 'note/products');
+
+      const response = await fetch('http://localhost:5009/api/uploads/cloudinary', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: payload
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: data.url
+      }));
+    } catch (error) {
+      console.error(error);
+      alert('Upload failed. Please verify Cloudinary config and try again.');
+    } finally {
+      setUploadingField('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = isEdit ? `http://localhost:5009/api/products/${id}` : 'http://localhost:5009/api/products';
@@ -58,6 +95,8 @@ const AddProduct = () => {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price)
+          ,
+          stock: parseInt(formData.stock, 10)
         })
       });
 
@@ -84,7 +123,7 @@ const AddProduct = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Price ($)</label>
+              <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Price (INR)</label>
               <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
             </div>
             <div>
@@ -97,28 +136,48 @@ const AddProduct = () => {
                 <option value="Premium">Premium</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Stock</label>
+              <input type="number" min="0" name="stock" value={formData.stock} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Main Image</label>
               <input type="text" name="image" value={formData.image} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'image' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 2 (Optional)</label>
               <input type="text" name="image2" value={formData.image2 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image2', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'image2' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 3 (Optional)</label>
               <input type="text" name="image3" value={formData.image3 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image3', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'image3' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 4 (Optional)</label>
               <input type="text" name="image4" value={formData.image4 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image4', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'image4' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 5 (Optional)</label>
               <input type="text" name="image5" value={formData.image5 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image5', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'image5' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Product Video (Optional)</label>
+              <input type="text" name="videoUrl" value={formData.videoUrl || ''} onChange={handleChange} placeholder="Cloudinary video URL" className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              <input type="file" accept="video/*" onChange={(e) => handleFileUpload('videoUrl', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
+              {uploadingField === 'videoUrl' && <p className="mt-1 text-xs text-taupe">Uploading video...</p>}
             </div>
           </div>
 

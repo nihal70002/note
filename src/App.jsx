@@ -14,6 +14,8 @@ import Dashboard from './pages/admin/Dashboard';
 import ProductsList from './pages/admin/ProductsList';
 import AddProduct from './pages/admin/AddProduct';
 import OrdersList from './pages/admin/OrdersList';
+import UsersList from './pages/admin/UsersList';
+import Expenses from './pages/admin/Expenses';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -43,6 +45,8 @@ function App() {
         }>
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<OrdersList />} />
+          <Route path="users" element={<UsersList />} />
+          <Route path="expenses" element={<Expenses />} />
           <Route path="products" element={<ProductsList />} />
           <Route path="products/add" element={<AddProduct />} />
           <Route path="products/edit/:id" element={<AddProduct />} />

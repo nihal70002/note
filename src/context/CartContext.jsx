@@ -11,6 +11,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [cartId, setCartId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cartMessage, setCartMessage] = useState('');
   const { token } = useAuth();
 
   // Initialize cart
@@ -30,6 +31,10 @@ export const CartProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         setCart(data);
+        setCartMessage('');
+      } else {
+        const error = await response.json().catch(() => ({}));
+        setCartMessage(error.message || error.Message || 'Could not add item to cart.');
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -50,6 +55,10 @@ export const CartProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         setCart(data);
+        setCartMessage('');
+      } else {
+        const error = await response.json().catch(() => ({}));
+        setCartMessage(error.message || error.Message || 'Could not update quantity.');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -90,8 +99,7 @@ export const CartProvider = ({ children }) => {
 
   const checkout = async (shippingDetails) => {
     if (!token) {
-      alert("Please login to checkout");
-      return false;
+      return { success: false, message: 'Please login to checkout.' };
     }
     
     try {
@@ -109,12 +117,13 @@ export const CartProvider = ({ children }) => {
         const newId = crypto.randomUUID();
         localStorage.setItem('cartId', newId);
         setCartId(newId);
-        return true;
+        return { success: true };
       }
-      return false;
+      const error = await response.json().catch(() => ({}));
+      return { success: false, message: error.message || error.Message || 'Checkout failed.' };
     } catch (error) {
       console.error('Checkout error:', error);
-      return false;
+      return { success: false, message: 'Checkout failed. Please try again.' };
     }
   };
 
@@ -122,7 +131,7 @@ export const CartProvider = ({ children }) => {
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
 
   return (
-    <CartContext.Provider value={{ cart, loading, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice }}>
+    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice }}>
       {children}
     </CartContext.Provider>
   );

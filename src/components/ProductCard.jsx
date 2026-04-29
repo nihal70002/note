@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ id, name, price, image, isNew = false }) => {
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
   return (
     <Link to={`/shop/${id}`} className="group flex flex-col cursor-pointer">
       <div className="relative aspect-[4/5] overflow-hidden bg-cream/50 mb-4 rounded-sm">
@@ -17,7 +18,9 @@ const ProductCard = ({ id, name, price, image, isNew = false }) => {
         />
       </div>
       <h3 className="font-serif text-lg text-ink tracking-wide mb-1 group-hover:text-taupe transition-colors">{name}</h3>
-      <p className="text-sm text-ink/70">${price.toFixed(2)}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-ink/70">{formatINR(price)}</p>
+      </div>
     </Link>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, Minus, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -9,7 +10,13 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [wishlist, setWishlist] = useState(false);
+  const [message, setMessage] = useState('');
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const { addToCart } = useCart();
+  const { user, token } = useAuth();
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
     fetch(`http://localhost:5009/api/products/${id}`)
@@ -27,9 +34,73 @@ const ProductDetails = () => {
       });
   }, [id]);
 
+  useEffect(() => {
+    fetch(`http://localhost:5009/api/products/${id}/reviews`)
+      .then(res => res.json())
+      .then(setReviews)
+      .catch(err => console.error(err));
+  }, [id]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    fetch(`http://localhost:5009/api/wishlist/${id}/exists`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : { exists: false })
+      .then(data => setWishlist(data.exists || data.Exists))
+      .catch(err => console.error(err));
+  }, [id, token]);
+
   const handleAddToCart = () => {
     if (product) {
+      if (product.stock <= 0) {
+        setMessage('This product is out of stock.');
+        return;
+      }
       addToCart(product.id, quantity);
+      setMessage('Added to cart.');
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if (!token) {
+      setMessage('Please sign in to save this product.');
+      return;
+    }
+
+    const response = await fetch(`http://localhost:5009/api/wishlist/${product.id}`, {
+      method: wishlist ? 'DELETE' : 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+      setWishlist(!wishlist);
+      setMessage(wishlist ? 'Removed from wishlist.' : 'Saved to wishlist.');
+    }
+  };
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      setMessage('Please sign in to write a review.');
+      return;
+    }
+
+    const response = await fetch(`http://localhost:5009/api/products/${product.id}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(reviewForm)
+    });
+
+    if (response.ok) {
+      setReviewForm({ rating: 5, comment: '' });
+      setMessage('Review saved.');
+      const nextReviews = await fetch(`http://localhost:5009/api/products/${id}/reviews`).then(res => res.json());
+      setReviews(nextReviews);
     }
   };
 
@@ -65,6 +136,11 @@ const ProductDetails = () => {
               ))}
             </div>
           )}
+          {product.videoUrl && (
+            <div className="rounded-sm overflow-hidden border border-taupe/20 bg-black">
+              <video src={product.videoUrl} controls className="w-full h-auto" />
+            </div>
+          )}
         </div>
 
         {/* Details */}
@@ -72,11 +148,18 @@ const ProductDetails = () => {
           <div className="mb-8">
              <div className="flex justify-between items-start gap-4 mb-2">
                <h1 className="font-serif text-3xl sm:text-4xl text-ink">{product.name}</h1>
-               <button className="p-2 text-ink/70 hover:text-ink transition-colors">
-                 <Heart className="w-6 h-6" />
+               <button onClick={toggleWishlist} className={`p-2 transition-colors ${wishlist ? 'text-red-500' : 'text-ink/70 hover:text-ink'}`}>
+                 <Heart className="w-6 h-6" fill={wishlist ? 'currentColor' : 'none'} />
                </button>
              </div>
-             <p className="text-xl text-taupe mb-6">${product.price.toFixed(2)}</p>
+             <p className="text-xl text-taupe mb-6">{formatINR(product.price)}</p>
+             <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-taupe">
+               <span>{product.averageRating > 0 ? `${product.averageRating.toFixed(1)} / 5` : 'No ratings yet'}</span>
+               <span>{product.reviewCount || 0} reviews</span>
+               <span className={product.stock > 0 ? 'text-green-700' : 'text-red-600'}>
+                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+               </span>
+             </div>
              <p className="text-ink/80 leading-relaxed mb-8">
                {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
@@ -88,16 +171,18 @@ const ProductDetails = () => {
                    <Minus className="w-4 h-4" />
                  </button>
                  <span className="w-4 text-center">{quantity}</span>
-                 <button onClick={() => setQuantity(quantity + 1)} className="text-ink hover:text-taupe">
+                 <button onClick={() => setQuantity(Math.min(product.stock || 1, quantity + 1))} className="text-ink hover:text-taupe">
                    <Plus className="w-4 h-4" />
                  </button>
                </div>
              </div>
 
-             <button onClick={handleAddToCart} className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4">
+             {message && <div className="mb-4 text-sm text-center text-taupe">{message}</div>}
+
+             <button onClick={handleAddToCart} disabled={product.stock <= 0} className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4 disabled:opacity-60 disabled:cursor-not-allowed">
                Add to Cart
              </button>
-             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over $50</p>
+             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹50</p>
           </div>
           
           <div className="space-y-6 mt-8 sm:mt-12 bg-cream/30 p-5 sm:p-8 rounded-sm">
@@ -110,6 +195,43 @@ const ProductDetails = () => {
                  <li>• Lay-flat binding</li>
                  <li>• 2 Ribbon Markers</li>
                </ul>
+             </div>
+          </div>
+
+          <div className="space-y-6 mt-8 bg-paper border border-taupe/10 p-5 sm:p-8 rounded-sm">
+             <h4 className="font-serif text-lg text-ink">Customer Reviews</h4>
+             {user && (
+               <form onSubmit={submitReview} className="space-y-4">
+                 <select
+                   value={reviewForm.rating}
+                   onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}
+                   className="w-full px-4 py-2 border border-taupe/30 rounded-sm bg-transparent"
+                 >
+                   {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} stars</option>)}
+                 </select>
+                 <textarea
+                   value={reviewForm.comment}
+                   onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                   required
+                   rows="3"
+                   className="w-full px-4 py-2 border border-taupe/30 rounded-sm bg-transparent"
+                   placeholder="Write your review"
+                 />
+                 <button type="submit" className="btn-secondary w-full py-3 text-sm uppercase tracking-widest">Save Review</button>
+               </form>
+             )}
+             <div className="space-y-4">
+               {reviews.length === 0 ? (
+                 <p className="text-sm text-taupe">No reviews yet.</p>
+               ) : reviews.map((review) => (
+                 <div key={review.id} className="border-t border-taupe/10 pt-4">
+                   <div className="flex justify-between text-sm mb-2">
+                     <span className="font-medium text-ink">{review.username}</span>
+                     <span className="text-taupe">{review.rating} / 5</span>
+                   </div>
+                   <p className="text-sm text-ink/70">{review.comment}</p>
+                 </div>
+               ))}
              </div>
           </div>
         </div>

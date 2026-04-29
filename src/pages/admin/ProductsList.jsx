@@ -7,6 +7,7 @@ const ProductsList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   const fetchProducts = () => {
     fetch('http://localhost:5009/api/products')
@@ -62,6 +63,7 @@ const ProductsList = () => {
                 <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Image</th>
                 <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Name</th>
                 <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Category</th>
+                <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Stock</th>
                 <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink">Price</th>
                 <th className="py-4 px-6 font-medium text-sm uppercase tracking-wider text-ink text-right">Actions</th>
               </tr>
@@ -76,7 +78,8 @@ const ProductsList = () => {
                   </td>
                   <td className="py-4 px-6 font-medium text-ink">{product.name}</td>
                   <td className="py-4 px-6 text-taupe">{product.category}</td>
-                  <td className="py-4 px-6 text-taupe">${product.price.toFixed(2)}</td>
+                  <td className={`py-4 px-6 ${product.stock <= 5 ? 'text-red-600 font-medium' : 'text-taupe'}`}>{product.stock}</td>
+                  <td className="py-4 px-6 text-taupe">{formatINR(product.price)}</td>
                   <td className="py-4 px-6 text-right space-x-4">
                     <Link to={`/admin/products/edit/${product.id}`} className="text-ink hover:text-ink/70 inline-block">
                       <Edit className="w-4 h-4" />

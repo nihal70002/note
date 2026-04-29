@@ -8,9 +8,17 @@ const Shop = () => {
   const [products, setProducts] = useState([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All');
+  const [sort, setSort] = useState('newest');
 
   useEffect(() => {
-    fetch('http://localhost:5009/api/products')
+    const params = new URLSearchParams();
+    if (search.trim()) params.set('search', search.trim());
+    if (category !== 'All') params.set('category', category);
+    if (sort) params.set('sort', sort);
+
+    fetch(`http://localhost:5009/api/products?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
@@ -20,7 +28,7 @@ const Shop = () => {
         console.error('Failed to fetch products', err);
         setLoading(false);
       });
-  }, []);
+  }, [search, category, sort]);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
@@ -30,24 +38,43 @@ const Shop = () => {
           <p className="text-ink/70 max-w-lg">Discover our full range of minimalist notebooks, productivity planners, and premium journaling accessories.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            className="w-full sm:w-56 border-b border-taupe/30 bg-transparent py-2 text-sm focus:outline-none focus:border-ink"
+          />
           <button 
             onClick={() => setFilterOpen(!filterOpen)}
             className="flex items-center gap-2 text-sm uppercase tracking-widest hover:text-taupe transition-colors"
           >
             <Filter className="w-4 h-4" /> Filter
           </button>
-          <div className="flex items-center gap-2 text-sm uppercase tracking-widest hover:text-taupe transition-colors cursor-pointer">
+          <label className="flex items-center gap-2 text-sm uppercase tracking-widest hover:text-taupe transition-colors">
             Sort <ChevronDown className="w-4 h-4" />
-          </div>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="bg-transparent focus:outline-none">
+              <option value="newest">Newest</option>
+              <option value="name">Name</option>
+              <option value="price-asc">Price Low</option>
+              <option value="price-desc">Price High</option>
+              <option value="rating">Rating</option>
+            </select>
+          </label>
         </div>
       </div>
 
       {filterOpen && (
         <div className="mb-10 sm:mb-12 flex flex-wrap gap-3 sm:gap-4 animate-in slide-in-from-top-4 duration-300">
-          <button className="btn-secondary text-sm border-taupe text-taupe hover:bg-taupe hover:text-paper">All</button>
-          <button className="btn-secondary text-sm border-taupe/40 hover:border-taupe">Journals</button>
-          <button className="btn-secondary text-sm border-taupe/40 hover:border-taupe">Planners</button>
-          <button className="btn-secondary text-sm border-taupe/40 hover:border-taupe">Premium</button>
+          {['All', 'Journals', 'Planners', 'Premium', 'Pocket', 'Creative'].map((item) => (
+            <button
+              key={item}
+              onClick={() => setCategory(item)}
+              className={`btn-secondary text-sm ${category === item ? 'border-taupe bg-taupe text-paper' : 'border-taupe/40 hover:border-taupe'}`}
+            >
+              {item}
+            </button>
+          ))}
         </div>
       )}
 

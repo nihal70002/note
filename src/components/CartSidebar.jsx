@@ -1,22 +1,84 @@
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { createPortal } from 'react-dom';
 
 import { useState } from 'react';
 
 const CartSidebar = ({ isOpen, onClose }) => {
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice } = useCart();
+  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, cartMessage, setCartMessage } = useCart();
+  const { user, login, register } = useAuth();
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
+  const [isAuthStep, setIsAuthStep] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authDetails, setAuthDetails] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [couponCode, setCouponCode] = useState('');
+  const [checkoutMessage, setCheckoutMessage] = useState({ type: '', text: '' });
   const [shippingDetails, setShippingDetails] = useState({
     fullName: '',
     phoneNumber: '',
-    deliveryAddress: '',
+    alternatePhoneNumber: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
     landmark: '',
-    pincode: ''
+    pincode: '',
+    deliveryAddress: ''
   });
+  const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   if (!isOpen) return null;
+
+  const resetCheckout = () => {
+    setIsCheckoutStep(false);
+    setIsAuthStep(false);
+    setAuthMode('login');
+    setAuthError('');
+    setAuthLoading(false);
+    setCouponCode('');
+    setCheckoutMessage({ type: '', text: '' });
+  };
+
+  const handleInlineAuth = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    const success = authMode === 'login'
+      ? await login(authDetails.email, authDetails.password, { redirect: false })
+      : await register(authDetails.username, authDetails.email, authDetails.password);
+
+    if (success && authMode === 'register') {
+      const loginSuccess = await login(authDetails.email, authDetails.password, { redirect: false });
+      if (!loginSuccess) {
+        setAuthError('Account created. Please sign in to continue checkout.');
+        setAuthMode('login');
+        setAuthLoading(false);
+        return;
+      }
+    }
+
+    setAuthLoading(false);
+
+    if (!success) {
+      setAuthError(authMode === 'login' ? 'Invalid email or password.' : 'Registration failed. Email might be in use.');
+      return;
+    }
+
+    setIsAuthStep(false);
+    setIsCheckoutStep(true);
+  };
+
+  const title = isAuthStep
+    ? authMode === 'login' ? 'Sign In' : 'Create Account'
+    : isCheckoutStep ? 'Shipping Details' : 'Your Cart';
 
   return createPortal(
     <>
@@ -29,11 +91,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
           <h2 className="font-serif text-xl sm:text-2xl text-ink">
-            {isCheckoutStep ? 'Shipping Details' : 'Your Cart'}
+            {title}
           </h2>
           <button onClick={() => {
             onClose();
-            setTimeout(() => setIsCheckoutStep(false), 300); // reset after slide animation
+            setTimeout(resetCheckout, 300); // reset after slide animation
           }} className="p-2 text-ink/60 hover:text-ink transition-colors">
             <X className="w-6 h-6" />
           </button>
@@ -41,7 +103,101 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
-          {isCheckoutStep ? (
+          {(cartMessage || checkoutMessage.text) && (
+            <div className={`text-sm p-3 rounded-sm border ${
+              checkoutMessage.type === 'success'
+                ? 'bg-green-50 text-green-800 border-green-100'
+                : 'bg-red-50 text-red-700 border-red-100'
+            }`}>
+              {checkoutMessage.text || cartMessage}
+            </div>
+          )}
+
+          {isAuthStep ? (
+            <div className="space-y-6">
+              <div className="bg-cream/30 border border-taupe/10 p-4 rounded-sm">
+                <p className="text-sm text-ink/80 leading-relaxed">
+                  Sign in or create an account here to finish checkout without leaving your cart.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 rounded-sm border border-taupe/20 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('login'); setAuthError(''); }}
+                  className={`py-3 text-xs uppercase tracking-widest ${authMode === 'login' ? 'bg-ink text-paper' : 'text-taupe hover:bg-cream/40'}`}
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('register'); setAuthError(''); }}
+                  className={`py-3 text-xs uppercase tracking-widest ${authMode === 'register' ? 'bg-ink text-paper' : 'text-taupe hover:bg-cream/40'}`}
+                >
+                  Register
+                </button>
+              </div>
+
+              <form onSubmit={handleInlineAuth} className="space-y-4">
+                {authError && (
+                  <div className="text-sm text-red-600 bg-red-50 border border-red-100 p-3 rounded-sm">
+                    {authError}
+                  </div>
+                )}
+
+                {authMode === 'register' && (
+                  <div>
+                    <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Username</label>
+                    <input
+                      type="text"
+                      required
+                      value={authDetails.username}
+                      onChange={(e) => setAuthDetails({ ...authDetails, username: e.target.value })}
+                      className="w-full px-4 py-3 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={authDetails.email}
+                    onChange={(e) => setAuthDetails({ ...authDetails, email: e.target.value })}
+                    className="w-full px-4 py-3 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={authDetails.password}
+                    onChange={(e) => setAuthDetails({ ...authDetails, password: e.target.value })}
+                    className="w-full px-4 py-3 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="btn-primary w-full py-4 uppercase tracking-widest text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {authLoading ? 'Please wait...' : authMode === 'login' ? 'Sign In & Continue' : 'Create Account & Continue'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setIsAuthStep(false); setAuthError(''); }}
+                  className="w-full py-2 text-sm text-taupe hover:text-ink underline uppercase tracking-widest"
+                >
+                  Back to Cart
+                </button>
+              </form>
+            </div>
+          ) : isCheckoutStep ? (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Full Name</label>
@@ -52,16 +208,42 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <input type="text" value={shippingDetails.phoneNumber} onChange={(e) => setShippingDetails({...shippingDetails, phoneNumber: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Full Delivery Address</label>
-                <textarea value={shippingDetails.deliveryAddress} onChange={(e) => setShippingDetails({...shippingDetails, deliveryAddress: e.target.value})} rows="3" className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Alternative Phone</label>
+                <input type="text" value={shippingDetails.alternatePhoneNumber} onChange={(e) => setShippingDetails({...shippingDetails, alternatePhoneNumber: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Landmark</label>
-                <input type="text" value={shippingDetails.landmark} onChange={(e) => setShippingDetails({...shippingDetails, landmark: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Address Line 1</label>
+                <input type="text" value={shippingDetails.addressLine1} onChange={(e) => setShippingDetails({...shippingDetails, addressLine1: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Address Line 2 (Optional)</label>
+                <input type="text" value={shippingDetails.addressLine2} onChange={(e) => setShippingDetails({...shippingDetails, addressLine2: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">City</label>
+                <input type="text" value={shippingDetails.city} onChange={(e) => setShippingDetails({...shippingDetails, city: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">State</label>
+                <input type="text" value={shippingDetails.state} onChange={(e) => setShippingDetails({...shippingDetails, state: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Pincode</label>
                 <input type="text" value={shippingDetails.pincode} onChange={(e) => setShippingDetails({...shippingDetails, pincode: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Landmark (Optional)</label>
+                <input type="text" value={shippingDetails.landmark} onChange={(e) => setShippingDetails({...shippingDetails, landmark: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Coupon Code</label>
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="WELCOME10"
+                  className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                />
               </div>
               <button 
                 onClick={() => setIsCheckoutStep(false)}
@@ -93,7 +275,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-sm text-taupe mt-1">${item.product?.price.toFixed(2)}</p>
+                      <p className="text-sm text-taupe mt-1">{formatINR(item.product?.price)}</p>
                     </div>
                     
                     <div className="flex items-center justify-between mt-4">
@@ -113,7 +295,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <p className="font-medium text-ink">${(item.product?.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-medium text-ink">{formatINR(item.product?.price * item.quantity)}</p>
                     </div>
                   </div>
                 </div>
@@ -123,32 +305,41 @@ const CartSidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        {cart?.items?.length > 0 && (
+        {cart?.items?.length > 0 && !isAuthStep && (
           <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
             <div className="flex justify-between items-center mb-6 text-lg font-serif">
               <span>Subtotal</span>
-              <span>${totalPrice.toFixed(2)}</span>
+              <span>{formatINR(totalPrice)}</span>
             </div>
             <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
               Shipping & taxes calculated at checkout
             </p>
             <button 
               onClick={async () => {
+                setCartMessage('');
+                setCheckoutMessage({ type: '', text: '' });
                 if (!isCheckoutStep) {
-                  setIsCheckoutStep(true);
+                  if (user) {
+                    setIsCheckoutStep(true);
+                  } else {
+                    setIsAuthStep(true);
+                  }
                 } else {
-                  if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.deliveryAddress || !shippingDetails.pincode) {
-                    alert("Please fill all required shipping fields.");
+                  if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.addressLine1 || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
+                    setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
                     return;
                   }
-                  const success = await checkout(shippingDetails);
-                  if (success) {
-                    alert('Order placed successfully!');
+                  const result = await checkout({ ...shippingDetails, couponCode });
+                  if (result.success) {
+                    setCheckoutMessage({ type: 'success', text: 'Order placed successfully!' });
                     onClose();
                     setTimeout(() => {
                       setIsCheckoutStep(false);
-                      setShippingDetails({ fullName: '', phoneNumber: '', deliveryAddress: '', landmark: '', pincode: '' });
+                      setCouponCode('');
+                      setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
                     }, 300);
+                  } else {
+                    setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
                   }
                 }
               }}
