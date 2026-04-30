@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useContext, useCallback } from 'rea
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
-const API_URL = 'http://localhost:5009/api';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 export const useAuth = () => useContext(AuthContext);
 
