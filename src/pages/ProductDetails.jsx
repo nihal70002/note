@@ -62,14 +62,15 @@ const ProductDetails = () => {
       return;
     }
 
-    const response = await axiosInstance({
-      method: wishlist ? 'delete' : 'post',
-      url: `/wishlist/${product.id}`,
-    });
-
-    if (response.ok) {
+    try {
+      await axiosInstance({
+        method: wishlist ? 'delete' : 'post',
+        url: `/wishlist/${product.id}`,
+      });
       setWishlist(!wishlist);
       setMessage(wishlist ? 'Removed from wishlist.' : 'Saved to wishlist.');
+    } catch (error) {
+      console.error('Failed to toggle wishlist:', error);
     }
   };
 

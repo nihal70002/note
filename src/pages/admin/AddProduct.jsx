@@ -61,14 +61,9 @@ const AddProduct = () => {
         },
       });
 
-      const data = response.data;
-      if (!response.ok) {
-        throw new Error(data.message || 'Upload failed');
-      }
-
       setFormData((prev) => ({
         ...prev,
-        [fieldName]: data.url
+        [fieldName]: response.data.url
       }));
     } catch (error) {
       console.error(error);

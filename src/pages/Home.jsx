@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import axiosInstance from '../api/axios';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5009/api/products')
-      .then(res => res.json())
-      .then(data => {
+    axiosInstance.get('/products')
+      .then(res => {
+        const data = res.data;
         // Just take the first 4 for home page, or filter by isNew
         const arrivals = data.filter(p => p.isNew).slice(0, 4);
         // Fallback if not enough new products
@@ -16,6 +17,7 @@ const Home = () => {
       })
       .catch(err => console.error(err));
   }, []);
+
   return (
     <div>
       {/* Hero Section */}
