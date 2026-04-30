@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../../api/axios';
 
 const AddProduct = () => {
   const { id } = useParams();
@@ -26,12 +27,11 @@ const AddProduct = () => {
 
   useEffect(() => {
     if (isEdit) {
-      fetch(`http://localhost:5009/api/products/${id}`)
-        .then(res => res.json())
-        .then(data => {
+      axiosInstance.get(`/products/${id}`)
+        .then(res => {
           setFormData({
-            ...data,
-            id: data.id // Ensure ID is preserved for PUT
+            ...res.data,
+            id: res.data.id // Ensure ID is preserved for PUT
           });
         })
         .catch(err => console.error(err));
@@ -55,15 +55,13 @@ const AddProduct = () => {
       payload.append('file', file);
       payload.append('folder', 'note/products');
 
-      const response = await fetch('http://localhost:5009/api/uploads/cloudinary', {
-        method: 'POST',
+      const response = await axiosInstance.post('/uploads/cloudinary', payload, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data',
         },
-        body: payload
       });
 
-      const data = await response.json();
+      const data = response.data;
       if (!response.ok) {
         throw new Error(data.message || 'Upload failed');
       }
@@ -82,31 +80,25 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isEdit ? `http://localhost:5009/api/products/${id}` : 'http://localhost:5009/api/products';
-    const method = isEdit ? 'PUT' : 'POST';
+    const url = isEdit ? `/products/${id}` : '/products';
 
     try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      if (isEdit) {
+        await axiosInstance.put(url, {
           ...formData,
-          price: parseFloat(formData.price)
-          ,
+          price: parseFloat(formData.price),
           stock: parseInt(formData.stock, 10)
-        })
-      });
-
-      if (response.ok) {
-        navigate('/admin/products');
+        });
       } else {
-        console.error('Failed to save product');
+        await axiosInstance.post(url, {
+          ...formData,
+          price: parseFloat(formData.price),
+          stock: parseInt(formData.stock, 10)
+        });
       }
+      navigate('/admin/products');
     } catch (error) {
-      console.error(error);
+      console.error('Failed to save product:', error);
     }
   };
 

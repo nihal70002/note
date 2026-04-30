@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../../api/axios';
 
 const emptyForm = {
   title: '',
@@ -32,12 +33,8 @@ const Expenses = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch('http://localhost:5009/api/admin/expenses', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) return;
-      const data = await response.json();
+      const response = await axiosInstance.get('/admin/expenses');
+      const data = response.data;
       setExpenses(data.items || []);
       setTotals({
         totalRevenue: data.totals?.totalRevenue || 0,
@@ -61,32 +58,19 @@ const Expenses = () => {
     setSaving(true);
 
     try {
-      const response = await fetch('http://localhost:5009/api/admin/expenses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: form.title,
-          category: form.category,
-          amount: Number(form.amount),
-          notes: form.notes,
-          expenseDate: form.expenseDate,
-        }),
+      await axiosInstance.post('/admin/expenses', {
+        title: form.title,
+        category: form.category,
+        amount: Number(form.amount),
+        notes: form.notes,
+        expenseDate: form.expenseDate,
       });
-
-      if (response.ok) {
-        setForm(emptyForm);
-        setMessage('Expense added successfully.');
-        await fetchExpenses();
-      } else {
-        const error = await response.json();
-        setMessage(error.message || 'Could not save expense.');
-      }
+      setForm(emptyForm);
+      setMessage('Expense added successfully.');
+      await fetchExpenses();
     } catch (error) {
       console.error('Failed to save expense:', error);
-      setMessage('Could not save expense.');
+      setMessage(error.response?.data?.message || 'Could not save expense.');
     } finally {
       setSaving(false);
     }

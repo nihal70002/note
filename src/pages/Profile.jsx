@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Package, Settings, Key } from 'lucide-react';
+import axiosInstance from '../api/axios';
 
 const Profile = () => {
   const { user, token } = useAuth();
@@ -22,13 +23,8 @@ const Profile = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:5009/api/orders', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data);
-      }
+      const response = await axiosInstance.get('/orders');
+      setOrders(response.data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
     } finally {
@@ -41,38 +37,19 @@ const Profile = () => {
     setPasswordMsg({ type: '', text: '' });
 
     try {
-      const response = await fetch('http://localhost:5009/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ currentPassword, newPassword })
-      });
-
-      if (response.ok) {
-        setPasswordMsg({ type: 'success', text: 'Password changed successfully.' });
-        setCurrentPassword('');
-        setNewPassword('');
-      } else {
-        const errData = await response.json();
-        setPasswordMsg({ type: 'error', text: errData.message || 'Failed to change password.' });
-      }
-    } catch {
-      setPasswordMsg({ type: 'error', text: 'An error occurred.' });
+      await axiosInstance.post('/auth/change-password', { currentPassword, newPassword });
+      setPasswordMsg({ type: 'success', text: 'Password changed successfully.' });
+      setCurrentPassword('');
+      setNewPassword('');
+    } catch (error) {
+      setPasswordMsg({ type: 'error', text: error.response?.data?.message || 'Failed to change password.' });
     }
   };
 
   const cancelOrder = async (orderId) => {
     try {
-      const response = await fetch(`http://localhost:5009/api/orders/${orderId}/cancel`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        fetchOrders();
-      }
+      await axiosInstance.put(`/orders/${orderId}/cancel`);
+      fetchOrders();
     } catch (error) {
       console.error('Failed to cancel order:', error);
     }

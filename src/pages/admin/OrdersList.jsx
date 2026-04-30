@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Package } from 'lucide-react';
+import axiosInstance from '../../api/axios';
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
@@ -33,29 +34,25 @@ const OrdersList = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:5009/api/orders/all', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await axiosInstance.get('/orders/all');
+      const data = response.data;
+
+      const statusPriority = {
+        Pending: 1,
+        Processing: 2,
+        Shipped: 3,
+        Delivered: 4
+      };
+
+      const sortedOrders = data.sort((a, b) => {
+        if (statusPriority[a.status] !== statusPriority[b.status]) {
+          return statusPriority[a.status] - statusPriority[b.status];
+        }
+        // If same status → newest first
+        return new Date(b.orderDate) - new Date(a.orderDate);
       });
-      if (response.ok) {
-        const data = await response.json();
-        const statusPriority = {
-  Pending: 1,
-  Processing: 2,
-  Shipped: 3,
-  Delivered: 4
-};
 
-const sortedOrders = data.sort((a, b) => {
-  if (statusPriority[a.status] !== statusPriority[b.status]) {
-    return statusPriority[a.status] - statusPriority[b.status];
-  }
-
-  // If same status → newest first
-  return new Date(b.orderDate) - new Date(a.orderDate);
-});
-
-setOrders(sortedOrders);
-      }
+      setOrders(sortedOrders);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
     } finally {
@@ -65,18 +62,8 @@ setOrders(sortedOrders);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5009/api/orders/${orderId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      
-      if (response.ok) {
-        fetchOrders(); // Refresh the list
-      }
+      await axiosInstance.put(`/orders/${orderId}/status`, { status: newStatus });
+      fetchOrders(); // Refresh the list
     } catch (error) {
       console.error('Failed to update status:', error);
     }

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Plus, Minus, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import axiosInstance from '../api/axios';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -19,13 +20,9 @@ const ProductDetails = () => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
-    fetch(`http://localhost:5009/api/products/${id}`)
+    axiosInstance.get(`/products/${id}`)
       .then(res => {
-        if (!res.ok) throw new Error('Product not found');
-        return res.json();
-      })
-      .then(data => {
-        setProduct(data);
+        setProduct(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -35,20 +32,16 @@ const ProductDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch(`http://localhost:5009/api/products/${id}/reviews`)
-      .then(res => res.json())
-      .then(setReviews)
+    axiosInstance.get(`/products/${id}/reviews`)
+      .then(res => setReviews(res.data))
       .catch(err => console.error(err));
   }, [id]);
 
   useEffect(() => {
     if (!token) return;
 
-    fetch(`http://localhost:5009/api/wishlist/${id}/exists`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.ok ? res.json() : { exists: false })
-      .then(data => setWishlist(data.exists || data.Exists))
+    axiosInstance.get(`/wishlist/${id}/exists`)
+      .then(res => setWishlist(res.data.exists || res.data.Exists))
       .catch(err => console.error(err));
   }, [id, token]);
 
@@ -69,9 +62,9 @@ const ProductDetails = () => {
       return;
     }
 
-    const response = await fetch(`http://localhost:5009/api/wishlist/${product.id}`, {
-      method: wishlist ? 'DELETE' : 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
+    const response = await axiosInstance({
+      method: wishlist ? 'delete' : 'post',
+      url: `/wishlist/${product.id}`,
     });
 
     if (response.ok) {
@@ -87,20 +80,14 @@ const ProductDetails = () => {
       return;
     }
 
-    const response = await fetch(`http://localhost:5009/api/products/${product.id}/reviews`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(reviewForm)
-    });
-
-    if (response.ok) {
+    try {
+      await axiosInstance.post(`/products/${product.id}/reviews`, reviewForm);
       setReviewForm({ rating: 5, comment: '' });
       setMessage('Review saved.');
-      const nextReviews = await fetch(`http://localhost:5009/api/products/${id}/reviews`).then(res => res.json());
-      setReviews(nextReviews);
+      const nextReviews = await axiosInstance.get(`/products/${id}/reviews`);
+      setReviews(nextReviews.data);
+    } catch (error) {
+      console.error('Failed to submit review:', error);
     }
   };
 

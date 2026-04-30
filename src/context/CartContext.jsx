@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useAuth } from './AuthContext';
+import axiosInstance from '../api/axios';
 
 const CartContext = createContext();
-const API_URL = 'http://localhost:5009/api';
 
 export const useCart = () => useContext(CartContext);
 
@@ -27,17 +27,12 @@ export const CartProvider = ({ children }) => {
 
   const fetchCart = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/cart/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data);
-        setCartMessage('');
-      } else {
-        const error = await response.json().catch(() => ({}));
-        setCartMessage(error.message || error.Message || 'Could not add item to cart.');
-      }
+      const response = await axiosInstance.get(`/cart/${id}`);
+      setCart(response.data);
+      setCartMessage('');
     } catch (error) {
       console.error('Error fetching cart:', error);
+      setCartMessage(error.response?.data?.message || error.response?.data?.Message || 'Could not add item to cart.');
     } finally {
       setLoading(false);
     }
@@ -45,39 +40,19 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (productId, quantity = 1) => {
     try {
-      const response = await fetch(`${API_URL}/cart/${cartId}/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId, quantity }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data);
-        setCartMessage('');
-      } else {
-        const error = await response.json().catch(() => ({}));
-        setCartMessage(error.message || error.Message || 'Could not update quantity.');
-      }
+      const response = await axiosInstance.post(`/cart/${cartId}/items`, { productId, quantity });
+      setCart(response.data);
+      setCartMessage('');
     } catch (error) {
       console.error('Error adding to cart:', error);
+      setCartMessage(error.response?.data?.message || error.response?.data?.Message || 'Could not update quantity.');
     }
   };
 
   const updateQuantity = async (itemId, quantity) => {
     try {
-      const response = await fetch(`${API_URL}/cart/${cartId}/items/${itemId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ quantity }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data);
-      }
+      const response = await axiosInstance.put(`/cart/${cartId}/items/${itemId}`, { quantity });
+      setCart(response.data);
     } catch (error) {
       console.error('Error updating quantity:', error);
     }
@@ -85,13 +60,8 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (itemId) => {
     try {
-      const response = await fetch(`${API_URL}/cart/${cartId}/items/${itemId}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data);
-      }
+      const response = await axiosInstance.delete(`/cart/${cartId}/items/${itemId}`);
+      setCart(response.data);
     } catch (error) {
       console.error('Error removing item:', error);
     }
@@ -103,27 +73,16 @@ export const CartProvider = ({ children }) => {
     }
     
     try {
-      const response = await fetch(`${API_URL}/orders/checkout/${cartId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(shippingDetails)
-      });
-      if (response.ok) {
-        setCart(null);
-        // Generate new cart ID
-        const newId = crypto.randomUUID();
-        localStorage.setItem('cartId', newId);
-        setCartId(newId);
-        return { success: true };
-      }
-      const error = await response.json().catch(() => ({}));
-      return { success: false, message: error.message || error.Message || 'Checkout failed.' };
+      await axiosInstance.post(`/orders/checkout/${cartId}`, shippingDetails);
+      setCart(null);
+      // Generate new cart ID
+      const newId = crypto.randomUUID();
+      localStorage.setItem('cartId', newId);
+      setCartId(newId);
+      return { success: true };
     } catch (error) {
       console.error('Checkout error:', error);
-      return { success: false, message: 'Checkout failed. Please try again.' };
+      return { success: false, message: error.response?.data?.message || error.response?.data?.Message || 'Checkout failed. Please try again.' };
     }
   };
 

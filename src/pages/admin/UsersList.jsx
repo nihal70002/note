@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, Package, Search, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../../api/axios';
 
 const UsersList = () => {
   const { token, user: currentUser } = useAuth();
@@ -29,12 +30,9 @@ const UsersList = () => {
     if (search.trim()) params.set('search', search.trim());
     if (role !== 'All') params.set('role', role);
 
-    fetch(`http://localhost:5009/api/admin/users?${params.toString()}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setUsers(data);
+    axiosInstance.get(`/admin/users?${params.toString()}`)
+      .then(res => {
+        setUsers(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -57,19 +55,11 @@ const UsersList = () => {
   const updateRole = async (id, nextRole) => {
     setMessage('');
 
-    const response = await fetch(`http://localhost:5009/api/admin/users/${id}/role`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ role: nextRole })
-    });
-
-    if (response.ok) {
+    try {
+      await axiosInstance.put(`/admin/users/${id}/role`, { role: nextRole });
       setUsers(prev => prev.map(item => item.id === id ? { ...item, role: nextRole } : item));
       setMessage('User role updated.');
-    } else {
+    } catch (error) {
       setMessage('Could not update user role.');
     }
   };
@@ -77,19 +67,11 @@ const UsersList = () => {
   const toggleBlock = async (id, isBlocked) => {
     setMessage('');
 
-    const response = await fetch(`http://localhost:5009/api/admin/users/${id}/block`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ isBlocked })
-    });
-
-    if (response.ok) {
+    try {
+      await axiosInstance.put(`/admin/users/${id}/block`, { isBlocked });
       setUsers(prev => prev.map(item => item.id === id ? { ...item, isBlocked } : item));
       setMessage(isBlocked ? 'User blocked.' : 'User unblocked.');
-    } else {
+    } catch (error) {
       setMessage('Could not update user status.');
     }
   };
@@ -105,14 +87,8 @@ const UsersList = () => {
 
     setOrdersLoading(true);
     try {
-      const response = await fetch(`http://localhost:5009/api/admin/users/${id}/orders`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserOrders(prev => ({ ...prev, [id]: data }));
-      }
+      const response = await axiosInstance.get(`/admin/users/${id}/orders`);
+      setUserOrders(prev => ({ ...prev, [id]: response.data }));
     } catch (error) {
       console.error('Failed to fetch user orders:', error);
     } finally {

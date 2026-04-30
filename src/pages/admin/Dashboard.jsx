@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { IndianRupee, ShoppingBag, Users, Wallet } from 'lucide-react';
+import axiosInstance from '../../api/axios';
 
 const chartRanges = [
   { key: 'day', label: 'Days', title: 'Sales (Last 7 Days)' },
@@ -98,19 +99,13 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const headers = { 'Authorization': `Bearer ${token}` };
         const [statsResponse, ordersResponse] = await Promise.all([
-          fetch('http://localhost:5009/api/admin/stats', { headers }),
-          fetch('http://localhost:5009/api/orders/all', { headers }),
+          axiosInstance.get('/admin/stats'),
+          axiosInstance.get('/orders/all'),
         ]);
 
-        if (statsResponse.ok) {
-          setStats(await statsResponse.json());
-        }
-
-        if (ordersResponse.ok) {
-          setOrders(await ordersResponse.json());
-        }
+        setStats(statsResponse.data);
+        setOrders(ordersResponse.data);
       } catch (err) {
         console.error(err);
       } finally {

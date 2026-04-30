@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components, react-hooks/set-state-in-effect */
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axios';
 
 const AuthContext = createContext();
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -45,30 +45,22 @@ export const AuthProvider = ({ children }) => {
     const { redirect = true } = options;
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await axiosInstance.post('/auth/login', { email, password });
+      const { token } = response.data;
+      setToken(token);
       
-      if (response.ok) {
-        const data = await response.json();
-        setToken(data.token);
-        
-        // Decode to check role for redirect
-        const payload = JSON.parse(atob(data.token.split('.')[1]));
-        const role = payload.Role || payload.role || "User";
-        
-        if (redirect) {
-          if (role === 'Admin') {
-            navigate('/admin');
-          } else {
-            navigate('/');
-          }
+      // Decode to check role for redirect
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.Role || payload.role || "User";
+      
+      if (redirect) {
+        if (role === 'Admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
         }
-        return true;
       }
-      return false;
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -77,12 +69,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
-      });
-      return response.ok;
+      await axiosInstance.post('/auth/register', { username, email, password });
+      return true;
     } catch (error) {
       console.error('Register error:', error);
       return false;

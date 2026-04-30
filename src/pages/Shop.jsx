@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
-
-
+import axiosInstance from '../api/axios';
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -18,10 +17,9 @@ const Shop = () => {
     if (category !== 'All') params.set('category', category);
     if (sort) params.set('sort', sort);
 
-    fetch(`http://localhost:5009/api/products?${params.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
+    axiosInstance.get(`/products?${params.toString()}`)
+      .then(response => {
+        setProducts(response.data);
         setLoading(false);
       })
       .catch(err => {

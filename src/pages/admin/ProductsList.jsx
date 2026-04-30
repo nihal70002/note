@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Edit, Trash2 } from 'lucide-react';
+import axiosInstance from '../../api/axios';
 
 const ProductsList = () => {
   const [products, setProducts] = useState([]);
@@ -10,10 +11,9 @@ const ProductsList = () => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   const fetchProducts = () => {
-    fetch('http://localhost:5009/api/products')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
+    axiosInstance.get('/products')
+      .then(res => {
+        setProducts(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -29,15 +29,8 @@ const ProductsList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const response = await fetch(`http://localhost:5009/api/products/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          fetchProducts();
-        }
+        await axiosInstance.delete(`/products/${id}`);
+        fetchProducts();
       } catch (error) {
         console.error('Failed to delete', error);
       }
