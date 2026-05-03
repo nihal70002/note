@@ -15,6 +15,7 @@ const AdminLayout = () => {
     { name: "Expenses", path: "/admin/expenses", icon: Wallet },
     { name: "Products", path: "/admin/products", icon: Package },
     { name: "Add Product", path: "/admin/products/add", icon: PlusSquare },
+    { name: "Storefront", path: "/admin/storefront", icon: LayoutDashboard },
   ];
 
   return (

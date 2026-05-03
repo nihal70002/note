@@ -16,6 +16,7 @@ import AddProduct from './pages/admin/AddProduct';
 import OrdersList from './pages/admin/OrdersList';
 import UsersList from './pages/admin/UsersList';
 import Expenses from './pages/admin/Expenses';
+import StorefrontSettings from './pages/admin/StorefrontSettings';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
           <Route path="products" element={<ProductsList />} />
           <Route path="products/add" element={<AddProduct />} />
           <Route path="products/edit/:id" element={<AddProduct />} />
+          <Route path="storefront" element={<StorefrontSettings />} />
         </Route>
       </Routes>
     </>
