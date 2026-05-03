@@ -155,54 +155,54 @@ const Dashboard = () => {
     <div className="max-w-6xl mx-auto">
       <h1 className="font-serif text-2xl sm:text-3xl text-ink mb-6 sm:mb-8">Dashboard Overview</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 sm:gap-6 mb-8 sm:mb-12">
-        <div className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0">
-          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
-            <IndianRupee className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-full flex-shrink-0">
+            <IndianRupee className="w-6 h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-widest text-taupe">Total Revenue</p>
-            <p className="font-serif text-2xl sm:text-3xl text-ink break-words">{formatINR(stats.totalRevenue)}</p>
-          </div>
-        </div>
-
-        <button onClick={() => navigate('/admin/orders?status=Pending')} className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0 text-left hover:bg-cream/30 transition-colors">
-          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
-            <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-widest text-taupe">Pending Orders</p>
-            <p className="font-serif text-2xl sm:text-3xl text-ink">{stats.pendingOrders || 0}</p>
-          </div>
-        </button>
-
-        <button onClick={() => navigate('/admin/users')} className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0 text-left hover:bg-cream/30 transition-colors">
-          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
-            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-ink" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-widest text-taupe">Registered Users</p>
-            <p className="font-serif text-2xl sm:text-3xl text-ink">{stats.totalUsers || 0}</p>
-          </div>
-        </button>
-
-        <div className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0">
-          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
-            <Wallet className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-widest text-taupe">Total Expenses</p>
-            <p className="font-serif text-2xl sm:text-3xl text-ink break-words">{formatINR(stats.totalExpenses)}</p>
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium">Total Revenue</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800 whitespace-nowrap">{formatINR(stats.totalRevenue)}</p>
           </div>
         </div>
 
-        <button onClick={() => navigate('/admin/expenses')} className="bg-paper p-5 sm:p-6 rounded-sm shadow-sm border border-taupe/10 flex items-center gap-4 min-w-0 text-left hover:bg-cream/30 transition-colors">
-          <div className="p-3 sm:p-4 bg-cream/50 rounded-full flex-shrink-0">
-            <IndianRupee className="w-6 h-6 sm:w-8 sm:h-8 text-green-700" />
+        <button onClick={() => navigate('/admin/orders?status=Pending')} className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4 text-left hover:bg-gray-50 transition-colors">
+          <div className="p-3 bg-yellow-50 text-yellow-600 rounded-full flex-shrink-0">
+            <ShoppingBag className="w-6 h-6" />
           </div>
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-widest text-taupe">Net Profit</p>
-            <p className="font-serif text-2xl sm:text-3xl text-ink break-words">{formatINR(stats.netProfit)}</p>
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium">Pending Orders</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.pendingOrders || 0}</p>
+          </div>
+        </button>
+
+        <button onClick={() => navigate('/admin/users')} className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4 text-left hover:bg-gray-50 transition-colors">
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-full flex-shrink-0">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium">Registered Users</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.totalUsers || 0}</p>
+          </div>
+        </button>
+
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="p-3 bg-red-50 text-red-600 rounded-full flex-shrink-0">
+            <Wallet className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium">Total Expenses</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800 whitespace-nowrap">{formatINR(stats.totalExpenses)}</p>
+          </div>
+        </div>
+
+        <button onClick={() => navigate('/admin/expenses')} className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4 text-left hover:bg-gray-50 transition-colors">
+          <div className="p-3 bg-green-50 text-green-600 rounded-full flex-shrink-0">
+            <IndianRupee className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium">Net Profit</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800 whitespace-nowrap">{formatINR(stats.netProfit)}</p>
           </div>
         </button>
       </div>
