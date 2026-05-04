@@ -73,7 +73,18 @@ export const CartProvider = ({ children }) => {
     }
     
     try {
-      const response = await axiosInstance.post(`/orders/checkout/${cartId}`, shippingDetails);
+      console.log("Cart ID:", cartId);
+      console.log("Token:", token);
+
+      const response = await axiosInstance.post(
+        `/orders/checkout/${cartId}`,
+        shippingDetails,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
       setCart(null);
       // Generate new cart ID
       const newId = crypto.randomUUID();
