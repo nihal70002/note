@@ -331,8 +331,16 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   }
                   const result = await checkout({ ...shippingDetails, couponCode });
                   if (result.success) {
+                    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+                    console.log('Razorpay Key Check:', razorpayKey ? 'Found' : 'Missing');
+                    
+                    if (!razorpayKey) {
+                      setCheckoutMessage({ type: 'error', text: 'Frontend Payment configuration missing.' });
+                      return;
+                    }
+
                     const options = {
-                      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                      key: razorpayKey,
                       amount: result.amount * 100, // paise
                       currency: result.currency,
                       name: 'Note E-Commerce',
