@@ -31,7 +31,7 @@ const Home = () => {
       <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16">
         <div className="absolute inset-0 w-full h-full">
           <div className="absolute inset-0 bg-ink/20 z-10" />
-          <img src={config?.heroImageUrl || "/product3.png"} alt="Hero" className="w-full h-full object-cover" />
+          <img src={config?.heroImageUrl || "/hero.png"} alt="Hero" className="w-full h-full object-cover" />
         </div>
         
         <div className="relative z-20 text-center text-paper px-4 sm:px-6 flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
