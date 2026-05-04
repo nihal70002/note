@@ -2,7 +2,7 @@ import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createPortal } from 'react-dom';
-
+import axiosInstance from '../api/axios';
 import { useState } from 'react';
 
 const CartSidebar = ({ isOpen, onClose }) => {
@@ -331,13 +331,56 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   }
                   const result = await checkout({ ...shippingDetails, couponCode });
                   if (result.success) {
-                    setCheckoutMessage({ type: 'success', text: 'Order placed successfully!' });
-                    onClose();
-                    setTimeout(() => {
-                      setIsCheckoutStep(false);
-                      setCouponCode('');
-                      setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
-                    }, 300);
+                    const options = {
+                      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                      amount: result.amount * 100, // paise
+                      currency: result.currency,
+                      name: 'Note E-Commerce',
+                      description: 'Order Payment',
+                      order_id: result.razorpayOrderId,
+                      handler: async function (response) {
+                        try {
+                          await axiosInstance.post('/orders/verify-payment', {
+                            orderId: result.orderId,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpaySignature: response.razorpay_signature
+                          });
+                          
+                          setCheckoutMessage({ type: 'success', text: 'Payment successful! Order placed.' });
+                          setTimeout(() => {
+                            onClose();
+                            setTimeout(() => {
+                              setIsCheckoutStep(false);
+                              setCouponCode('');
+                              setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
+                            }, 300);
+                          }, 2000);
+                        } catch (err) {
+                          setCheckoutMessage({ type: 'error', text: 'Payment verification failed. Please contact support.' });
+                        }
+                      },
+                      prefill: {
+                        name: shippingDetails.fullName,
+                        contact: shippingDetails.phoneNumber,
+                        email: user?.email || ''
+                      },
+                      theme: {
+                        color: '#1a1a1a' // ink color
+                      },
+                      modal: {
+                        ondismiss: function () {
+                          setCheckoutMessage({ type: 'error', text: 'Payment cancelled. Order is pending.' });
+                        }
+                      }
+                    };
+
+                    const rzp = new window.Razorpay(options);
+                    rzp.on('payment.failed', function (response) {
+                      setCheckoutMessage({ type: 'error', text: response.error.description || 'Payment failed.' });
+                    });
+                    rzp.open();
+
                   } else {
                     setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
                   }

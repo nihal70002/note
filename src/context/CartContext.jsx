@@ -73,13 +73,20 @@ export const CartProvider = ({ children }) => {
     }
     
     try {
-      await axiosInstance.post(`/orders/checkout/${cartId}`, shippingDetails);
+      const response = await axiosInstance.post(`/orders/checkout/${cartId}`, shippingDetails);
       setCart(null);
       // Generate new cart ID
       const newId = crypto.randomUUID();
       localStorage.setItem('cartId', newId);
       setCartId(newId);
-      return { success: true };
+      
+      return { 
+        success: true, 
+        orderId: response.data.orderId,
+        razorpayOrderId: response.data.razorpayOrderId,
+        amount: response.data.amount,
+        currency: response.data.currency || 'INR'
+      };
     } catch (error) {
       console.error('Checkout error:', error);
       return { success: false, message: error.response?.data?.message || error.response?.data?.Message || 'Checkout failed. Please try again.' };
