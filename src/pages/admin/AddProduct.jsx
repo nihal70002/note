@@ -132,36 +132,66 @@ const AddProduct = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Main Image</label>
+              {formData.image && (
+                <div className="mb-2 h-24 w-24 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <img src={formData.image} alt="Main Preview" className="w-full h-full object-cover" />
+                </div>
+              )}
               <input type="text" name="image" value={formData.image} onChange={handleChange} required className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'image' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 2 (Optional)</label>
+              {formData.image2 && (
+                <div className="mb-2 h-24 w-24 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <img src={formData.image2} alt="Preview 2" className="w-full h-full object-cover" />
+                </div>
+              )}
               <input type="text" name="image2" value={formData.image2 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image2', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'image2' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 3 (Optional)</label>
+              {formData.image3 && (
+                <div className="mb-2 h-24 w-24 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <img src={formData.image3} alt="Preview 3" className="w-full h-full object-cover" />
+                </div>
+              )}
               <input type="text" name="image3" value={formData.image3 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image3', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'image3' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 4 (Optional)</label>
+              {formData.image4 && (
+                <div className="mb-2 h-24 w-24 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <img src={formData.image4} alt="Preview 4" className="w-full h-full object-cover" />
+                </div>
+              )}
               <input type="text" name="image4" value={formData.image4 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image4', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'image4' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Image 5 (Optional)</label>
+              {formData.image5 && (
+                <div className="mb-2 h-24 w-24 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <img src={formData.image5} alt="Preview 5" className="w-full h-full object-cover" />
+                </div>
+              )}
               <input type="text" name="image5" value={formData.image5 || ''} onChange={handleChange} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="image/*" onChange={(e) => handleFileUpload('image5', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'image5' && <p className="mt-1 text-xs text-taupe">Uploading...</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Product Video (Optional)</label>
+              {formData.videoUrl && (
+                <div className="mb-2 h-24 w-32 relative border border-taupe/30 rounded-sm overflow-hidden bg-cream/30">
+                  <video src={formData.videoUrl} className="w-full h-full object-cover" controls muted />
+                </div>
+              )}
               <input type="text" name="videoUrl" value={formData.videoUrl || ''} onChange={handleChange} placeholder="Cloudinary video URL" className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               <input type="file" accept="video/*" onChange={(e) => handleFileUpload('videoUrl', e.target.files?.[0])} className="mt-2 w-full text-sm text-taupe" />
               {uploadingField === 'videoUrl' && <p className="mt-1 text-xs text-taupe">Uploading video...</p>}

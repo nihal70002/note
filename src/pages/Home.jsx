@@ -12,8 +12,8 @@ const Home = () => {
     axiosInstance.get('/products')
       .then(res => {
         const data = res.data;
-        const arrivals = data.filter(p => p.isNew).slice(0, 4);
-        setNewArrivals(arrivals.length > 0 ? arrivals : data.slice(0, 4));
+        const arrivals = data.filter(p => p.isNew).slice(0, 3);
+        setNewArrivals(arrivals.length > 0 ? arrivals : data.slice(0, 3));
       })
       .catch(err => console.error(err));
 
@@ -54,7 +54,7 @@ const Home = () => {
             <Link to="/shop" className="text-sm border-b border-ink pb-1 uppercase tracking-widest hover:text-ink/70 mb-1">View All</Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {newArrivals.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
