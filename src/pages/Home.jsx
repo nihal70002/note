@@ -43,30 +43,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Categories */}
-      <section className="py-16 sm:py-24 bg-paper container mx-auto px-4 sm:px-6 md:px-12">
-        <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-4xl text-ink">Curated for the Creator</h2>
-          <div className="h-0.5 w-16 bg-taupe mx-auto mt-6"></div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
-          <Link to={config?.category1Link || "/shop"} className="group relative aspect-[4/3] overflow-hidden rounded-sm">
-            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors z-10 duration-500" />
-            <img src={config?.category1ImageUrl || "/product.png"} alt={config?.category1Title || "Daily Journals"} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-out" />
-            <div className="absolute inset-0 flex items-center justify-center z-20">
-              <span className="bg-paper/90 backdrop-blur-sm text-ink px-5 sm:px-8 py-3 sm:py-4 font-serif text-base sm:text-xl tracking-widest uppercase text-center">{config?.category1Title || "Daily Journals"}</span>
-            </div>
-          </Link>
-          <Link to={config?.category2Link || "/shop"} className="group relative aspect-[4/3] overflow-hidden rounded-sm">
-            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors z-10 duration-500" />
-            <img src={config?.category2ImageUrl || "/product5.png"} alt={config?.category2Title || "Goal Planners"} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-out" />
-            <div className="absolute inset-0 flex items-center justify-center z-20">
-              <span className="bg-paper/90 backdrop-blur-sm text-ink px-5 sm:px-8 py-3 sm:py-4 font-serif text-base sm:text-xl tracking-widest uppercase text-center">{config?.category2Title || "Goal Planners"}</span>
-            </div>
-          </Link>
-        </div>
-      </section>
 
       {/* New Arrivals */}
       <section className="py-16 sm:py-24 bg-cream/30">
