@@ -2,10 +2,12 @@ import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { useState } from 'react';
 
 const CartSidebar = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, checkout, totalPrice, cartMessage, setCartMessage } = useCart();
   const { user, login, register } = useAuth();
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
@@ -279,20 +281,20 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     </div>
                     
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-3 border border-taupe/30 rounded-full px-3 py-1">
+                      <div className="flex items-center gap-5 border border-taupe/30 rounded-full px-4 py-2">
                         <button 
                           onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))} 
-                          className="text-ink hover:text-taupe"
+                          className="text-ink hover:text-taupe transition-colors"
                           disabled={item.quantity <= 1}
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-4 text-center text-sm">{item.quantity}</span>
+                        <span className="w-6 text-center text-base font-medium">{item.quantity}</span>
                         <button 
                           onClick={() => updateQuantity(item.id, item.quantity + 1)} 
-                          className="text-ink hover:text-taupe"
+                          className="text-ink hover:text-taupe transition-colors"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <p className="font-medium text-ink">{formatINR(item.product?.price * item.quantity)}</p>
@@ -358,14 +360,19 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           setCheckoutMessage({ type: 'success', text: 'Payment successful! Order placed.' });
                           setTimeout(() => {
                             onClose();
+                            navigate(`/order-success/${result.orderId}`);
                             setTimeout(() => {
                               setIsCheckoutStep(false);
                               setCouponCode('');
                               setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
                             }, 300);
-                          }, 2000);
+                          }, 1500);
                         } catch (err) {
                           setCheckoutMessage({ type: 'error', text: 'Payment verification failed. Please contact support.' });
+                          setTimeout(() => {
+                            onClose();
+                            navigate('/payment-failed');
+                          }, 2000);
                         }
                       },
                       prefill: {
@@ -378,7 +385,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       },
                       modal: {
                         ondismiss: function () {
-                          setCheckoutMessage({ type: 'error', text: 'Payment cancelled. Order is pending.' });
+                          onClose();
+                          navigate('/payment-failed');
                         }
                       }
                     };
@@ -386,6 +394,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     const rzp = new window.Razorpay(options);
                     rzp.on('payment.failed', function (response) {
                       setCheckoutMessage({ type: 'error', text: response.error.description || 'Payment failed.' });
+                      setTimeout(() => {
+                        onClose();
+                        navigate('/payment-failed');
+                      }, 2000);
                     });
                     rzp.open();
 

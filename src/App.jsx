@@ -10,6 +10,8 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import OrderSuccess from './pages/OrderSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 import Dashboard from './pages/admin/Dashboard';
 import ProductsList from './pages/admin/ProductsList';
 import AddProduct from './pages/admin/AddProduct';
@@ -28,6 +30,8 @@ function App() {
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
           <Route path="shop/:id" element={<ProductDetails />} />
+          <Route path="order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="payment-failed" element={<PaymentFailed />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
           <Route path="login" element={<Login />} />

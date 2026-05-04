@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Minus, Heart } from 'lucide-react';
+import { Plus, Minus, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../api/axios';
@@ -10,7 +10,7 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [mainImage, setMainImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [wishlist, setWishlist] = useState(false);
   const [message, setMessage] = useState('');
@@ -101,23 +101,48 @@ const ProductDetails = () => {
   }
 
   const availableImages = [product.image, product.image2, product.image3, product.image4, product.image5].filter(Boolean);
-  const displayImage = mainImage || product.image || "/product.png";
+  const displayImage = availableImages[currentImageIndex] || "/product.png";
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % availableImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + availableImages.length) % availableImages.length);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20">
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Images */}
         <div className="flex-1 space-y-6">
-          <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden">
+          <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden relative group">
              <img src={displayImage} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+             
+             {availableImages.length > 1 && (
+               <>
+                 <button 
+                   onClick={prevImage}
+                   className="absolute left-4 top-1/2 -translate-y-1/2 bg-paper/80 hover:bg-paper p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-ink"
+                 >
+                   <ChevronLeft className="w-6 h-6" />
+                 </button>
+                 <button 
+                   onClick={nextImage}
+                   className="absolute right-4 top-1/2 -translate-y-1/2 bg-paper/80 hover:bg-paper p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-ink"
+                 >
+                   <ChevronRight className="w-6 h-6" />
+                 </button>
+               </>
+             )}
           </div>
           {availableImages.length > 1 && (
             <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-3 sm:gap-4">
               {availableImages.map((img, idx) => (
                 <div 
                   key={idx} 
-                  className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${displayImage === img ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
-                  onClick={() => setMainImage(img)}
+                  className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${currentImageIndex === idx ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
+                  onClick={() => setCurrentImageIndex(idx)}
                 >
                   <img src={img} alt={`${product.name} detail ${idx + 1}`} className="w-full h-full object-cover" />
                 </div>
@@ -152,15 +177,15 @@ const ProductDetails = () => {
                {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
              
-             <div className="border-t border-b border-taupe/20 py-6 mb-8 flex items-center justify-between gap-4">
+             <div className="border-t border-b border-taupe/20 py-8 mb-8 flex items-center justify-between gap-4">
                <span className="text-sm uppercase tracking-widest text-ink font-medium">Quantity</span>
-               <div className="flex items-center gap-6 border border-taupe/30 rounded-full px-4 py-2">
-                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink hover:text-taupe">
-                   <Minus className="w-4 h-4" />
+               <div className="flex items-center gap-8 border border-taupe/30 rounded-full px-6 py-3">
+                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink hover:text-taupe transition-colors">
+                   <Minus className="w-5 h-5" />
                  </button>
-                 <span className="w-4 text-center">{quantity}</span>
-                 <button onClick={() => setQuantity(Math.min(product.stock || 1, quantity + 1))} className="text-ink hover:text-taupe">
-                   <Plus className="w-4 h-4" />
+                 <span className="w-6 text-center text-lg font-medium">{quantity}</span>
+                 <button onClick={() => setQuantity(Math.min(product.stock || 1, quantity + 1))} className="text-ink hover:text-taupe transition-colors">
+                   <Plus className="w-5 h-5" />
                  </button>
                </div>
              </div>
