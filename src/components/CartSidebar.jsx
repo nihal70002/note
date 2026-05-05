@@ -39,8 +39,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
-  if (!isOpen) return null;
-
   const resetCheckout = () => {
     setIsCheckoutStep(false);
     setIsAuthStep(false);
@@ -115,6 +113,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const title = isAuthStep
     ? authMode === 'login' ? 'Sign In' : 'Create Account'
     : isCheckoutStep ? 'Shipping Details' : 'Your Cart';
+
+  if (!isOpen) return null;
 
   return createPortal(
     <>
