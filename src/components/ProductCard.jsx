@@ -20,14 +20,14 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
         </div>
         <h3 className="font-serif text-lg text-ink tracking-wide mb-1 group-hover:text-taupe transition-colors">{name}</h3>
       </Link>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3">
         <p className="text-sm text-ink/70">{formatINR(price)}</p>
         {onAddToCart && (
           <button
             type="button"
             onClick={() => onAddToCart({ id, name })}
             disabled={addingToCart}
-            className="text-xs uppercase tracking-widest border-b border-ink pb-1 text-ink hover:text-taupe hover:border-taupe transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-ink text-paper py-3 px-4 text-xs uppercase tracking-widest hover:bg-taupe transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {addingToCart ? 'Adding...' : 'Add to Cart'}
           </button>
