@@ -114,10 +114,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
     ? authMode === 'login' ? 'Sign In' : 'Create Account'
     : isCheckoutStep ? 'Shipping Details' : 'Your Cart';
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <>
+    isOpen ? (
+      <>
       <div 
         className="fixed inset-0 bg-ink/30 backdrop-blur-sm z-50 transition-opacity"
         onClick={onClose}
@@ -490,7 +489,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
           </div>
         )}
       </div>
-    </>,
+      </>
+    ) : null,
     document.body
   );
 };
