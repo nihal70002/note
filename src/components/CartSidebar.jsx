@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -22,6 +22,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const [couponCode, setCouponCode] = useState('');
   const [checkoutMessage, setCheckoutMessage] = useState({ type: '', text: '' });
+  const [previousAddress, setPreviousAddress] = useState(null);
+  const [usePreviousAddress, setUsePreviousAddress] = useState(false);
+  const [addressLoading, setAddressLoading] = useState(false);
   const [shippingDetails, setShippingDetails] = useState({
     fullName: '',
     phoneNumber: '',
@@ -46,7 +49,38 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthLoading(false);
     setCouponCode('');
     setCheckoutMessage({ type: '', text: '' });
+    setPreviousAddress(null);
+    setUsePreviousAddress(false);
   };
+
+  useEffect(() => {
+    if (isCheckoutStep && user) {
+      setAddressLoading(true);
+      axiosInstance.get('/orders')
+        .then(res => {
+          if (res.data && res.data.length > 0) {
+            const lastOrder = res.data.find(o => o.addressLine1);
+            if (lastOrder) {
+              setPreviousAddress({
+                fullName: lastOrder.fullName || '',
+                phoneNumber: lastOrder.phoneNumber || '',
+                alternatePhoneNumber: lastOrder.alternatePhoneNumber || '',
+                addressLine1: lastOrder.addressLine1 || '',
+                addressLine2: lastOrder.addressLine2 || '',
+                city: lastOrder.city || '',
+                state: lastOrder.state || '',
+                landmark: lastOrder.landmark || '',
+                pincode: lastOrder.pincode || '',
+                deliveryAddress: lastOrder.deliveryAddress || ''
+              });
+              setUsePreviousAddress(true);
+            }
+          }
+        })
+        .catch(console.error)
+        .finally(() => setAddressLoading(false));
+    }
+  }, [isCheckoutStep, user]);
 
   const handleInlineAuth = async (e) => {
     e.preventDefault();
@@ -201,7 +235,42 @@ const CartSidebar = ({ isOpen, onClose }) => {
             </div>
           ) : isCheckoutStep ? (
             <div className="space-y-4">
-              <div>
+              {addressLoading && (
+                 <div className="text-sm text-taupe text-center py-2 animate-pulse">Looking for saved address...</div>
+              )}
+              
+              {previousAddress && !addressLoading && (
+                <div className="mb-4 space-y-4">
+                  <div className="flex gap-4 p-1 bg-cream/30 rounded-sm border border-taupe/20">
+                    <button 
+                      className={`flex-1 py-2 text-xs uppercase tracking-widest font-medium transition-colors ${usePreviousAddress ? 'bg-ink text-paper' : 'text-taupe hover:text-ink'}`}
+                      onClick={() => setUsePreviousAddress(true)}
+                    >
+                      Saved Address
+                    </button>
+                    <button 
+                      className={`flex-1 py-2 text-xs uppercase tracking-widest font-medium transition-colors ${!usePreviousAddress ? 'bg-ink text-paper' : 'text-taupe hover:text-ink'}`}
+                      onClick={() => setUsePreviousAddress(false)}
+                    >
+                      New Address
+                    </button>
+                  </div>
+                  
+                  {usePreviousAddress && (
+                    <div className="bg-cream/40 p-4 border border-taupe/20 rounded-sm space-y-1 text-sm text-ink/80">
+                      <p className="font-medium text-ink text-base">{previousAddress.fullName}</p>
+                      <p>{previousAddress.phoneNumber}</p>
+                      <p>{previousAddress.addressLine1}</p>
+                      {previousAddress.addressLine2 && <p>{previousAddress.addressLine2}</p>}
+                      <p>{previousAddress.city}, {previousAddress.state} {previousAddress.pincode}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!usePreviousAddress && (
+                <div className="space-y-4">
+                  <div>
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Full Name</label>
                 <input type="text" value={shippingDetails.fullName} onChange={(e) => setShippingDetails({...shippingDetails, fullName: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               </div>
@@ -233,11 +302,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Pincode</label>
                 <input type="text" value={shippingDetails.pincode} onChange={(e) => setShippingDetails({...shippingDetails, pincode: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Landmark (Optional)</label>
-                <input type="text" value={shippingDetails.landmark} onChange={(e) => setShippingDetails({...shippingDetails, landmark: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
-              </div>
-              <div>
+                  <div>
+                    <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Landmark (Optional)</label>
+                    <input type="text" value={shippingDetails.landmark} onChange={(e) => setShippingDetails({...shippingDetails, landmark: e.target.value})} className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent" />
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-taupe/10 mt-2">
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Coupon Code</label>
                 <input
                   type="text"
@@ -327,11 +399,16 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     setIsAuthStep(true);
                   }
                 } else {
-                  if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.addressLine1 || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
-                    setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
-                    return;
+                  if (!usePreviousAddress) {
+                    if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.addressLine1 || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
+                      setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
+                      return;
+                    }
                   }
-                  const result = await checkout({ ...shippingDetails, couponCode });
+                  
+                  const finalShippingDetails = usePreviousAddress ? previousAddress : shippingDetails;
+                  const result = await checkout({ ...finalShippingDetails, couponCode });
+                  
                   if (result.success) {
                     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
                     console.log('Razorpay Key Check:', razorpayKey ? 'Found' : 'Missing');
