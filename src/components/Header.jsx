@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Feather, ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import CartSidebar from './CartSidebar';
@@ -33,8 +33,7 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <Feather className="w-6 h-6 text-ink group-hover:rotate-12 transition-transform duration-300" />
-          <span className="font-serif font-semibold text-lg sm:text-xl tracking-wider">PAPERCUES</span>
+          <img src="/logo.png" alt="Papercues logo" className="h-10 sm:h-12 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}

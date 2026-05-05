@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Feather, Camera, MessageCircle, Mail } from 'lucide-react';
+import { Camera, MessageCircle, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -7,9 +7,9 @@ const Footer = () => {
       <div className="container mx-auto px-4 sm:px-6 md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-12 mb-12 sm:mb-16">
         <div className="flex flex-col gap-4 col-span-1 md:col-span-2">
           <Link to="/" className="flex items-center gap-2 group text-paper">
-            <Feather className="w-6 h-6 text-paper" />
-            <span className="font-serif font-semibold text-xl tracking-wider">AESTHETIC</span>
+            <img src="/logo.png" alt="Papercues logo" className="h-12 w-auto" />
           </Link>
+
           <p className="max-w-md mt-4 text-sm leading-loose">
             Crafting premium, minimalist journals and notebooks for the modern writer.
             Designed to elevate your everyday thoughts into art.
