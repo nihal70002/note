@@ -63,11 +63,11 @@ const Login = () => {
           {/* EMAIL */}
           <div>
             <label className="block text-xs uppercase tracking-widest text-taupe">
-              Email address
+              Email or Phone Number
             </label>
 
             <input
-              type="email"
+              type="text"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}

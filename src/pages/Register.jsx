@@ -57,13 +57,13 @@ const Register = () => {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-ink uppercase tracking-wider">
-                Email address
+                Email or Phone Number
               </label>
               <div className="mt-1">
                 <input
                   id="email"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   required
                   value={email}
