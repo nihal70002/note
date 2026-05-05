@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
+import { getProductPath } from '../utils/seo';
 
 const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addingToCart = false }) => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
   return (
     <div className="group flex flex-col">
-      <Link to={`/shop/${id}`} className="cursor-pointer">
+      <Link to={getProductPath({ id, name })} className="cursor-pointer">
         <div className="relative aspect-[4/5] overflow-hidden bg-cream/50 mb-4 rounded-sm">
           {isNew && (
             <span className="absolute top-4 left-4 z-10 bg-paper/90 text-ink text-xs uppercase tracking-widest px-3 py-1 font-bold">
@@ -15,6 +16,7 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
           <img 
             src={image} 
             alt={name} 
+            loading="lazy"
             className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         </div>

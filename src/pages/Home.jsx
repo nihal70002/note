@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import axiosInstance from '../api/axios';
 import { useCart } from '../context/CartContext';
+import SEO from '../components/SEO';
+import { organizationSchema } from '../utils/schema';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
@@ -70,6 +72,14 @@ const Home = () => {
 
   return (
     <div>
+      <SEO
+        title="Papercues | Premium Journals & Notebooks"
+        description="Shop premium journals, notebooks, planners, and aesthetic stationery designed for writing, planning, and creativity."
+        path="/"
+        image="/logo.png"
+        jsonLd={organizationSchema}
+      />
+
       {toast.text && (
         <div className={`fixed top-24 right-4 z-[100] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
           toast.type === 'success'
@@ -92,6 +102,7 @@ const Home = () => {
             <img
               src={heroImage}
               alt="Hero"
+              fetchPriority="high"
               className="w-full h-full object-cover animate-in fade-in duration-1000"
             />
           )}

@@ -4,9 +4,13 @@ import { Plus, Minus, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../api/axios';
+import SEO from '../components/SEO';
+import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
+import { productSchema } from '../utils/schema';
 
 const ProductDetails = () => {
-  const { id } = useParams();
+  const { id, slug } = useParams();
+  const productId = id || getProductIdFromSlug(slug);
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +24,7 @@ const ProductDetails = () => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
-    axiosInstance.get(`/products/${id}`)
+    axiosInstance.get(`/products/${productId}`)
       .then(res => {
         setProduct(res.data);
         setLoading(false);
@@ -29,21 +33,21 @@ const ProductDetails = () => {
         console.error(err);
         setLoading(false);
       });
-  }, [id]);
+  }, [productId]);
 
   useEffect(() => {
-    axiosInstance.get(`/products/${id}/reviews`)
+    axiosInstance.get(`/products/${productId}/reviews`)
       .then(res => setReviews(res.data))
       .catch(err => console.error(err));
-  }, [id]);
+  }, [productId]);
 
   useEffect(() => {
     if (!token) return;
 
-    axiosInstance.get(`/wishlist/${id}/exists`)
+    axiosInstance.get(`/wishlist/${productId}/exists`)
       .then(res => setWishlist(res.data.exists || res.data.Exists))
       .catch(err => console.error(err));
-  }, [id, token]);
+  }, [productId, token]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -85,7 +89,7 @@ const ProductDetails = () => {
       await axiosInstance.post(`/products/${product.id}/reviews`, reviewForm);
       setReviewForm({ rating: 5, comment: '' });
       setMessage('Review saved.');
-      const nextReviews = await axiosInstance.get(`/products/${id}/reviews`);
+      const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
       setReviews(nextReviews.data);
     } catch (error) {
       console.error('Failed to submit review:', error);
@@ -106,6 +110,8 @@ const ProductDetails = () => {
     .split('\n')
     .map((item) => item.trim())
     .filter(Boolean);
+  const seoPath = getProductPath(product);
+  const seoDescription = productDescription(product);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % availableImages.length);
@@ -117,11 +123,20 @@ const ProductDetails = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20">
+      <SEO
+        title={`${product.name} | Papercues`}
+        description={seoDescription}
+        path={seoPath}
+        image={product.image || '/logo.png'}
+        type="product"
+        jsonLd={productSchema(product, seoPath)}
+      />
+
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Images */}
         <div className="flex-1 space-y-6">
           <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden relative group">
-             <img src={displayImage} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+             <img src={displayImage} alt={product.name} fetchPriority="high" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
              
              {availableImages.length > 1 && (
                <>
@@ -148,7 +163,7 @@ const ProductDetails = () => {
                   className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${currentImageIndex === idx ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
                   onClick={() => setCurrentImageIndex(idx)}
                 >
-                  <img src={img} alt={`${product.name} detail ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} detail ${idx + 1}`} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

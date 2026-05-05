@@ -1,6 +1,15 @@
+import SEO from '../components/SEO';
+
 const About = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
+      <SEO
+        title="About Papercues | Our Story"
+        description="Learn about Papercues, our stationery craftsmanship, and our passion for premium journals and notebooks."
+        path="/about"
+        image="/logo.png"
+      />
+
       <div className="max-w-3xl mx-auto text-center mb-16 sm:mb-24 space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <span className="text-sm font-bold uppercase tracking-widest text-taupe block">Our Story</span>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-ink leading-tight">Crafting Your Beautiful<br/>Paper Journey</h1>
@@ -10,7 +19,7 @@ const About = () => {
       {/* Section 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center mb-24 sm:mb-32">
         <div className="aspect-[4/5] bg-cream/50 overflow-hidden rounded-sm">
-          <img src="https://res.cloudinary.com/diybhyxwi/image/upload/v1777885120/note/products/yzampb5as7ttgnoxab7z.png" alt="Papercues Journal" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
+          <img src="https://res.cloudinary.com/diybhyxwi/image/upload/v1777885120/note/products/yzampb5as7ttgnoxab7z.png" alt="Papercues Journal" loading="lazy" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
         </div>
         <div className="space-y-6">
           <h2 className="font-serif text-3xl text-ink">Welcome to Papercues</h2>

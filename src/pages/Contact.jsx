@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SEO from '../components/SEO';
 
 const Contact = () => {
   const [status, setStatus] = useState('');
@@ -30,7 +31,13 @@ const Contact = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-24">
+    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
+      <SEO
+        title="Contact Papercues | Customer Support"
+        description="Contact Papercues for journal orders, stationery questions, support, and collaborations."
+        path="/contact"
+        image="/logo.png"
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 lg:gap-24">
         <div>
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-ink mb-6">Get in Touch</h1>

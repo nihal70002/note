@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
 import axiosInstance from '../api/axios';
+import SEO from '../components/SEO';
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -30,6 +31,13 @@ const Shop = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
+      <SEO
+        title="Shop Journals & Notebooks | Papercues"
+        description="Browse Papercues premium journals, notebooks, planners, and creative stationery collections."
+        path="/shop"
+        image="/logo.png"
+      />
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-taupe/20 pb-8 mb-10 sm:mb-12">
         <div>
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-ink mb-4">The Collection</h1>

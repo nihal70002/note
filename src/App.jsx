@@ -29,6 +29,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
+          <Route path="product/:slug" element={<ProductDetails />} />
           <Route path="shop/:id" element={<ProductDetails />} />
           <Route path="order-success/:orderId" element={<OrderSuccess />} />
           <Route path="payment-failed" element={<PaymentFailed />} />
