@@ -33,7 +33,8 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <img src="/logo.png" alt="Papercues logo" className="h-10 sm:h-12 w-auto" />
+          <img src="/logo.png" alt="Papercues logo" className="h-12 sm:h-14 w-auto" />
+          <span className="font-serif font-semibold text-lg sm:text-xl tracking-wider">PAPERCUES</span>
         </Link>
 
         {/* Desktop Navigation */}
