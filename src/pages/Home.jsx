@@ -14,8 +14,8 @@ const Home = () => {
     axiosInstance.get('/products')
       .then(res => {
         const data = res.data;
-        const arrivals = data.filter(p => p.isNew).slice(0, 3);
-        setNewArrivals(arrivals.length > 0 ? arrivals : data.slice(0, 3));
+        const arrivals = data.filter(p => p.isNew);
+        setNewArrivals(arrivals.length > 0 ? arrivals : data);
       })
       .catch(err => console.error(err));
 
