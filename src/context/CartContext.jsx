@@ -43,9 +43,12 @@ export const CartProvider = ({ children }) => {
       const response = await axiosInstance.post(`/cart/${cartId}/items`, { productId, quantity });
       setCart(response.data);
       setCartMessage('');
+      return { success: true };
     } catch (error) {
       console.error('Error adding to cart:', error);
-      setCartMessage(error.response?.data?.message || error.response?.data?.Message || 'Could not update quantity.');
+      const message = error.response?.data?.message || error.response?.data?.Message || 'Could not update quantity.';
+      setCartMessage(message);
+      return { success: false, message };
     }
   };
 

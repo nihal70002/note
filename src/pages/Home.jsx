@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import axiosInstance from '../api/axios';
+import { useCart } from '../context/CartContext';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [config, setConfig] = useState(null);
   const [configLoading, setConfigLoading] = useState(true);
   const [heroReady, setHeroReady] = useState(false); // 👈 controls when image shows
+  const [addingProductId, setAddingProductId] = useState(null);
+  const [toast, setToast] = useState({ type: '', text: '' });
+  const { addToCart } = useCart();
 
   useEffect(() => {
     // Fetch products
@@ -47,8 +51,35 @@ const Home = () => {
       ? config.heroImageUrl
       : '/hero.png';
 
+  const showToast = (type, text) => {
+    setToast({ type, text });
+    setTimeout(() => setToast({ type: '', text: '' }), 3000);
+  };
+
+  const handleAddToCart = async (product) => {
+    setAddingProductId(product.id);
+    const result = await addToCart(product.id, 1);
+    setAddingProductId(null);
+
+    if (result?.success) {
+      showToast('success', `${product.name} added to cart.`);
+    } else {
+      showToast('error', result?.message || 'Could not add item to cart.');
+    }
+  };
+
   return (
     <div>
+      {toast.text && (
+        <div className={`fixed top-24 right-4 z-[100] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
+          toast.type === 'success'
+            ? 'bg-green-50 text-green-800 border-green-100'
+            : 'bg-red-50 text-red-700 border-red-100'
+        }`}>
+          {toast.text}
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16">
         <div className="absolute inset-0 w-full h-full bg-cream/40">
@@ -106,7 +137,12 @@ const Home = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {newArrivals.map((product) => (
-              <ProductCard key={product.id} {...product} />
+              <ProductCard
+                key={product.id}
+                {...product}
+                onAddToCart={handleAddToCart}
+                addingToCart={addingProductId === product.id}
+              />
             ))}
           </div>
         </div>
