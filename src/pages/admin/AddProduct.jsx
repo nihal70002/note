@@ -21,7 +21,8 @@ const AddProduct = () => {
     category: 'Journals',
     stock: 25,
     isNew: false,
-    description: ''
+    description: '',
+    specifications: ''
   });
   const [uploadingField, setUploadingField] = useState('');
 
@@ -201,6 +202,11 @@ const AddProduct = () => {
           <div>
             <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Description</label>
             <textarea name="description" value={formData.description} onChange={handleChange} rows="4" className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"></textarea>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Specifications</label>
+            <textarea name="specifications" value={formData.specifications || ''} onChange={handleChange} rows="6" placeholder="Type one specification per line" className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"></textarea>
           </div>
 
           <div className="flex items-center gap-2">

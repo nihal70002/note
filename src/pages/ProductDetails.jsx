@@ -102,6 +102,10 @@ const ProductDetails = () => {
 
   const availableImages = [product.image, product.image2, product.image3, product.image4, product.image5].filter(Boolean);
   const displayImage = availableImages[currentImageIndex] || "/product.png";
+  const specifications = (product.specifications || '')
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % availableImages.length);
@@ -198,18 +202,18 @@ const ProductDetails = () => {
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹50</p>
           </div>
           
+          {specifications.length > 0 && (
           <div className="space-y-6 mt-8 sm:mt-12 bg-cream/30 p-5 sm:p-8 rounded-sm">
              <div>
                <h4 className="font-serif text-lg text-ink mb-2">Specifications</h4>
                <ul className="text-sm text-ink/70 space-y-2">
-                 <li>• 192 Numbered Pages</li>
-                 <li>• 120gsm Acid-Free Paper</li>
-                 <li>• 5mm Dot Grid</li>
-                 <li>• Lay-flat binding</li>
-                 <li>• 2 Ribbon Markers</li>
+                 {specifications.map((item) => (
+                   <li key={item}>• {item}</li>
+                 ))}
                </ul>
              </div>
           </div>
+          )}
 
           <div className="space-y-6 mt-8 bg-paper border border-taupe/10 p-5 sm:p-8 rounded-sm">
              <h4 className="font-serif text-lg text-ink">Customer Reviews</h4>
