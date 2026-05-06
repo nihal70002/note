@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Plus, Minus, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../api/axios';
 import SEO from '../components/SEO';
+import ProductCard from '../components/ProductCard';
 import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
-import { productSchema } from '../utils/schema';
+import { breadcrumbSchema, productSchema } from '../utils/schema';
 
 const ProductDetails = () => {
   const { id, slug } = useParams();
@@ -16,6 +17,7 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [reviews, setReviews] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [wishlist, setWishlist] = useState(false);
   const [message, setMessage] = useState('');
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
@@ -38,6 +40,15 @@ const ProductDetails = () => {
   useEffect(() => {
     axiosInstance.get(`/products/${productId}/reviews`)
       .then(res => setReviews(res.data))
+      .catch(err => console.error(err));
+  }, [productId]);
+
+  useEffect(() => {
+    axiosInstance.get('/products')
+      .then(res => {
+        const products = Array.isArray(res.data) ? res.data : [];
+        setRelatedProducts(products.filter((item) => String(item.id) !== String(productId)).slice(0, 3));
+      })
       .catch(err => console.error(err));
   }, [productId]);
 
@@ -112,6 +123,11 @@ const ProductDetails = () => {
     .filter(Boolean);
   const seoPath = getProductPath(product);
   const seoDescription = productDescription(product);
+  const breadcrumbs = [
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+    { name: product.name, path: seoPath },
+  ];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % availableImages.length);
@@ -129,14 +145,28 @@ const ProductDetails = () => {
         path={seoPath}
         image={product.image || '/logo.png'}
         type="product"
-        jsonLd={productSchema(product, seoPath)}
+        jsonLd={[productSchema(product, seoPath), breadcrumbSchema(breadcrumbs)]}
       />
+
+      <nav aria-label="Breadcrumb" className="mb-8 text-xs uppercase tracking-widest text-taupe">
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <Link to="/" className="hover:text-ink transition-colors">Home</Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link to="/shop" className="hover:text-ink transition-colors">Shop</Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li className="text-ink" aria-current="page">{product.name}</li>
+        </ol>
+      </nav>
 
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
         {/* Images */}
         <div className="flex-1 space-y-6">
           <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden relative group">
-             <img src={displayImage} alt={product.name} fetchPriority="high" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+             <img src={displayImage} alt={`${product.name} premium aesthetic journal or notebook by Papercues`} fetchPriority="high" decoding="async" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
              
              {availableImages.length > 1 && (
                <>
@@ -163,7 +193,7 @@ const ProductDetails = () => {
                   className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${currentImageIndex === idx ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
                   onClick={() => setCurrentImageIndex(idx)}
                 >
-                  <img src={img} alt={`${product.name} detail ${idx + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} product detail image ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
@@ -268,6 +298,22 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {relatedProducts.length > 0 && (
+        <section className="mt-16 sm:mt-24 border-t border-taupe/20 pt-12 sm:pt-16">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10">
+            <h2 className="font-serif text-3xl md:text-4xl text-ink">Related Products</h2>
+            <Link to="/shop" className="text-sm border-b border-ink pb-1 uppercase tracking-widest hover:text-ink/70">
+              Shop All
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {relatedProducts.map((item) => (
+              <ProductCard key={item.id} {...item} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

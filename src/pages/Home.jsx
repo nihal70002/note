@@ -4,15 +4,14 @@ import ProductCard from '../components/ProductCard';
 import axiosInstance from '../api/axios';
 import { useCart } from '../context/CartContext';
 import SEO from '../components/SEO';
-import { organizationSchema } from '../utils/schema';
+import { organizationSchema, websiteSchema } from '../utils/schema';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [config, setConfig] = useState(null);
-  const [configLoading, setConfigLoading] = useState(true);
-  const [heroReady, setHeroReady] = useState(false); // 👈 controls when image shows
   const [addingProductId, setAddingProductId] = useState(null);
   const [toast, setToast] = useState({ type: '', text: '' });
+
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -25,42 +24,30 @@ const Home = () => {
       })
       .catch(err => console.error(err));
 
-    // Fetch config
+    // Optional storefront config
     axiosInstance.get('/storefront')
       .then(res => {
         setConfig(res.data);
       })
-      .catch(err => console.error('Failed to load storefront config', err))
-      .finally(() => setConfigLoading(false));
+      .catch(err => console.error('Failed to load storefront config', err));
   }, []);
 
-  // 👇 Preload hero image BEFORE showing it (prevents flicker)
-  useEffect(() => {
-    if (!configLoading) {
-      const imageUrl =
-        config?.heroImageUrl && config.heroImageUrl !== '/product3.png'
-          ? config.heroImageUrl
-          : '/hero.png';
-
-      const img = new Image();
-      img.src = imageUrl;
-      img.onload = () => setHeroReady(true);
-    }
-  }, [config, configLoading]);
-
-  const heroImage =
-    config?.heroImageUrl && config.heroImageUrl !== '/product3.png'
-      ? config.heroImageUrl
-      : '/hero.png';
+  // STATIC HERO IMAGE FROM PUBLIC
+  const heroImage = '/hero.png';
 
   const showToast = (type, text) => {
     setToast({ type, text });
-    setTimeout(() => setToast({ type: '', text: '' }), 3000);
+
+    setTimeout(() => {
+      setToast({ type: '', text: '' });
+    }, 3000);
   };
 
   const handleAddToCart = async (product) => {
     setAddingProductId(product.id);
+
     const result = await addToCart(product.id, 1);
+
     setAddingProductId(null);
 
     if (result?.success) {
@@ -73,71 +60,78 @@ const Home = () => {
   return (
     <div>
       <SEO
-        title="Papercues | Premium Journals & Notebooks"
-        description="Shop premium journals, notebooks, planners, and aesthetic stationery designed for writing, planning, and creativity."
+        title="Papercues | Premium Aesthetic Journals & Notebooks India"
+        description="Shop premium aesthetic journals, notebooks and planners at Papercues. Elegant stationery designed for students, journaling and gifting."
         path="/"
         image="/logo.png"
-        jsonLd={organizationSchema}
+        jsonLd={[organizationSchema, websiteSchema]}
       />
 
       {toast.text && (
-        <div className={`fixed top-24 right-4 z-[100] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
-          toast.type === 'success'
-            ? 'bg-green-50 text-green-800 border-green-100'
-            : 'bg-red-50 text-red-700 border-red-100'
-        }`}>
+        <div
+          className={`fixed top-24 right-4 z-[100] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
+            toast.type === 'success'
+              ? 'bg-green-50 text-green-800 border-green-100'
+              : 'bg-red-50 text-red-700 border-red-100'
+          }`}
+        >
           {toast.text}
         </div>
       )}
 
-      {/* Hero Section */}
-      <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16">
-        <div className="absolute inset-0 w-full h-full bg-cream/40">
-          <div className="absolute inset-0 bg-ink/30 z-10" />
+      {/* HERO SECTION */}
+      <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16 overflow-hidden">
 
-          {/* 👇 Show smooth placeholder until image fully loads */}
-          {!heroReady ? (
-            <div className="w-full h-full bg-cream animate-pulse" />
-          ) : (
-            <img
-              src={heroImage}
-              alt="Hero"
-              fetchPriority="high"
-              className="w-full h-full object-cover animate-in fade-in duration-1000"
-            />
-          )}
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt="Papercues premium aesthetic journals and notebooks"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/30"></div>
         </div>
 
-        <div className="relative z-20 text-center text-paper px-4 sm:px-6 flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <h2 className="font-serif italic text-lg sm:text-xl md:text-2xl mb-4 text-paper/80">
-            {config?.heroTitle || "The Art of Logging"}
+        {/* Content */}
+        <div className="relative z-20 text-center text-white px-4 sm:px-6 flex flex-col items-center">
+
+          <h2 className="font-serif italic text-lg sm:text-xl md:text-2xl mb-4 text-white/80">
+            {config?.heroTitle || 'The Art of Logging'}
           </h2>
 
           <h1
             className="font-serif text-4xl sm:text-5xl md:text-7xl mb-8 tracking-widest uppercase leading-tight"
             dangerouslySetInnerHTML={{
-              __html: config?.heroSubtitle || "Capture<br />Every Moment"
+              __html: config?.heroSubtitle || 'Capture<br />Every Moment'
             }}
           />
 
           <Link
-            to={config?.heroLink || "/shop"}
-            className="btn-primary bg-paper text-ink hover:bg-paper/90 px-8 py-3 text-sm tracking-widest uppercase"
+            to={config?.heroLink || '/shop'}
+            className="bg-white text-black px-8 py-3 text-sm tracking-widest uppercase hover:bg-white/90 transition-all duration-300"
           >
             Explore Collection
           </Link>
+
         </div>
       </section>
 
-      {/* New Arrivals */}
+      {/* NEW ARRIVALS */}
       <section className="py-16 sm:py-24 bg-cream/30">
         <div className="container mx-auto px-4 sm:px-6 md:px-12">
+
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10 sm:mb-12">
             <div>
               <h2 className="font-serif text-3xl md:text-4xl text-ink">
                 New Arrivals
               </h2>
             </div>
+
             <Link
               to="/shop"
               className="text-sm border-b border-ink pb-1 uppercase tracking-widest hover:text-ink/70 mb-1"
@@ -156,6 +150,7 @@ const Home = () => {
               />
             ))}
           </div>
+
         </div>
       </section>
     </div>

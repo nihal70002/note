@@ -1,5 +1,23 @@
 # React + Vite
 
+## Vercel sitemap generation
+
+`npm run build` automatically runs `scripts/generate-sitemap.mjs` before Vite builds the app.
+
+Set this environment variable in Vercel for Production, Preview, and Development:
+
+```text
+VITE_API_BASE_URL=https://your-active-railway-backend-domain
+```
+
+The value must be the backend origin without a trailing `/api`. The sitemap script will request `/api/products` and generate canonical product URLs in this format:
+
+```text
+https://papercues.in/product/product-name-productId
+```
+
+On Vercel, product fetching is required. If the API cannot be reached, the build fails instead of deploying a static-only ecommerce sitemap.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

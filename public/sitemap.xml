@@ -20,19 +20,4 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  <url>
-    <loc>https://papercues.in/product/floral-affair-94d1f9a4-fe14-4599-9212-c8a35e9fbacf</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://papercues.in/product/fresh-lemon-656f13a7-b502-44e7-b280-834d1d0b0413</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://papercues.in/product/girl-and-toucan-97aa440b-47b8-499f-a6be-4a7a781c73da</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
 </urlset>
