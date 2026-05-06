@@ -100,23 +100,11 @@ const Home = () => {
         {/* Content */}
         <div className="relative z-20 text-center text-white px-4 sm:px-6 flex flex-col items-center">
 
-          <h2 className="font-serif italic text-lg sm:text-xl md:text-2xl mb-4 text-white/80">
-            {config?.heroTitle || 'The Art of Logging'}
-          </h2>
+          
 
-          <h1
-            className="font-serif text-4xl sm:text-5xl md:text-7xl mb-8 tracking-widest uppercase leading-tight"
-            dangerouslySetInnerHTML={{
-              __html: config?.heroSubtitle || 'Capture<br />Every Moment'
-            }}
-          />
+          
 
-          <Link
-            to={config?.heroLink || '/shop'}
-            className="bg-white text-black px-8 py-3 text-sm tracking-widest uppercase hover:bg-white/90 transition-all duration-300"
-          >
-            Explore Collection
-          </Link>
+          
 
         </div>
       </section>
