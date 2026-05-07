@@ -56,8 +56,13 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await axiosInstance.put(`/cart/${cartId}/items/${itemId}`, { quantity });
       setCart(response.data);
+      setCartMessage('');
+      return { success: true };
     } catch (error) {
       console.error('Error updating quantity:', error);
+      const message = error.response?.data?.message || error.response?.data?.Message || 'Could not update quantity.';
+      setCartMessage(message);
+      return { success: false, message };
     }
   };
 
@@ -65,8 +70,13 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await axiosInstance.delete(`/cart/${cartId}/items/${itemId}`);
       setCart(response.data);
+      setCartMessage('');
+      return { success: true };
     } catch (error) {
       console.error('Error removing item:', error);
+      const message = error.response?.data?.message || error.response?.data?.Message || 'Could not remove item from cart.';
+      setCartMessage(message);
+      return { success: false, message };
     }
   };
 

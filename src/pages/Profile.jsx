@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Package, Settings, Key } from 'lucide-react';
 import axiosInstance from '../api/axios';
+import { useToast } from '../context/ToastContext';
 
 const Profile = () => {
   const { user, token } = useAuth();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -39,19 +41,24 @@ const Profile = () => {
     try {
       await axiosInstance.post('/auth/change-password', { currentPassword, newPassword });
       setPasswordMsg({ type: 'success', text: 'Password changed successfully.' });
+      showToast('success', 'Password changed successfully.');
       setCurrentPassword('');
       setNewPassword('');
     } catch (error) {
-      setPasswordMsg({ type: 'error', text: error.response?.data?.message || 'Failed to change password.' });
+      const message = error.response?.data?.message || 'Failed to change password.';
+      setPasswordMsg({ type: 'error', text: message });
+      showToast('error', message);
     }
   };
 
   const cancelOrder = async (orderId) => {
     try {
       await axiosInstance.put(`/orders/${orderId}/cancel`);
+      showToast('success', 'Order cancelled successfully.');
       fetchOrders();
     } catch (error) {
       console.error('Failed to cancel order:', error);
+      showToast('error', error.response?.data?.message || 'Failed to cancel order.');
     }
   };
 
