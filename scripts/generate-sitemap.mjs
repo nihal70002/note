@@ -51,7 +51,7 @@ const productPath = (product) => {
   const id = product.id ?? product._id ?? product.productId;
   const name = product.name ?? product.title ?? 'product';
   const slug = slugify(name) || 'product';
-  return `/product/${slug}-${id}`;
+  return `/product/${slug}--${id}`;
 };
 
 const staticPages = [

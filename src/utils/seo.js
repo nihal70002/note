@@ -11,11 +11,16 @@ export const slugify = (value) => String(value || '')
 
 export const getProductPath = (product) => {
   const slug = slugify(product?.name) || 'product';
-  return `/product/${slug}-${product?.id}`;
+  return `/product/${slug}--${product?.id}`;
 };
 
 export const getProductIdFromSlug = (slug) => {
   const value = String(slug || '');
+  if (value.includes('--')) {
+    return value.slice(value.lastIndexOf('--') + 2) || value;
+  }
+  const uuidMatch = value.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  if (uuidMatch) return uuidMatch[0];
   const parts = value.split('-');
   return parts[parts.length - 1] || value;
 };
