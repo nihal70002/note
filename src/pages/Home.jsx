@@ -68,37 +68,37 @@ const Home = () => {
       )}
 
       <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16">
-        <div className="absolute inset-0 w-full h-full bg-cream/40">
-          <div className="absolute inset-0 bg-ink/30 z-10" />
-          <img
-            src={heroImage}
-            alt="Papercues premium aesthetic journals and notebooks"
-            fetchPriority="high"
-            decoding="async"
-            className="w-full h-full object-cover animate-in fade-in duration-1000"
-          />
-        </div>
+  <div className="absolute inset-0 w-full h-full bg-cream/40">
+    <div className="absolute inset-0 bg-ink/30 z-10" />
 
-        <div className="relative z-20 text-center text-paper px-4 sm:px-6 flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <h2 className="font-serif italic text-lg sm:text-xl md:text-2xl mb-4 text-paper/80">
-            {config?.heroTitle || 'The Art of Logging'}
-          </h2>
+    <img
+      src={heroImage}
+      alt="Papercues premium aesthetic journals and notebooks"
+      fetchPriority="high"
+      className="w-full h-full object-cover"
+    />
+  </div>
 
-          <h1
-            className="font-serif text-4xl sm:text-5xl md:text-7xl mb-8 tracking-widest uppercase leading-tight"
-            dangerouslySetInnerHTML={{
-              __html: config?.heroSubtitle || 'Capture<br />Every Moment'
-            }}
-          />
+  <div className="relative z-20 text-center text-paper px-4 sm:px-6 flex flex-col items-center">
+    <h2 className="font-serif italic text-lg sm:text-xl md:text-2xl mb-4 text-paper/80">
+      {config?.heroTitle || 'The Art of Logging'}
+    </h2>
 
-          <Link
-            to={config?.heroLink || '/shop'}
-            className="btn-primary bg-paper text-ink hover:bg-paper/90 px-8 py-3 text-sm tracking-widest uppercase"
-          >
-            Explore Collection
-          </Link>
-        </div>
-      </section>
+    <h1
+      className="font-serif text-4xl sm:text-5xl md:text-7xl mb-8 tracking-widest uppercase leading-tight"
+      dangerouslySetInnerHTML={{
+        __html: config?.heroSubtitle || 'Capture<br />Every Moment'
+      }}
+    />
+
+    <Link
+      to={config?.heroLink || '/shop'}
+      className="btn-primary bg-paper text-ink hover:bg-paper/90 px-8 py-3 text-sm tracking-widest uppercase"
+    >
+      Explore Collection
+    </Link>
+  </div>
+</section>
 
       <section className="py-16 sm:py-24 bg-cream/30">
         <div className="container mx-auto px-4 sm:px-6 md:px-12">
