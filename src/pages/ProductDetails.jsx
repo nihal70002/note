@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Plus, Minus, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import axiosInstance from '../api/axios';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
@@ -19,10 +20,10 @@ const ProductDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [wishlist, setWishlist] = useState(false);
-  const [message, setMessage] = useState('');
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const { addToCart } = useCart();
   const { user, token } = useAuth();
+  const { showToast } = useToast();
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
@@ -60,20 +61,20 @@ const ProductDetails = () => {
       .catch(err => console.error(err));
   }, [productId, token]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product) {
       if (product.stock <= 0) {
-        setMessage('This product is out of stock.');
+        showToast('error', 'This product is out of stock.');
         return;
       }
-      addToCart(product.id, quantity);
-      setMessage('Added to cart.');
+      const result = await addToCart(product.id, quantity);
+      showToast(result?.success ? 'success' : 'error', result?.success ? `${product.name} added to cart.` : result?.message || 'Could not add item to cart.');
     }
   };
 
   const toggleWishlist = async () => {
     if (!token) {
-      setMessage('Please sign in to save this product.');
+      showToast('error', 'Please sign in to save this product.');
       return;
     }
 
@@ -83,27 +84,29 @@ const ProductDetails = () => {
         url: `/wishlist/${product.id}`,
       });
       setWishlist(!wishlist);
-      setMessage(wishlist ? 'Removed from wishlist.' : 'Saved to wishlist.');
+      showToast('success', wishlist ? 'Removed from wishlist.' : 'Saved to wishlist.');
     } catch (error) {
       console.error('Failed to toggle wishlist:', error);
+      showToast('error', 'Could not update wishlist.');
     }
   };
 
   const submitReview = async (e) => {
     e.preventDefault();
     if (!token) {
-      setMessage('Please sign in to write a review.');
+      showToast('error', 'Please sign in to write a review.');
       return;
     }
 
     try {
       await axiosInstance.post(`/products/${product.id}/reviews`, reviewForm);
       setReviewForm({ rating: 5, comment: '' });
-      setMessage('Review saved.');
+      showToast('success', 'Review saved.');
       const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
       setReviews(nextReviews.data);
     } catch (error) {
       console.error('Failed to submit review:', error);
+      showToast('error', 'Could not save review.');
     }
   };
 
@@ -238,8 +241,6 @@ const ProductDetails = () => {
                  </button>
                </div>
              </div>
-
-             {message && <div className="mb-4 text-sm text-center text-taupe">{message}</div>}
 
              <button onClick={handleAddToCart} disabled={product.stock <= 0} className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4 disabled:opacity-60 disabled:cursor-not-allowed">
                Add to Cart

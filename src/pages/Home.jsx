@@ -5,14 +5,15 @@ import axiosInstance from '../api/axios';
 import { useCart } from '../context/CartContext';
 import SEO from '../components/SEO';
 import { organizationSchema, websiteSchema } from '../utils/schema';
+import { useToast } from '../context/ToastContext';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
   const [config, setConfig] = useState(null);
   const [addingProductId, setAddingProductId] = useState(null);
-  const [toast, setToast] = useState({ type: '', text: '' });
 
   const { addToCart } = useCart();
+  const { showToast } = useToast();
 
   useEffect(() => {
     axiosInstance.get('/products')
@@ -29,11 +30,6 @@ const Home = () => {
   }, []);
 
   const heroImage = '/hero.png';
-
-  const showToast = (type, text) => {
-    setToast({ type, text });
-    setTimeout(() => setToast({ type: '', text: '' }), 3000);
-  };
 
   const handleAddToCart = async (product) => {
     setAddingProductId(product.id);
@@ -56,16 +52,6 @@ const Home = () => {
         image="/logo.png"
         jsonLd={[organizationSchema, websiteSchema]}
       />
-
-      {toast.text && (
-        <div className={`fixed top-24 right-4 z-[100] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
-          toast.type === 'success'
-            ? 'bg-green-50 text-green-800 border-green-100'
-            : 'bg-red-50 text-red-700 border-red-100'
-        }`}>
-          {toast.text}
-        </div>
-      )}
 
       <section className="relative min-h-[620px] h-[88svh] flex items-center justify-center -mt-16">
   <div className="absolute inset-0 w-full h-full bg-cream/40">

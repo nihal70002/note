@@ -17,12 +17,24 @@ export const ToastProvider = ({ children }) => {
     <ToastContext.Provider value={{ showToast }}>
       {children}
       {toast.text && (
-        <div className={`fixed top-24 right-4 z-[200] max-w-xs rounded-sm border px-5 py-4 shadow-lg text-sm ${
+        <div className={`fixed top-24 right-4 z-[200] w-[calc(100%-2rem)] max-w-sm rounded-xl border px-5 py-4 shadow-2xl backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-300 ${
           toast.type === 'success'
-            ? 'bg-green-50 text-green-800 border-green-100'
-            : 'bg-red-50 text-red-700 border-red-100'
+            ? 'bg-green-50/95 text-green-900 border-green-200'
+            : 'bg-red-50/95 text-red-900 border-red-200'
         }`}>
-          {toast.text}
+          <div className="flex items-start gap-3">
+            <div className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+              toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+            }`}>
+              {toast.type === 'success' ? '✓' : '!'}
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest">
+                {toast.type === 'success' ? 'Success' : 'Attention'}
+              </p>
+              <p className="mt-1 text-sm leading-relaxed">{toast.text}</p>
+            </div>
+          </div>
         </div>
       )}
     </ToastContext.Provider>
