@@ -5,7 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 
 const Home = lazy(() => import('./pages/Home'));
-const Shop = lazy(() => import('./pages/Shop'));
+const Shop = lazy(() => import('./pages/Shop'));   
 const ProductDetails = lazy(() => import('./pages/ProductDetails'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));

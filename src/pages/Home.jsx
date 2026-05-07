@@ -28,10 +28,7 @@ const Home = () => {
       .catch(err => console.error('Failed to load storefront config', err));
   }, []);
 
-  const heroImage =
-    config?.heroImageUrl && config.heroImageUrl !== '/product3.png'
-      ? config.heroImageUrl
-      : '/hero.png';
+  const heroImage = '/hero.png';
 
   const showToast = (type, text) => {
     setToast({ type, text });
