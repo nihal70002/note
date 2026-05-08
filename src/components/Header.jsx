@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X, UserCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import CartSidebar from './CartSidebar';
@@ -54,7 +54,14 @@ const Header = () => {
         <div className="flex items-center gap-2 sm:gap-4">
           {user ? (
             <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
-              <Link to="/profile" className="text-sm font-medium text-ink hover:text-taupe transition-colors">Hi, {user.username}</Link>
+              <Link
+                to="/profile"
+                aria-label="Open my account, profile, and orders"
+                className="inline-flex items-center gap-2 rounded-full border border-taupe/30 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-ink hover:border-ink hover:bg-cream/40 transition-colors"
+              >
+                <UserCircle className="w-4 h-4" />
+                My Account
+              </Link>
               {user.role === 'Admin' && (
                 <Link to="/admin" className="text-sm text-taupe hover:text-ink transition-colors">Admin</Link>
               )}
@@ -102,8 +109,9 @@ const Header = () => {
           <div className="pt-2 border-t border-taupe/10 flex flex-col gap-3">
             {user ? (
               <>
-                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-ink">
-                  Hi, {user.username}
+                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-sm uppercase tracking-widest text-ink">
+                  <UserCircle className="w-4 h-4" />
+                  My Account / Orders
                 </Link>
                 {user.role === 'Admin' && (
                   <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-taupe">

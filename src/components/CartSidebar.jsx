@@ -20,7 +20,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
     email: '',
     password: ''
   });
-  const [couponCode, setCouponCode] = useState('');
   const [checkoutMessage, setCheckoutMessage] = useState({ type: '', text: '' });
   const [previousAddress, setPreviousAddress] = useState(null);
   const [usePreviousAddress, setUsePreviousAddress] = useState(false);
@@ -45,7 +44,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthMode('login');
     setAuthError('');
     setAuthLoading(false);
-    setCouponCode('');
     setCheckoutMessage({ type: '', text: '' });
     setPreviousAddress(null);
     setUsePreviousAddress(false);
@@ -308,16 +306,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              <div className="pt-2 border-t border-taupe/10 mt-2">
-                <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">Coupon Code</label>
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  placeholder="WELCOME10"
-                  className="w-full px-4 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
-                />
-              </div>
               <button 
                 onClick={() => setIsCheckoutStep(false)}
                 className="w-full py-2 text-sm text-taupe hover:text-ink underline uppercase tracking-widest mt-4"
@@ -406,7 +394,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   }
                   
                   const finalShippingDetails = usePreviousAddress ? previousAddress : shippingDetails;
-                  const result = await checkout({ ...finalShippingDetails, couponCode });
+                  const result = await checkout(finalShippingDetails);
                   
                   if (result.success) {
                     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -439,7 +427,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
                             navigate(`/order-success/${result.orderId}`);
                             setTimeout(() => {
                               setIsCheckoutStep(false);
-                              setCouponCode('');
                               setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
                             }, 300);
                           }, 1500);
