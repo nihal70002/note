@@ -6,6 +6,7 @@ export const organizationSchema = {
   name: 'Papercues',
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
+  description: 'Papercues India creates premium journals, aesthetic notebooks, planners and creative stationery for writing, planning and self-expression.',
   sameAs: [
     SITE_URL,
   ],
@@ -48,8 +49,32 @@ export const productSchema = (product, path) => ({
     availability: Number(product.stock || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
     itemCondition: 'https://schema.org/NewCondition',
   },
+  aggregateRating: Number(product.averageRating || 0) > 0 ? {
+    '@type': 'AggregateRating',
+    ratingValue: String(product.averageRating),
+    reviewCount: String(product.reviewCount || 1),
+  } : undefined,
   brand: {
     '@type': 'Brand',
     name: 'Papercues',
   },
+});
+
+export const reviewSchema = (product, reviews = []) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  review: reviews.slice(0, 10).map((review) => ({
+    '@type': 'Review',
+    author: {
+      '@type': 'Person',
+      name: review.username || 'Papercues customer',
+    },
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(review.rating || 5),
+      bestRating: '5',
+    },
+    reviewBody: review.comment || '',
+  })),
 });

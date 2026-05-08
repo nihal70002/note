@@ -30,20 +30,20 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass-header py-3' : 'bg-transparent py-5'}`}>
-      <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 flex justify-between items-center gap-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <img src="/logo.png" alt="Papercues logo" className="h-12 sm:h-14 w-auto" />
-          <span className="font-serif font-semibold text-lg sm:text-xl tracking-wider">PAPERCUES</span>
+        <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+          <img src="/logo.png" alt="Papercues logo" className="h-10 sm:h-12 lg:h-14 w-auto" />
+          <span className="font-serif font-semibold text-base sm:text-lg lg:text-xl tracking-wider">PAPERCUES</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-5 lg:gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               to={link.path}
-              className={`nav-link text-sm uppercase tracking-widest ${location.pathname === link.path ? 'font-semibold text-ink' : ''}`}
+              className={`nav-link text-xs lg:text-sm uppercase tracking-widest ${location.pathname === link.path ? 'font-semibold text-ink' : ''}`}
             >
               {link.name}
             </Link>
@@ -51,9 +51,9 @@ const Header = () => {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
           {user ? (
-            <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 mr-2 lg:mr-4 border-r border-ink/20 pr-2 lg:pr-4">
               <Link
                 to="/profile"
                 aria-label="Open my account, profile, and orders"
@@ -68,8 +68,8 @@ const Header = () => {
               <button onClick={logout} className="text-sm text-red-500 hover:text-red-700 transition-colors">Logout</button>
             </div>
           ) : (
-            <div className="hidden md:flex items-center gap-4 mr-4 border-r border-ink/20 pr-4">
-              <Link to="/login" className="text-sm uppercase tracking-widest text-ink hover:text-taupe transition-colors">Login</Link>
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 mr-2 lg:mr-4 border-r border-ink/20 pr-2 lg:pr-4">
+              <Link to="/login" className="text-xs lg:text-sm uppercase tracking-widest text-ink hover:text-taupe transition-colors">Login</Link>
             </div>
           )}
 
