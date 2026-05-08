@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getProductPath } from '../utils/seo';
 
@@ -15,8 +16,11 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
           <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors z-10" />
           <img 
             src={image} 
-            alt={name} 
+            alt={`${name} premium aesthetic journal by Papercues India`}
             loading="lazy"
+            decoding="async"
+            width="640"
+            height="800"
             className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         </div>
@@ -39,4 +43,4 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);

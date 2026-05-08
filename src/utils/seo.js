@@ -1,6 +1,6 @@
 export const SITE_URL = 'https://papercues.in';
-export const DEFAULT_TITLE = 'Papercues | Premium Aesthetic Journals & Notebooks India';
-export const DEFAULT_DESCRIPTION = 'Shop premium aesthetic journals, notebooks and planners at Papercues. Elegant stationery designed for students, journaling and gifting.';
+export const DEFAULT_TITLE = 'Papercues India | Premium Journals, Diaries & Aesthetic Notebooks';
+export const DEFAULT_DESCRIPTION = 'Shop premium journals, aesthetic notebooks, planners and creative stationery at Papercues India. Designed for writing, planning and self-expression.';
 export const DEFAULT_IMAGE = `${SITE_URL}/logo.png`;
 
 export const slugify = (value) => String(value || '')
@@ -31,5 +31,11 @@ export const absoluteUrl = (path = '/') => {
 };
 
 export const productDescription = (product) => {
-  return `Buy ${product?.name || 'this product'} from Papercues. Premium aesthetic journal/notebook designed for journaling, gifting and students.`;
+  const name = product?.name || 'premium aesthetic journal';
+  return `Buy ${name} from Papercues India. Premium aesthetic journal and notebook for writing, planning, journaling, gifting and creative self-expression.`;
+};
+
+export const productTitle = (product) => {
+  const name = product?.name || 'Premium Aesthetic Journal';
+  return `${name} | Premium Aesthetic Journal | Papercues India`;
 };
