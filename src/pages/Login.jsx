@@ -82,9 +82,14 @@ const Login = () => {
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-xs uppercase tracking-widest text-taupe">
-              Password
-            </label>
+            <div className="flex justify-between items-center">
+              <label className="block text-xs uppercase tracking-widest text-taupe">
+                Password
+              </label>
+              <Link to="/forgot-password" className="text-xs text-taupe hover:text-ink transition underline-offset-4 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
 
             <div className="relative mt-2">
               <input
