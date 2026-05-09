@@ -15,13 +15,21 @@ const ForgotPassword = () => {
     setMessage('');
 
     try {
-      await axiosInstance.post('/auth/forgot-password', { email });
-      const successMessage = 'If an account exists, password reset instructions have been sent.';
+      const response = await axiosInstance.post('/auth/forgot-password', { email });
+      const successMessage = response.data?.message || 'If an account exists, password reset instructions have been sent.';
       setMessage(successMessage);
       showToast('success', successMessage);
       setEmail('');
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Could not send reset instructions. Please try again.';
+      console.error("Forgot password error:", error);
+      let errorMessage = 'Could not send reset instructions. Please try again.';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Network error. Please check your connection or wait for the server to wake up.';
+      }
+      
       setMessage(errorMessage);
       showToast('error', errorMessage);
     } finally {
