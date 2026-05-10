@@ -30,7 +30,8 @@ export const CartProvider = ({ children }) => {
     }
     setCartId(id);
     fetchCart(id);
-    fetchShippingSettings();
+    // Don't block cart initialization on shipping settings error
+    fetchShippingSettings().catch(console.error);
   }, []);
 
   const fetchShippingSettings = async () => {
@@ -39,7 +40,7 @@ export const CartProvider = ({ children }) => {
       setShippingSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch shipping settings:', error);
-      // Use default settings if API fails
+      // Use default settings if API fails - no need to update state since defaults are already set
     }
   };
 

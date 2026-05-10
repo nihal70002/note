@@ -10,7 +10,7 @@ import ShimmerButton from './ShimmerButton';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, cartMessage, setCartMessage } = useCart();
+  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage } = useCart();
   const { user, login, register } = useAuth();
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
@@ -42,10 +42,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   // Check if cart qualifies for free shipping promotion
-  const booksCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-  
   // For now, assume quantity-based shipping (3+ items) since that's what the banner shows
-  const showFreeShippingBanner = booksCount >= 3;
+  const showFreeShippingBanner = totalItems >= 3;
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);
