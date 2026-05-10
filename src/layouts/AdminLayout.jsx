@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, PlusSquare, LogOut, Menu, X, Users, Wallet } from "lucide-react";
+import { LayoutDashboard, Package, PlusSquare, LogOut, Menu, X, Users, Wallet, Truck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
@@ -15,6 +15,7 @@ const AdminLayout = () => {
     { name: "Expenses", path: "/admin/expenses", icon: Wallet },
     { name: "Products", path: "/admin/products", icon: Package },
     { name: "Add Product", path: "/admin/products/add", icon: PlusSquare },
+    { name: "Shipping Settings", path: "/admin/shipping", icon: Truck },
     { name: "Storefront", path: "/admin/storefront", icon: LayoutDashboard },
   ];
 

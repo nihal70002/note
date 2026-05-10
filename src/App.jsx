@@ -23,6 +23,7 @@ const AddProduct = lazy(() => import('./pages/admin/AddProduct'));
 const OrdersList = lazy(() => import('./pages/admin/OrdersList'));
 const UsersList = lazy(() => import('./pages/admin/UsersList'));
 const Expenses = lazy(() => import('./pages/admin/Expenses'));
+const ShippingSettings = lazy(() => import('./pages/admin/ShippingSettings'));
 const StorefrontSettings = lazy(() => import('./pages/admin/StorefrontSettings'));
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
             <Route path="products" element={<ProductsList />} />
             <Route path="products/add" element={<AddProduct />} />
             <Route path="products/edit/:id" element={<AddProduct />} />
+            <Route path="shipping" element={<ShippingSettings />} />
             <Route path="storefront" element={<StorefrontSettings />} />
           </Route>
         </Routes>

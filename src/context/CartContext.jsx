@@ -12,6 +12,13 @@ export const CartProvider = ({ children }) => {
   const [cartId, setCartId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cartMessage, setCartMessage] = useState('');
+  const [shippingSettings, setShippingSettings] = useState({
+    enabled: true,
+    standardShippingFee: 5,
+    freeShippingThreshold: 3,
+    freeShippingType: 'quantity',
+    freeShippingAmount: 50
+  });
   const { token } = useAuth();
 
   // Initialize cart
@@ -23,7 +30,18 @@ export const CartProvider = ({ children }) => {
     }
     setCartId(id);
     fetchCart(id);
+    fetchShippingSettings();
   }, []);
+
+  const fetchShippingSettings = async () => {
+    try {
+      const response = await axiosInstance.get('/shipping/settings');
+      setShippingSettings(response.data);
+    } catch (error) {
+      console.error('Failed to fetch shipping settings:', error);
+      // Use default settings if API fails
+    }
+  };
 
   const fetchCart = async (id) => {
     try {
@@ -119,7 +137,13 @@ export const CartProvider = ({ children }) => {
 
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
-  const shippingCharge = totalPrice >= 50 ? 0 : 5;
+  
+  const shippingCharge = shippingSettings.enabled 
+    ? (shippingSettings.freeShippingType === 'quantity' 
+        ? (totalItems >= shippingSettings.freeShippingThreshold ? 0 : shippingSettings.standardShippingFee)
+        : (totalPrice >= shippingSettings.freeShippingAmount ? 0 : shippingSettings.standardShippingFee))
+    : 0;
+  
   const totalAmount = totalPrice + shippingCharge;
 
   return (

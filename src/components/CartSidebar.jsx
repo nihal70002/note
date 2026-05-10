@@ -39,8 +39,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
-  // Check if cart has 3+ books for free shipping promotion
+  // Check if cart qualifies for free shipping promotion
   const booksCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  
+  // For now, assume quantity-based shipping (3+ items) since that's what the banner shows
   const showFreeShippingBanner = booksCount >= 3;
 
   const resetCheckout = () => {
@@ -392,7 +394,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
             </div>
             {shippingCharge > 0 && (
               <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
-                Add ₹{formatINR(50 - totalPrice)} more for FREE shipping
+                Add {3 - totalItems} more {totalItems === 2 ? 'book' : 'books'} for FREE shipping
               </p>
             )}
             <div className="flex justify-between items-center mb-6 text-lg font-serif">
