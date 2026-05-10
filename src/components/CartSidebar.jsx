@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { useState, useEffect } from 'react';
 import FreeShippingBanner from './FreeShippingBanner';
+import ShimmerButton from './ShimmerButton';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const [previousAddress, setPreviousAddress] = useState(null);
   const [usePreviousAddress, setUsePreviousAddress] = useState(false);
   const [addressLoading, setAddressLoading] = useState(false);
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [shippingDetails, setShippingDetails] = useState({
     fullName: '',
     phoneNumber: '',
@@ -227,13 +229,13 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   />
                 </div>
 
-                <button
+                <ShimmerButton
                   type="submit"
-                  disabled={authLoading}
-                  className="btn-primary w-full py-4 uppercase tracking-widest text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                  loading={authLoading}
+                  className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
                 >
-                  {authLoading ? 'Please wait...' : authMode === 'login' ? 'Sign In & Continue' : 'Create Account & Continue'}
-                </button>
+                  {authMode === 'login' ? 'Sign In & Continue' : 'Create Account & Continue'}
+                </ShimmerButton>
 
                 <button
                   type="button"
@@ -401,7 +403,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
               <span>Total</span>
               <span>{formatINR(totalAmount)}</span>
             </div>
-            <button 
+            <ShimmerButton 
+              loading={isProcessingCheckout}
               onClick={async () => {
                 setCartMessage('');
                 setCheckoutMessage({ type: '', text: '' });
@@ -419,8 +422,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     }
                   }
                   
+                  setIsProcessingCheckout(true);
                   const finalShippingDetails = usePreviousAddress ? previousAddress : shippingDetails;
                   const result = await checkout(finalShippingDetails);
+                  setIsProcessingCheckout(false);
                   
                   if (result.success) {
                     const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -497,8 +502,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
               }}
               className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
             >
-              {isCheckoutStep ? 'Confirm Order' : 'Checkout'}
-            </button>
+              {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
+            </ShimmerButton>
           </div>
         )}
       </div>

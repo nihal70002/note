@@ -7,6 +7,7 @@ import { useToast } from '../context/ToastContext';
 import axiosInstance from '../api/axios';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
+import ShimmerButton from '../components/ShimmerButton';
 import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
 import { breadcrumbSchema, productSchema } from '../utils/schema';
 
@@ -288,9 +289,14 @@ const ProductDetails = () => {
                </div>
              </div>
 
-             <button onClick={handleAddToCart} disabled={product.stock <= 0} className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4 disabled:opacity-60 disabled:cursor-not-allowed">
-               Add to Cart
-             </button>
+             <ShimmerButton 
+              onClick={handleAddToCart} 
+              disabled={product.stock <= 0} 
+              loading={addingProductId === product.id}
+              className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4"
+            >
+              {addingProductId === product.id ? 'Adding...' : 'Add to Cart'}
+            </ShimmerButton>
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹50</p>
           </div>
           
