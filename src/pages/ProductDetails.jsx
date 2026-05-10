@@ -21,6 +21,8 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [wishlist, setWishlist] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
+  const [reviewImages, setReviewImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const { addToCart } = useCart();
   const { user, token } = useAuth();
   const { showToast } = useToast();
@@ -91,6 +93,35 @@ const ProductDetails = () => {
     }
   };
 
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (validFiles.length + reviewImages.length > 3) {
+      showToast('error', 'Maximum 3 images allowed.');
+      return;
+    }
+
+    validFiles.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showToast('error', `${file.name} is too large. Max size is 5MB.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setReviewImages(prev => [...prev, file]);
+        setImagePreviews(prev => [...prev, e.target.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setReviewImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
   const submitReview = async (e) => {
     e.preventDefault();
     if (!token) {
@@ -99,8 +130,23 @@ const ProductDetails = () => {
     }
 
     try {
-      await axiosInstance.post(`/products/${product.id}/reviews`, reviewForm);
+      const formData = new FormData();
+      formData.append('rating', reviewForm.rating);
+      formData.append('comment', reviewForm.comment);
+      
+      reviewImages.forEach((image, index) => {
+        formData.append(`images`, image);
+      });
+
+      await axiosInstance.post(`/products/${product.id}/reviews`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
       setReviewForm({ rating: 5, comment: '' });
+      setReviewImages([]);
+      setImagePreviews([]);
       showToast('success', 'Review saved.');
       const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
       setReviews(nextReviews.data);
@@ -272,6 +318,51 @@ const ProductDetails = () => {
                  >
                    {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} stars</option>)}
                  </select>
+                 
+                 {/* Image Upload */}
+                 <div className="space-y-2">
+                   <label className="block text-sm font-medium text-ink uppercase tracking-wider">Add Photos (Optional)</label>
+                   <div className="flex items-center gap-4">
+                     <input
+                       type="file"
+                       multiple
+                       accept="image/*"
+                       onChange={handleImageUpload}
+                       className="hidden"
+                       id="review-images"
+                     />
+                     <label
+                       htmlFor="review-images"
+                       className="px-4 py-2 border border-taupe/30 rounded-sm cursor-pointer hover:border-ink transition-colors text-sm"
+                     >
+                       Choose Images
+                     </label>
+                     <span className="text-xs text-taupe">Up to 3 images, max 5MB each</span>
+                   </div>
+                   
+                   {/* Image Previews */}
+                   {imagePreviews.length > 0 && (
+                     <div className="grid grid-cols-3 gap-2">
+                       {imagePreviews.map((preview, index) => (
+                         <div key={index} className="relative group">
+                           <img
+                             src={preview}
+                             alt={`Review image ${index + 1}`}
+                             className="w-full h-20 object-cover rounded-sm"
+                           />
+                           <button
+                             type="button"
+                             onClick={() => removeImage(index)}
+                             className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                           >
+                             <X className="w-3 h-3" />
+                           </button>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                 </div>
+                 
                  <textarea
                    value={reviewForm.comment}
                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
@@ -292,7 +383,22 @@ const ProductDetails = () => {
                      <span className="font-medium text-ink">{review.username}</span>
                      <span className="text-taupe">{review.rating} / 5</span>
                    </div>
-                   <p className="text-sm text-ink/70">{review.comment}</p>
+                   <p className="text-sm text-ink/70 mb-3">{review.comment}</p>
+                   
+                   {/* Review Images */}
+                   {review.images && review.images.length > 0 && (
+                     <div className="grid grid-cols-3 gap-2">
+                       {review.images.map((image, index) => (
+                         <img
+                           key={index}
+                           src={image}
+                           alt={`Customer review photo ${index + 1}`}
+                           className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
+                           onClick={() => window.open(image, '_blank')}
+                         />
+                       ))}
+                     </div>
+                   )}
                  </div>
                ))}
              </div>

@@ -119,9 +119,11 @@ export const CartProvider = ({ children }) => {
 
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
+  const shippingCharge = totalPrice >= 50 ? 0 : 5;
+  const totalAmount = totalPrice + shippingCharge;
 
   return (
-    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice }}>
+    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice, shippingCharge, totalAmount }}>
       {children}
     </CartContext.Provider>
   );

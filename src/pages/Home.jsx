@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import SEO from '../components/SEO';
 import { organizationSchema, websiteSchema } from '../utils/schema';
 import { useToast } from '../context/ToastContext';
+import FreeShippingBanner from '../components/FreeShippingBanner';
 
 const Home = () => {
   const [newArrivals, setNewArrivals] = useState([]);
@@ -112,6 +113,13 @@ const Home = () => {
               />
             ))}
           </div>
+        </div>
+      </section>
+      
+      {/* Free Shipping Banner */}
+      <section className="py-8 bg-cream/20">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12">
+          <FreeShippingBanner />
         </div>
       </section>
     </div>

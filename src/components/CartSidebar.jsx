@@ -5,10 +5,11 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { useState, useEffect } from 'react';
+import FreeShippingBanner from './FreeShippingBanner';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, cartMessage, setCartMessage } = useCart();
+  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, cartMessage, setCartMessage } = useCart();
   const { user, login, register } = useAuth();
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
@@ -37,6 +38,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
     deliveryAddress: ''
   });
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
+
+  // Check if cart has 3+ books for free shipping promotion
+  const booksCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const showFreeShippingBanner = booksCount >= 3;
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);
@@ -136,6 +141,13 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+          {/* Free Shipping Banner for 3+ books */}
+          {showFreeShippingBanner && !isCheckoutStep && !isAuthStep && (
+            <div className="mb-6">
+              <FreeShippingBanner compact={true} />
+            </div>
+          )}
+          
           {(cartMessage || checkoutMessage.text) && (
             <div className={`text-sm p-3 rounded-sm border ${
               checkoutMessage.type === 'success'
@@ -368,13 +380,25 @@ const CartSidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         {cart?.items?.length > 0 && !isAuthStep && (
           <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
-            <div className="flex justify-between items-center mb-6 text-lg font-serif">
+            <div className="flex justify-between items-center mb-4 text-lg font-serif">
               <span>Subtotal</span>
               <span>{formatINR(totalPrice)}</span>
             </div>
-            <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
-              Shipping & taxes calculated at checkout
-            </p>
+            <div className="flex justify-between items-center mb-4 text-sm">
+              <span className="text-taupe">Shipping</span>
+              <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "text-taupe"}>
+                {shippingCharge === 0 ? "FREE" : formatINR(shippingCharge)}
+              </span>
+            </div>
+            {shippingCharge > 0 && (
+              <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
+                Add ₹{formatINR(50 - totalPrice)} more for FREE shipping
+              </p>
+            )}
+            <div className="flex justify-between items-center mb-6 text-lg font-serif">
+              <span>Total</span>
+              <span>{formatINR(totalAmount)}</span>
+            </div>
             <button 
               onClick={async () => {
                 setCartMessage('');
@@ -407,7 +431,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
                     const options = {
                       key: razorpayKey,
-                      amount: result.amount * 100, // paise
+                      amount: totalAmount * 100, // paise
                       currency: result.currency,
                       name: 'Note E-Commerce',
                       description: 'Order Payment',
