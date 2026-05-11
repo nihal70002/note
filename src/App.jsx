@@ -12,6 +12,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const BuyJournals = lazy(() => import('./pages/BuyJournals'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Profile = lazy(() => import('./pages/Profile'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
@@ -35,6 +36,7 @@ function App() {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="shop" element={<Shop />} />
+            <Route path="buy-journals" element={<BuyJournals />} />
             <Route path="product/:slug" element={<ProductDetails />} />
             <Route path="order-success/:orderId" element={<OrderSuccess />} />
             <Route path="payment-failed" element={<PaymentFailed />} />

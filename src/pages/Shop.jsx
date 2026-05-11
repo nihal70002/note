@@ -32,23 +32,23 @@ const Shop = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12">
       <SEO
-        title="Shop Journals & Notebooks | Papercues"
-        description="Browse Papercues premium journals, notebooks, planners, and creative stationery collections."
+        title="Buy Premium Journals Online India | Free Shipping Above ₹500 | Papercues"
+        description="Shop premium journals and notebooks online in India. Buy aesthetic journals with 120gsm acid-free paper, free shipping above ₹500, and 7-day returns. Order now for fast delivery."
         path="/shop"
         image="/logo.png"
       />
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-taupe/20 pb-8 mb-10 sm:mb-12">
         <div>
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-ink mb-4">The Collection</h1>
-          <p className="text-ink/70 max-w-lg">Discover our full range of minimalist notebooks, productivity planners, and premium journaling accessories.</p>
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-ink mb-4">Buy Premium Journals Online</h1>
+          <p className="text-ink/70 max-w-lg">Shop premium journals with free shipping across India. Quality notebooks with 120gsm acid-free paper, perfect for bullet journaling and creative planning.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
+            placeholder="Search journals..."
             className="w-full sm:w-56 border-b border-taupe/30 bg-transparent py-2 text-sm focus:outline-none focus:border-ink"
           />
           <button 

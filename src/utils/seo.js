@@ -32,7 +32,7 @@ export const absoluteUrl = (path = '/') => {
 
 export const productDescription = (product) => {
   const name = product?.name || 'premium aesthetic journal';
-  return `Buy ${name} from Papercues India. Premium aesthetic journal and notebook for writing, planning, journaling, gifting and creative self-expression.`;
+  return `Buy ${name} online in India with free shipping. Premium aesthetic journal with 120gsm acid-free paper, perfect for bullet journaling, sketching, and planning. Order now for fast delivery.`;
 };
 
 export const productTitle = (product) => {
