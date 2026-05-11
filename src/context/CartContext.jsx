@@ -23,15 +23,21 @@ export const CartProvider = ({ children }) => {
 
   // Initialize cart
   useEffect(() => {
-    let id = localStorage.getItem('cartId');
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem('cartId', id);
+    try {
+      let id = localStorage.getItem('cartId');
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem('cartId', id);
+      }
+      setCartId(id);
+      fetchCart(id);
+      // Don't block cart initialization on shipping settings error
+      fetchShippingSettings().catch(console.error);
+    } catch (error) {
+      console.error('Cart initialization error:', error);
+      // Set empty cart to prevent crashes
+      setCart({ items: [] });
     }
-    setCartId(id);
-    fetchCart(id);
-    // Don't block cart initialization on shipping settings error
-    fetchShippingSettings().catch(console.error);
   }, []);
 
   const fetchShippingSettings = async () => {
@@ -51,7 +57,9 @@ export const CartProvider = ({ children }) => {
       setCartMessage('');
     } catch (error) {
       console.error('Error fetching cart:', error);
-      setCartMessage(error.response?.data?.message || error.response?.data?.Message || 'Could not add item to cart.');
+      setCartMessage(error.response?.data?.message || error.response?.data?.Message || 'Could not fetch cart.');
+      // Set empty cart to prevent crashes
+      setCart({ items: [] });
     } finally {
       setLoading(false);
     }
@@ -139,7 +147,7 @@ export const CartProvider = ({ children }) => {
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
   
-  const shippingCharge = shippingSettings.enabled 
+  const shippingCharge = shippingSettings?.enabled 
     ? (shippingSettings.freeShippingType === 'quantity' 
         ? (totalItems >= shippingSettings.freeShippingThreshold ? 0 : shippingSettings.standardShippingFee)
         : (totalPrice >= shippingSettings.freeShippingAmount ? 0 : shippingSettings.standardShippingFee))

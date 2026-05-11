@@ -43,7 +43,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
   // Check if cart qualifies for free shipping promotion
   // For now, assume quantity-based shipping (3+ items) since that's what the banner shows
-  const showFreeShippingBanner = totalItems >= 3;
+  const showFreeShippingBanner = (totalItems || 0) >= 3;
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);

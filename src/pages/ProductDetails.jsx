@@ -18,6 +18,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [addingProductId, setAddingProductId] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [wishlist, setWishlist] = useState(false);
@@ -70,7 +71,9 @@ const ProductDetails = () => {
         showToast('error', 'This product is out of stock.');
         return;
       }
+      setAddingProductId(product.id);
       const result = await addToCart(product.id, quantity);
+      setAddingProductId(null);
       showToast(result?.success ? 'success' : 'error', result?.success ? `${product.name} added to cart.` : result?.message || 'Could not add item to cart.');
     }
   };
