@@ -10,7 +10,7 @@ import ShimmerButton from './ShimmerButton';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage } = useCart();
+  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
   const { user, login, register } = useAuth();
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
@@ -41,9 +41,12 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
-  // Check if cart qualifies for free shipping promotion
-  // For now, assume quantity-based shipping (3+ items) since that's what the banner shows
-  const showFreeShippingBanner = (totalItems || 0) >= 3;
+  // Check if cart qualifies for free shipping promotion based on shipping settings
+  const showFreeShippingBanner = shippingSettings?.enabled 
+    ? (shippingSettings.freeShippingType === 'quantity' 
+        ? (totalItems || 0) >= shippingSettings.freeShippingThreshold
+        : totalPrice >= shippingSettings.freeShippingAmount)
+    : false;
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);
@@ -392,9 +395,12 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 {shippingCharge === 0 ? "FREE" : formatINR(shippingCharge)}
               </span>
             </div>
-            {shippingCharge > 0 && (
+            {shippingCharge > 0 && shippingSettings?.enabled && (
               <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
-                Add {3 - totalItems} more {totalItems === 2 ? 'book' : 'books'} for FREE shipping
+                {shippingSettings.freeShippingType === 'quantity' 
+                  ? `Add ${Math.max(0, shippingSettings.freeShippingThreshold - totalItems)} more ${shippingSettings.freeShippingThreshold - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
+                  : `Add ₹${Math.max(0, shippingSettings.freeShippingAmount - totalPrice).toFixed(2)} more for FREE shipping`
+                }
               </p>
             )}
             <div className="flex justify-between items-center mb-6 text-lg font-serif">

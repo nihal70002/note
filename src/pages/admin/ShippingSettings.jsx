@@ -11,7 +11,7 @@ const ShippingSettings = () => {
     standardShippingFee: 5,
     freeShippingThreshold: 3,
     freeShippingType: 'quantity', // 'quantity' or 'amount'
-    freeShippingAmount: 50,
+    freeShippingAmount: 500,
     enabled: true
   });
 

@@ -17,7 +17,7 @@ export const CartProvider = ({ children }) => {
     standardShippingFee: 5,
     freeShippingThreshold: 3,
     freeShippingType: 'quantity',
-    freeShippingAmount: 50
+    freeShippingAmount: 500
   });
   const { token } = useAuth();
 

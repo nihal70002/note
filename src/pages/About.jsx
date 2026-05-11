@@ -47,6 +47,62 @@ const About = () => {
           <img src="https://res.cloudinary.com/diybhyxwi/image/upload/v1777885096/note/products/h19khprlqchicwvzw729.png" alt="Craftsmanship Details" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
         </div>
       </div>
+
+      {/* FAQ Section */}
+      <div className="max-w-4xl mx-auto mb-16 sm:mb-24">
+        <div className="text-center mb-12">
+          <span className="text-sm font-bold uppercase tracking-widest text-taupe block">Frequently Asked Questions</span>
+          <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2">Everything You Need to Know</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">What makes Papercues journals special?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                Our journals feature premium 120gsm acid-free paper that prevents ink bleed-through, aesthetic linen-finish hard covers, and thoughtful design elements like 5mm dot grids. Each journal is crafted to be both beautiful and functional.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">Do you ship across India?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                Yes! We ship nationwide with free shipping on orders above ₹500. Standard delivery typically takes 5-7 business days, with express options available for major cities.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">Can I return or exchange products?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                We offer a 7-day return policy for unused items in original packaging. If you receive a damaged product, please contact us within 48 hours for a free replacement.
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">What paper quality do you use?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                All our journals use 120gsm acid-free premium paper that's perfect for fountain pens, gel pens, and markers. The paper prevents ghosting and bleed-through, ensuring clean, professional-looking pages.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">Are your journals eco-friendly?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                We prioritize sustainability by using acid-free paper sourced from responsibly managed forests. Our packaging is minimal and recyclable, and we're constantly working to reduce our environmental footprint.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-serif text-xl text-ink mb-3">How do I care for my journal?</h3>
+              <p className="text-ink/80 leading-relaxed">
+                Keep your journal away from direct sunlight and moisture. Store it flat when not in use to maintain the cover's integrity. Avoid placing heavy objects on the cover to prevent warping.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
