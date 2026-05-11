@@ -293,37 +293,6 @@ const ProductDetails = () => {
              <p className="text-ink/80 leading-relaxed mb-8">
                {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
-             
-             <div className="bg-cream/30 p-4 rounded-sm mb-6">
-               <h4 className="font-serif text-lg text-ink mb-3">Why Choose This Premium Journal?</h4>
-               <ul className="text-sm text-ink/80 space-y-2">
-                 <li className="flex items-start gap-2">
-                   <span className="text-green-600 mt-1">✓</span>
-                   <span><strong>120gsm Acid-Free Paper</strong> - Premium thick paper prevents ink bleed-through, perfect for fountain pens and markers</span>
-                 </li>
-                 <li className="flex items-start gap-2">
-                   <span className="text-green-600 mt-1">✓</span>
-                   <span><strong>5mm Dot Grid</strong> - Ideal structure for bullet journaling, planning, and creative layouts</span>
-                 </li>
-                 <li className="flex items-start gap-2">
-                   <span className="text-green-600 mt-1">✓</span>
-                   <span><strong>Premium Linen Cover</strong> - Durable hard cover with elegant finish for long-lasting use</span>
-                 </li>
-                 <li className="flex items-start gap-2">
-                   <span className="text-green-600 mt-1">✓</span>
-                   <span><strong>Free Shipping Above ₹500</strong> - Order today and get free delivery across India</span>
-                 </li>
-                 <li className="flex items-start gap-2">
-                   <span className="text-green-600 mt-1">✓</span>
-                   <span><strong>7-Day Returns</strong> - Not satisfied? Return within 7 days for full refund</span>
-                 </li>
-               </ul>
-             </div>
-             
-             <div className="border-t border-b border-taupe/20 py-8 mb-8 flex items-center justify-between gap-4">
-               <span className="text-sm uppercase tracking-widest text-ink font-medium">Quantity</span>
-               <div className="flex items-center gap-8 border border-taupe/30 rounded-full px-6 py-3">
-                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink hover:text-taupe transition-colors">
                    <Minus className="w-5 h-5" />
                  </button>
                  <span className="w-6 text-center text-lg font-medium">{quantity}</span>
