@@ -310,7 +310,7 @@ const ProductDetails = () => {
             >
               {addingProductId === product.id ? 'Adding...' : 'Add to Cart'}
             </ShimmerButton>
-             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹50</p>
+             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹500</p>
           </div>
           
           {specifications.length > 0 && (
