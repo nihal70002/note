@@ -99,7 +99,24 @@ const ProductDetails = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    const validFiles = files.filter(file => {
+      // Check for valid image formats
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const isValidType = validTypes.includes(file.type);
+      const isValidExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+      
+      if (!isValidType || !isValidExtension) {
+        showToast('error', `${file.name} is not a valid image format. Please use JPG, PNG, GIF, or WebP.`);
+        return false;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showToast('error', `${file.name} is too large. Max size is 5MB.`);
+        return false;
+      }
+      
+      return true;
+    });
     
     if (validFiles.length + reviewImages.length > 3) {
       showToast('error', 'Maximum 3 images allowed.');
@@ -107,15 +124,13 @@ const ProductDetails = () => {
     }
 
     validFiles.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        showToast('error', `${file.name} is too large. Max size is 5MB.`);
-        return;
-      }
-
       const reader = new FileReader();
       reader.onload = (e) => {
         setReviewImages(prev => [...prev, file]);
         setImagePreviews(prev => [...prev, e.target.result]);
+      };
+      reader.onerror = () => {
+        showToast('error', `Failed to read ${file.name}. Please try again.`);
       };
       reader.readAsDataURL(file);
     });
@@ -139,7 +154,7 @@ const ProductDetails = () => {
       formData.append('comment', reviewForm.comment);
       
       reviewImages.forEach((image, index) => {
-        formData.append(`images`, image);
+        formData.append(`images`, image, index);
       });
 
       await axiosInstance.post(`/products/${product.id}/reviews`, formData, {
@@ -276,7 +291,7 @@ const ProductDetails = () => {
                </span>
              </div>
              <p className="text-ink/80 leading-relaxed mb-8">
-               {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover. Buy now with free shipping on orders above ₹500."}
+               {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
              
              <div className="bg-cream/30 p-4 rounded-sm mb-6">
