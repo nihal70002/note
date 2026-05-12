@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, Minus, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Minus, Heart, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -10,6 +10,13 @@ import ProductCard from '../components/ProductCard';
 import ShimmerButton from '../components/ShimmerButton';
 import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
 import { breadcrumbSchema, productSchema } from '../utils/schema';
+
+const normalizeReviews = (data) => {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.reviews)) return data.reviews;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
+};
 
 const ProductDetails = () => {
   const { id, slug } = useParams();
@@ -44,7 +51,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     axiosInstance.get(`/products/${productId}/reviews`)
-      .then(res => setReviews(res.data))
+      .then(res => setReviews(normalizeReviews(res.data)))
       .catch(err => console.error(err));
   }, [productId]);
 
@@ -168,7 +175,7 @@ const ProductDetails = () => {
       setImagePreviews([]);
       showToast('success', 'Review saved.');
       const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
-      setReviews(nextReviews.data);
+      setReviews(normalizeReviews(nextReviews.data));
     } catch (error) {
       console.error('Failed to submit review:', error);
       showToast('error', 'Could not save review.');
@@ -289,10 +296,17 @@ const ProductDetails = () => {
                <span className={product.stock > 0 ? 'text-green-700' : 'text-red-600'}>
                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                </span>
+               <a href="#customer-reviews" className="basis-full sm:basis-auto text-ink underline underline-offset-4">
+                 Write a review
+               </a>
              </div>
              <p className="text-ink/80 leading-relaxed mb-8">
                {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
              </p>
+             <div className="mb-8">
+               <label className="block text-sm uppercase tracking-widest text-taupe mb-3">Quantity</label>
+               <div className="inline-flex items-center gap-4 border border-taupe/30 rounded-sm px-4 py-3">
+                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-ink hover:text-taupe transition-colors">
                    <Minus className="w-5 h-5" />
                  </button>
                  <span className="w-6 text-center text-lg font-medium">{quantity}</span>
@@ -326,7 +340,7 @@ const ProductDetails = () => {
           </div>
           )}
 
-          <div className="space-y-6 mt-8 bg-paper border border-taupe/10 p-5 sm:p-8 rounded-sm">
+          <div id="customer-reviews" className="space-y-6 mt-8 scroll-mt-24 bg-paper border border-taupe/10 p-5 sm:p-8 rounded-sm">
              <h4 className="font-serif text-lg text-ink">Customer Reviews</h4>
              {user && (
                <form onSubmit={submitReview} className="space-y-4">
@@ -341,7 +355,7 @@ const ProductDetails = () => {
                  {/* Image Upload */}
                  <div className="space-y-2">
                    <label className="block text-sm font-medium text-ink uppercase tracking-wider">Add Photos (Optional)</label>
-                   <div className="flex items-center gap-4">
+                   <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                      <input
                        type="file"
                        multiple
@@ -392,6 +406,14 @@ const ProductDetails = () => {
                  />
                  <button type="submit" className="btn-secondary w-full py-3 text-sm uppercase tracking-widest">Save Review</button>
                </form>
+             )}
+             {!user && (
+               <div className="space-y-3 border-t border-taupe/10 pt-5">
+                 <p className="text-sm text-taupe">Sign in to write a review for this product.</p>
+                 <Link to="/login" className="btn-secondary inline-flex w-full justify-center py-3 text-sm uppercase tracking-widest sm:w-auto sm:px-6">
+                   Sign In to Review
+                 </Link>
+               </div>
              )}
              <div className="space-y-4">
                {reviews.length === 0 ? (
