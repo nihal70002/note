@@ -427,16 +427,31 @@ const ProductDetails = () => {
                    <p className="text-sm text-ink/70 mb-3">{review.comment}</p>
                    
                    {/* Review Images */}
-                   {review.images && Array.isArray(review.images) && review.images.length > 0 && (
+                   {(() => {
+                     console.log('Review data:', review);
+                     console.log('Review images:', review.images);
+                     console.log('Images type:', typeof review.images);
+                     console.log('Images array check:', Array.isArray(review.images));
+                     return review.images && Array.isArray(review.images) && review.images.length > 0;
+                   })() && (
                      <div className="grid grid-cols-3 gap-2">
                        {review.images.map((image, index) => {
-                         // Handle both string URLs and potential Cloudinary objects
-                         let imageUrl = image;
-                         if (typeof image === 'object' && image.url) {
+                         console.log('Processing image:', image, 'Type:', typeof image);
+                         
+                         // Handle different image formats
+                         let imageUrl = '';
+                         if (typeof image === 'string') {
+                           imageUrl = image.startsWith('http') ? image : `https://noteback-production.up.railway.app${image}`;
+                         } else if (typeof image === 'object' && image.url) {
                            imageUrl = image.url;
-                         } else if (typeof image === 'string') {
-                           imageUrl = image.startsWith('http') ? image : image;
+                         } else if (typeof image === 'object' && image.secure_url) {
+                           imageUrl = image.secure_url;
+                         } else {
+                           console.error('Unknown image format:', image);
+                           return null;
                          }
+                         
+                         console.log('Final image URL:', imageUrl);
                          
                          return (
                            <img
@@ -446,7 +461,7 @@ const ProductDetails = () => {
                              className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
                              onClick={() => window.open(imageUrl, '_blank')}
                              onError={(e) => {
-                               console.error('Image failed to load:', imageUrl, image);
+                               console.error('Image failed to load:', imageUrl, 'Original:', image);
                                e.target.style.display = 'none';
                              }}
                              onLoad={() => {
