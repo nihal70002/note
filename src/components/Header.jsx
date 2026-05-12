@@ -10,7 +10,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
-  const { totalItems } = useCart();
+  const { totalItems, shouldOpenCart, setShouldOpenCart } = useCart();
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -20,6 +20,14 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Auto-open cart when item is added
+  useEffect(() => {
+    if (shouldOpenCart) {
+      setCartOpen(true);
+      setShouldOpenCart(false); // Reset the trigger
+    }
+  }, [shouldOpenCart, setShouldOpenCart]);
 
   const navLinks = [
     { name: 'Home', path: '/' },

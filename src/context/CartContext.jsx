@@ -17,6 +17,7 @@ export const CartProvider = ({ children }) => {
     standardShippingFee: 5,
     freeShippingAmount: 500
   });
+  const [shouldOpenCart, setShouldOpenCart] = useState(false);
   const { token } = useAuth();
 
   // Initialize cart
@@ -68,6 +69,8 @@ export const CartProvider = ({ children }) => {
       const response = await axiosInstance.post(`/cart/${cartId}/items`, { productId, quantity });
       setCart(response.data);
       setCartMessage('');
+      // Trigger cart to open automatically
+      setShouldOpenCart(true);
       return { success: true };
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -152,7 +155,7 @@ export const CartProvider = ({ children }) => {
   const totalAmount = totalPrice + shippingCharge;
 
   return (
-    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice, shippingCharge, totalAmount }}>
+    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice, shippingCharge, totalAmount, shouldOpenCart, setShouldOpenCart }}>
       {children}
     </CartContext.Provider>
   );
