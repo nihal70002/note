@@ -530,6 +530,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
                   }
                 }}
+            }}
               className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
             >
               {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
@@ -537,7 +538,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        const options = {
+        const razorpayOptions = {
           key: razorpayKey,
           amount: result.amount * 100, // paise
           currency: result.currency,
