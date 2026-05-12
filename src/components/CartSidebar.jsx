@@ -480,15 +480,13 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         setIsAuthStep(true);
                       }
                     } else {
-                      if (!usePreviousAddress) {
-                        if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.addressLine1 || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
-                          setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
-                          return;
-                        }
+                      if (!shippingDetails.fullName || !shippingDetails.phoneNumber || !shippingDetails.addressLine1 || !shippingDetails.city || !shippingDetails.state || !shippingDetails.pincode) {
+                        setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
+                        return;
                       }
                       
                       setIsProcessingCheckout(true);
-                      const finalShippingDetails = usePreviousAddress ? previousAddress : shippingDetails;
+                      const finalShippingDetails = shippingDetails;
                       const result = await checkout(finalShippingDetails);
                       setIsProcessingCheckout(false);
                       
