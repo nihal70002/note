@@ -383,7 +383,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         {cart?.items?.length > 0 && !isAuthStep && (
           <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
-            <div className="flex justify-between items-center mb-4 text-lg font-serif">
+            <div className="flex justify-between items-center mb-4 text-lg">
               <span>Subtotal</span>
               <span>{formatINR(totalPrice)}</span>
             </div>
@@ -401,7 +401,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 }
               </p>
             )}
-            <div className="flex justify-between items-center mb-6 text-lg font-serif">
+            <div className="flex justify-between items-center mb-6 text-lg">
               <span>Total</span>
               <span>{formatINR(totalAmount)}</span>
             </div>
