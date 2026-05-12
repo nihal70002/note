@@ -42,7 +42,27 @@ export const CartProvider = ({ children }) => {
   const fetchShippingSettings = async () => {
     try {
       const response = await axiosInstance.get('/shipping/settings');
-      setShippingSettings(response.data);
+      const settings = response.data;
+      
+      // Validate and warn about missing config data
+      if (!settings) {
+        console.warn('[Cart Warning] Shipping settings response is empty, using defaults');
+        return;
+      }
+      
+      if (import.meta.env.DEV) {
+        if (settings.freeShippingAmount === undefined) {
+          console.warn('[Cart Warning] freeShippingAmount is missing from shipping settings');
+        }
+        if (settings.standardShippingFee === undefined) {
+          console.warn('[Cart Warning] standardShippingFee is missing from shipping settings');
+        }
+        if (settings.enabled === undefined) {
+          console.warn('[Cart Warning] enabled flag is missing from shipping settings');
+        }
+      }
+      
+      setShippingSettings(settings);
     } catch (error) {
       console.error('Failed to fetch shipping settings:', error);
       // Use default settings if API fails - no need to update state since defaults are already set
@@ -149,7 +169,7 @@ export const CartProvider = ({ children }) => {
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
   
   const shippingCharge = shippingSettings?.enabled 
-    ? (totalPrice >= shippingSettings.freeShippingAmount ? 0 : shippingSettings.standardShippingFee)
+    ? (totalPrice >= (shippingSettings?.freeShippingAmount ?? 500) ? 0 : (shippingSettings?.standardShippingFee ?? 5))
     : 0;
   
   const totalAmount = totalPrice + shippingCharge;

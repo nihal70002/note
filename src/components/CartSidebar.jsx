@@ -12,6 +12,26 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
   const { user, login, register } = useAuth();
+
+  // Guard against undefined shipping settings
+  if (!shippingSettings) {
+    console.warn('[Cart Warning] Shipping settings not available, cart may not display correctly');
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+        <div className="bg-paper rounded-lg shadow-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
+            <h2 className="font-serif text-xl text-ink">Your Cart</h2>
+            <button onClick={onClose} className="text-taupe hover:text-ink transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="p-4 sm:p-6">
+            <p className="text-taupe text-center">Loading shipping information...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -47,11 +67,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
   const showFreeShippingBanner = shippingSettings?.enabled 
-    ? totalPrice >= shippingSettings.freeShippingAmount
+    ? totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)
     : false;
 
   // Debug shipping calculation
-  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings.freeShippingAmount, 'should be free:', totalPrice >= shippingSettings.freeShippingAmount);
+  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings?.freeShippingAmount, 'should be free:', totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);
@@ -413,9 +433,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
             </div>
             {shippingCharge > 0 && shippingSettings?.enabled && (
               <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
-                {shippingSettings.freeShippingType === 'quantity' 
-                  ? `Add ${Math.max(0, shippingSettings.freeShippingThreshold - totalItems)} more ${shippingSettings.freeShippingThreshold - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
-                  : `Add ₹${Math.max(0, shippingSettings.freeShippingAmount - totalPrice).toFixed(2)} more for FREE shipping`
+                {shippingSettings?.freeShippingType === 'quantity' 
+                  ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 3) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 3) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
+                  : `Add ₹${Math.max(0, (shippingSettings?.freeShippingAmount ?? 500) - totalPrice).toFixed(2)} more for FREE shipping`
                 }
               </p>
             )}
