@@ -43,10 +43,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
     password: ''
   });
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
-  const [addressLoading, setAddressLoading] = useState(false);
   const [checkoutMessage, setCheckoutMessage] = useState({ type: '', text: '' });
-  const [previousAddress, setPreviousAddress] = useState(null);
-  const [usePreviousAddress, setUsePreviousAddress] = useState(false);
   const [shippingDetails, setShippingDetails] = useState({
     fullName: '',
     phoneNumber: '',
@@ -89,38 +86,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthError('');
     setAuthLoading(false);
     setCheckoutMessage({ type: '', text: '' });
-    setPreviousAddress(null);
-    setUsePreviousAddress(false);
   };
 
-  useEffect(() => {
-    if (isCheckoutStep && user && !addressLoading) {
-      setAddressLoading(true);
-      axiosInstance.get('/orders')
-        .then(res => {
-          if (res.data && res.data.length > 0) {
-            const lastOrder = res.data.find(o => o.addressLine1);
-            if (lastOrder) {
-              setPreviousAddress({
-                fullName: lastOrder.fullName || '',
-                phoneNumber: lastOrder.phoneNumber || '',
-                alternatePhoneNumber: lastOrder.alternatePhoneNumber || '',
-                addressLine1: lastOrder.addressLine1 || '',
-                addressLine2: lastOrder.addressLine2 || '',
-                city: lastOrder.city || '',
-                state: lastOrder.state || '',
-                landmark: lastOrder.landmark || '',
-                pincode: lastOrder.pincode || '',
-                deliveryAddress: lastOrder.deliveryAddress || ''
-              });
-              setUsePreviousAddress(true);
-            }
-          }
-        })
-        .catch(console.error)
-        .finally(() => setAddressLoading(false));
-    }
-  }, [isCheckoutStep, user, addressLoading]);
 
   const handleInlineAuth = async (e) => {
     e.preventDefault();
@@ -297,33 +264,13 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     </p>
                   </div>
 
-                  {addressLoading && (
-                    <div className="text-center py-8">
-                      <p className="text-taupe">Loading previous addresses...</p>
-                    </div>
-                  )}
-
-                  {previousAddress && (
-                    <div className="bg-green-50 border border-green-100 p-3 rounded-sm mb-4">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={usePreviousAddress}
-                          onChange={(e) => setUsePreviousAddress(e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm text-green-800">Use previous shipping address</span>
-                      </label>
-                    </div>
-                  )}
-
                   <form onSubmit={handleInlineAuth} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-ink mb-1">Full Name *</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.fullName : shippingDetails.fullName}
+                          value={shippingDetails.fullName}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, fullName: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="John Doe"
@@ -335,7 +282,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">Phone Number *</label>
                         <input
                           type="tel"
-                          value={usePreviousAddress ? previousAddress.phoneNumber : shippingDetails.phoneNumber}
+                          value={shippingDetails.phoneNumber}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, phoneNumber: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="+91 98765 43210"
@@ -349,7 +296,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">Alternate Phone</label>
                         <input
                           type="tel"
-                          value={usePreviousAddress ? previousAddress.alternatePhoneNumber : shippingDetails.alternatePhoneNumber}
+                          value={shippingDetails.alternatePhoneNumber}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, alternatePhoneNumber: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="+91 98765 43210"
@@ -360,7 +307,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">Address Line 1 *</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.addressLine1 : shippingDetails.addressLine1}
+                          value={shippingDetails.addressLine1}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, addressLine1: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="123, Main Street"
@@ -373,7 +320,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       <label className="block text-sm font-medium text-ink mb-1">Address Line 2</label>
                       <input
                         type="text"
-                        value={usePreviousAddress ? previousAddress.addressLine2 : shippingDetails.addressLine2}
+                        value={shippingDetails.addressLine2}
                         onChange={(e) => setShippingDetails(prev => ({ ...prev, addressLine2: e.target.value }))}
                         className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                         placeholder="Apt 4B"
@@ -385,7 +332,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">City *</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.city : shippingDetails.city}
+                          value={shippingDetails.city}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, city: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="Mumbai"
@@ -397,7 +344,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">State *</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.state : shippingDetails.state}
+                          value={shippingDetails.state}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, state: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="Maharashtra"
@@ -409,7 +356,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <label className="block text-sm font-medium text-ink mb-1">PIN Code *</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.pincode : shippingDetails.pincode}
+                          value={shippingDetails.pincode}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, pincode: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="400001"
@@ -423,7 +370,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       <label className="block text-sm font-medium text-ink mb-1">Landmark</label>
                         <input
                           type="text"
-                          value={usePreviousAddress ? previousAddress.landmark : shippingDetails.landmark}
+                          value={shippingDetails.landmark}
                           onChange={(e) => setShippingDetails(prev => ({ ...prev, landmark: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
                           placeholder="Near Railway Station"
