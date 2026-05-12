@@ -50,6 +50,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
     ? totalPrice >= shippingSettings.freeShippingAmount
     : false;
 
+  // Debug shipping calculation
+  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings.freeShippingAmount, 'should be free:', totalPrice >= shippingSettings.freeShippingAmount);
+
   const resetCheckout = () => {
     setIsCheckoutStep(false);
     setIsAuthStep(false);
