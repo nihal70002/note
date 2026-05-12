@@ -23,11 +23,40 @@ export const CartProvider = ({ children }) => {
   // Initialize cart
   useEffect(() => {
     try {
-      let id = localStorage.getItem('cartId');
+      // Create user-specific cart ID based on token to prevent sharing between users
+      let id = null;
+      if (token) {
+        // For logged-in users, create cart ID based on user ID from token
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const userId = payload.sub || payload.nameid;
+          id = `cart_${userId}`;
+        } catch (e) {
+          console.error('Failed to decode token for cart ID:', e);
+          id = localStorage.getItem('cartId');
+        }
+      } else {
+        // For guest users, use session storage instead of local storage
+        id = sessionStorage.getItem('cartId');
+      }
+      
       if (!id) {
         id = crypto.randomUUID();
-        localStorage.setItem('cartId', id);
+        if (token) {
+          // For logged-in users, we could associate cart with user on backend
+          console.log('[Cart] Creating new cart for logged-in user:', id);
+        } else {
+          // For guest users, use session storage
+          sessionStorage.setItem('cartId', id);
+          console.log('[Cart] Creating new cart for guest user:', id);
+        }
       }
+      
+      // For guest users, also store in session storage
+      if (!token) {
+        sessionStorage.setItem('cartId', id);
+      }
+      
       setCartId(id);
       fetchCart(id);
       // Don't block cart initialization on shipping settings error
@@ -37,7 +66,7 @@ export const CartProvider = ({ children }) => {
       // Set empty cart to prevent crashes
       setCart({ items: [] });
     }
-  }, []);
+  }, [token]);
 
   const fetchShippingSettings = async () => {
     try {

@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(() => {
     setToken(null);
+    // Clear cart data when logging out to prevent sharing between users
+    localStorage.removeItem('cartId');
+    sessionStorage.removeItem('cartId');
     navigate('/login');
   }, [navigate]);
 
