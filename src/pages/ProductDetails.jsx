@@ -11,11 +11,42 @@ import ShimmerButton from '../components/ShimmerButton';
 import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
 import { breadcrumbSchema, productSchema } from '../utils/schema';
 
-const normalizeReviews = (data) => {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.reviews)) return data.reviews;
-  if (Array.isArray(data?.items)) return data.items;
+const normalizeReviewImages = (review) => {
+  const images = review.images ?? review.Images ?? review.imageUrls ?? review.photos ?? [];
+  if (Array.isArray(images)) return images.filter(Boolean).slice(0, 3);
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 3) : [];
+    } catch {
+      return images ? [images].slice(0, 3) : [];
+    }
+  }
   return [];
+};
+
+const normalizeReviews = (data) => {
+  const source = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.reviews)
+      ? data.reviews
+      : Array.isArray(data?.items)
+        ? data.items
+        : [];
+
+  return source.map((review) => ({
+    ...review,
+    images: normalizeReviewImages(review),
+  }));
+};
+
+const getReviewImageUrl = (image) => {
+  if (typeof image === 'string') {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+    return image.startsWith('http') ? image : `${apiBaseUrl}${image}`;
+  }
+
+  return image?.url || image?.secure_url || '';
 };
 
 const ProductDetails = () => {
@@ -51,7 +82,12 @@ const ProductDetails = () => {
 
   useEffect(() => {
     axiosInstance.get(`/products/${productId}/reviews`)
-      .then(res => setReviews(normalizeReviews(res.data)))
+      .then(res => {
+        console.log('Reviews API response:', res.data);
+        const normalizedReviews = normalizeReviews(res.data);
+        console.log('Normalized reviews:', normalizedReviews);
+        setReviews(normalizedReviews);
+      })
       .catch(err => console.error(err));
   }, [productId]);
 
@@ -160,22 +196,28 @@ const ProductDetails = () => {
       formData.append('rating', reviewForm.rating);
       formData.append('comment', reviewForm.comment);
       
-      reviewImages.forEach((image, index) => {
-        formData.append(`images`, image, index);
+      reviewImages.forEach((image) => {
+        formData.append('images', image, image.name);
       });
 
-      await axiosInstance.post(`/products/${product.id}/reviews`, formData, {
+      console.log('Submitting review images:', reviewImages);
+
+      const saveResponse = await axiosInstance.post(`/products/${product.id}/reviews`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log('Review save response:', saveResponse.data);
       
       setReviewForm({ rating: 5, comment: '' });
       setReviewImages([]);
       setImagePreviews([]);
       showToast('success', 'Review saved.');
       const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
-      setReviews(normalizeReviews(nextReviews.data));
+      console.log('Reviews API response after save:', nextReviews.data);
+      const normalizedReviews = normalizeReviews(nextReviews.data);
+      console.log('Normalized reviews after save:', normalizedReviews);
+      setReviews(normalizedReviews);
     } catch (error) {
       console.error('Failed to submit review:', error);
       showToast('error', 'Could not save review.');
@@ -426,48 +468,30 @@ const ProductDetails = () => {
                    </div>
                    <p className="text-sm text-ink/70 mb-3">{review.comment}</p>
                    
-                   {/* Review Images */}
-                   {(() => {
-                     console.log('Review data:', review);
-                     console.log('Review images:', review.images);
-                     console.log('Images type:', typeof review.images);
-                     console.log('Images array check:', Array.isArray(review.images));
-                     return review.images && Array.isArray(review.images) && review.images.length > 0;
-                   })() && (
-                     <div className="grid grid-cols-3 gap-2">
-                       {review.images.map((image, index) => {
-                         console.log('Processing image:', image, 'Type:', typeof image);
-                         
-                         // Handle different image formats
-                         let imageUrl = '';
-                         if (typeof image === 'string') {
-                           imageUrl = image.startsWith('http') ? image : `https://noteback-production.up.railway.app${image}`;
-                         } else if (typeof image === 'object' && image.url) {
-                           imageUrl = image.url;
-                         } else if (typeof image === 'object' && image.secure_url) {
-                           imageUrl = image.secure_url;
-                         } else {
-                           console.error('Unknown image format:', image);
-                           return null;
-                         }
-                         
-                         console.log('Final image URL:', imageUrl);
-                         
+                   {review.images?.length > 0 && (
+                     <div className="flex gap-2 mt-3 flex-wrap">
+                       {review.images.slice(0, 3).map((image, index) => {
+                         const imageUrl = getReviewImageUrl(image);
+
+                         if (!imageUrl) return null;
+
                          return (
-                           <img
+                           <button
                              key={index}
-                             src={imageUrl}
-                             alt={`Customer review photo ${index + 1}`}
-                             className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
-                             onClick={() => window.open(imageUrl, '_blank')}
-                             onError={(e) => {
-                               console.error('Image failed to load:', imageUrl, 'Original:', image);
-                               e.target.style.display = 'none';
-                             }}
-                             onLoad={() => {
-                               console.log('Image loaded successfully:', imageUrl);
-                             }}
-                           />
+                             type="button"
+                             className="block rounded-lg focus:outline-none focus:ring-2 focus:ring-ink/40"
+                             onClick={() => window.open(imageUrl, '_blank', 'noopener,noreferrer')}
+                           >
+                             <img
+                               src={imageUrl}
+                               alt="review"
+                               className="w-20 h-20 object-cover rounded-lg border border-taupe/20"
+                               onError={(e) => {
+                                 console.error('Review image failed to load:', imageUrl, image);
+                                 e.target.style.display = 'none';
+                               }}
+                             />
+                           </button>
                          );
                        })}
                      </div>
