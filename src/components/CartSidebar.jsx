@@ -147,14 +147,15 @@ const CartSidebar = ({ isOpen, onClose }) => {
     : isCheckoutStep ? 'Shipping Details' : 'Your Cart';
 
   return createPortal(
-    isOpen ? (
-      <>
-      <div 
-        className="fixed inset-0 bg-ink/30 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
-      />
-      
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-paper shadow-2xl z-50 animate-in slide-in-from-right duration-300 flex flex-col">
+    <>
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-ink/30 backdrop-blur-sm z-50 transition-opacity"
+            onClick={onClose}
+          />
+          
+          <div className="fixed top-0 right-0 h-full w-full max-w-md bg-paper shadow-2xl z-50 animate-in slide-in-from-right duration-300 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
           <h2 className="font-serif text-xl sm:text-2xl text-ink">
@@ -582,10 +583,25 @@ const CartSidebar = ({ isOpen, onClose }) => {
               onClose();
               navigate('/payment-failed');
             }
-      </div>
-    </div>
-  </div>
-);
+          }
+        };
+        const razorpay = new window.Razorpay(razorpayOptions);
+        razorpay.open();
+      } else {
+        setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
+      }
+    }}
+    className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
+  >
+    {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
+  </ShimmerButton>
+        </div>
+      )}
+        </div>
+        </>
+      )}
+    </>
+  );
 };  
 
 export default CartSidebar;
