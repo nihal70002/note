@@ -2,6 +2,7 @@ import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import FreeShippingBanner from './FreeShippingBanner';
@@ -359,14 +360,13 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
                     <div>
                       <label className="block text-sm font-medium text-ink mb-1">Address Line 2</label>
-                        <input
-                          type="text"
-                          value={usePreviousAddress ? previousAddress.addressLine2 : shippingDetails.addressLine2}
-                          onChange={(e) => setShippingDetails(prev => ({ ...prev, addressLine2: e.target.value }))}
-                          className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
-                          placeholder="Apt 4B"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        value={usePreviousAddress ? previousAddress.addressLine2 : shippingDetails.addressLine2}
+                        onChange={(e) => setShippingDetails(prev => ({ ...prev, addressLine2: e.target.value }))}
+                        className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
+                        placeholder="Apt 4B"
+                      />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -611,7 +611,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       } else {
                         setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
                       }
-                    }}
+                    }}}
                     className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
                   >
                     {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
