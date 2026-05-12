@@ -170,7 +170,7 @@ export const CartProvider = ({ children }) => {
   
   const shippingCharge = shippingSettings?.enabled 
     ? (shippingSettings?.freeShippingType === 'quantity' 
-        ? (totalItems >= (shippingSettings?.freeShippingThreshold ?? 3) ? 0 : (shippingSettings?.standardShippingFee ?? 5))
+        ? (totalItems >= (shippingSettings?.freeShippingThreshold ?? 2) ? 0 : (shippingSettings?.standardShippingFee ?? 5))
         : (totalPrice >= (shippingSettings?.freeShippingAmount ?? 500) ? 0 : (shippingSettings?.standardShippingFee ?? 5)))
     : 0;
   

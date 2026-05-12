@@ -67,9 +67,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const totalSavings = totalOriginalPrice - totalPrice;
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
+
+  // Check if cart qualifies for free shipping promotion based on shipping settings
   const showFreeShippingBanner = shippingSettings?.enabled 
     ? (shippingSettings?.freeShippingType === 'quantity' 
-        ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 3)
+        ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
         : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500))
     : false;
 
@@ -525,7 +527,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 {shippingCharge > 0 && shippingSettings?.enabled && (
                   <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
                     {shippingSettings?.freeShippingType === 'quantity' 
-                      ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 3) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 3) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
+                      ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 2) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 2) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
                       : `Add ₹${Math.max(0, (shippingSettings?.freeShippingAmount ?? 500) - totalPrice).toFixed(2)} more for FREE shipping`
                     }
                   </p>

@@ -10,7 +10,7 @@ const ShippingSettings = () => {
   const [settings, setSettings] = useState({
     standardShippingFee: 5,
     freeShippingAmount: 500,
-    freeShippingThreshold: 3,
+    freeShippingThreshold: 2,
     freeShippingType: 'amount',
     enabled: true
   });
@@ -239,7 +239,7 @@ const ShippingSettings = () => {
                   <p className="text-ink/70">
                     <span className="font-medium">Free Shipping:</span> 
                     {settings.freeShippingType === 'quantity' 
-                      ? ` Orders with ${(settings.freeShippingThreshold ?? 3)}+ items`
+                      ? ` Orders with ${(settings.freeShippingThreshold ?? 2)}+ items`
                       : ` Orders {formatINR(settings.freeShippingAmount)}+`
                     }
                   </p>
