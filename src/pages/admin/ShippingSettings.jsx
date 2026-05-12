@@ -93,7 +93,10 @@ const ShippingSettings = () => {
                     min="0"
                     step="0.01"
                     value={settings.standardShippingFee}
-                    onChange={(e) => setSettings({ ...settings, standardShippingFee: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSettings({ ...settings, standardShippingFee: value === '' ? 0 : parseFloat(value) || 0 });
+                    }}
                     className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
                   />
                 </div>
@@ -160,7 +163,10 @@ const ShippingSettings = () => {
                       min="0"
                       step="0.01"
                       value={settings.freeShippingAmount}
-                      onChange={(e) => setSettings({ ...settings, freeShippingAmount: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setSettings({ ...settings, freeShippingAmount: value === '' ? 0 : parseFloat(value) || 0 });
+                      }}
                       className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
                     />
                   </div>
