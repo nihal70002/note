@@ -592,10 +592,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
         setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
       }
     }}
-    className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
-  >
-    {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
-  </ShimmerButton>
+              className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
+            >
+              {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
+            </ShimmerButton>
         </div>
       )}
         </div>
