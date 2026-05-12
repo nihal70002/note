@@ -1,10 +1,9 @@
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createPortal } from 'react-dom';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
-import { useState, useEffect } from 'react';
 import FreeShippingBanner from './FreeShippingBanner';
 import ShimmerButton from './ShimmerButton';
 
@@ -85,7 +84,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
-    if (isCheckoutStep && user) {
+    if (isCheckoutStep && user && !addressLoading) {
       setAddressLoading(true);
       axiosInstance.get('/orders')
         .then(res => {
@@ -111,7 +110,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
         .catch(console.error)
         .finally(() => setAddressLoading(false));
     }
-  }, [isCheckoutStep, user]);
+  }, [isCheckoutStep, user, addressLoading]);
 
   const handleInlineAuth = async (e) => {
     e.preventDefault();
@@ -464,7 +463,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   
                   setIsProcessingCheckout(true);
                   const finalShippingDetails = usePreviousAddress ? previousAddress : shippingDetails;
-                  const result = await checkout(finalShippingDetails);
+                  const result = await handleCheckout();
                   setIsProcessingCheckout(false);
                   
                   if (result.success) {
@@ -476,9 +475,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       return;
                     }
 
-                    const options = {
+                    const razorpayOptions = {
                       key: razorpayKey,
-                      amount: totalAmount * 100, // paise
+                      amount: result.amount * 100, // paise
                       currency: result.currency,
                       name: 'Note E-Commerce',
                       description: 'Order Payment',
@@ -524,33 +523,69 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         }
                       }
                     };
-
-                    const rzp = new window.Razorpay(options);
-                    rzp.on('payment.failed', function (response) {
-                      setCheckoutMessage({ type: 'error', text: response.error.description || 'Payment failed.' });
-                      setTimeout(() => {
-                        onClose();
-                        navigate('/payment-failed');
-                      }, 2000);
-                    });
-                    rzp.open();
-
+                    const razorpay = new window.Razorpay(razorpayOptions);
+                    razorpay.open();
                   } else {
                     setCheckoutMessage({ type: 'error', text: result.message || 'Checkout failed.' });
                   }
-                }
-              }}
+                }}
               className="btn-primary w-full py-4 uppercase tracking-widest text-sm"
             >
               {isProcessingCheckout ? 'Processing...' : (isCheckoutStep ? 'Confirm Order' : 'Checkout')}
             </ShimmerButton>
           </div>
         )}
+
+        const options = {
+          key: razorpayKey,
+          amount: result.amount * 100, // paise
+          currency: result.currency,
+          name: 'Note E-Commerce',
+          description: 'Order Payment',
+          order_id: result.razorpayOrderId,
+          handler: async function (response) {
+            try {
+              await axiosInstance.post('/orders/verify-payment', {
+                orderId: result.orderId,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+              });
+              
+              setCheckoutMessage({ type: 'success', text: 'Payment successful! Order placed.' });
+              setTimeout(() => {
+                onClose();
+                navigate(`/order-success/${result.orderId}`);
+                setTimeout(() => {
+                  setIsCheckoutStep(false);
+                  setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
+                }, 300);
+              }, 1500);
+            } catch (err) {
+              setCheckoutMessage({ type: 'error', text: 'Payment verification failed. Please contact support.' });
+              setTimeout(() => {
+                onClose();
+                navigate('/payment-failed');
+              }, 2000);
+            }
+          },
+          prefill: {
+            name: shippingDetails.fullName,
+            contact: shippingDetails.phoneNumber,
+            email: user?.email || ''
+          },
+          theme: {
+            color: '#1a1a1a' // ink color
+          },
+          modal: {
+            ondismiss: function () {
+              onClose();
+              navigate('/payment-failed');
+            }
       </div>
-      </>
-    ) : null,
-    document.body
-  );
-};
+    </div>
+  </div>
+);
+};  
 
 export default CartSidebar;
