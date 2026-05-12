@@ -429,15 +429,22 @@ const ProductDetails = () => {
                    {/* Review Images */}
                    {review.images && review.images.length > 0 && (
                      <div className="grid grid-cols-3 gap-2">
-                       {review.images.map((image, index) => (
-                         <img
-                           key={index}
-                           src={image}
-                           alt={`Customer review photo ${index + 1}`}
-                           className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
-                           onClick={() => window.open(image, '_blank')}
-                         />
-                       ))}
+                       {review.images.map((image, index) => {
+                         const imageUrl = image.startsWith('http') ? image : `https://noteback-production.up.railway.app${image}`;
+                         return (
+                           <img
+                             key={index}
+                             src={imageUrl}
+                             alt={`Customer review photo ${index + 1}`}
+                             className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
+                             onClick={() => window.open(imageUrl, '_blank')}
+                             onError={(e) => {
+                               console.error('Image failed to load:', imageUrl);
+                               e.target.style.display = 'none';
+                             }}
+                           />
+                         );
+                       })}
                      </div>
                    )}
                  </div>
