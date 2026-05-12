@@ -22,12 +22,23 @@ const ShippingSettings = () => {
   const fetchShippingSettings = async () => {
     setLoading(true);
     try {
+      console.log('[Frontend] Fetching shipping settings...');
       const response = await axiosInstance.get('/admin/shipping-settings');
-      if (response.data) {
+      console.log('[Frontend] Response:', response.data);
+      
+      if (response.data?.success && response.data?.data) {
+        setSettings(response.data.data);
+      } else if (response.data) {
+        // Fallback for old response format
         setSettings(response.data);
       }
     } catch (error) {
-      console.error('Failed to fetch shipping settings:', error);
+      console.error('[Frontend] Failed to fetch shipping settings:', error);
+      console.error('[Frontend] Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch shipping settings';
+      showToast('error', errorMessage);
+      
       // Use defaults if API fails
     } finally {
       setLoading(false);
@@ -39,11 +50,33 @@ const ShippingSettings = () => {
     setSaving(true);
     
     try {
-      await axiosInstance.post('/admin/shipping-settings', settings);
-      showToast('success', 'Shipping settings saved successfully!');
+      console.log('[Frontend] Saving shipping settings:', settings);
+      const response = await axiosInstance.post('/admin/shipping-settings', settings);
+      console.log('[Frontend] Save response:', response.data);
+      
+      if (response.data?.success) {
+        showToast('success', response.data.message || 'Shipping settings saved successfully!');
+        // Refresh settings to ensure we have the latest data
+        await fetchShippingSettings();
+      } else {
+        showToast('error', response.data?.message || 'Failed to save shipping settings');
+      }
     } catch (error) {
-      console.error('Failed to save shipping settings:', error);
-      showToast('error', 'Failed to save shipping settings.');
+      console.error('[Frontend] Failed to save shipping settings:', error);
+      console.error('[Frontend] Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          'Failed to save shipping settings';
+      
+      showToast('error', errorMessage);
+      
+      // If it's a validation error, show the details
+      if (error.response?.status === 400 && error.response?.data?.errors) {
+        const validationErrors = error.response.data.errors.join(', ');
+        showToast('error', `Validation errors: ${validationErrors}`);
+      }
     } finally {
       setSaving(false);
     }
