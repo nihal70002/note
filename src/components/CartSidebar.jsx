@@ -38,8 +38,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authDetails, setAuthDetails] = useState({
-    username: '',
-    email: '',
+    phoneNumber: '',
     password: ''
   });
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
@@ -95,28 +94,16 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthLoading(true);
 
     const success = authMode === 'login'
-      ? await login(authDetails.email, authDetails.password, { redirect: false })
-      : await register(authDetails.username, authDetails.email, authDetails.password);
+      ? await login(authDetails.phoneNumber, authDetails.password, { redirect: false })
+      : await register(authDetails.phoneNumber, authDetails.password);
 
-    if (success && authMode === 'register') {
-      const loginSuccess = await login(authDetails.email, authDetails.password, { redirect: false });
-      if (!loginSuccess) {
-        setAuthError('Account created. Please sign in to continue checkout.');
-        setAuthMode('login');
-        setAuthLoading(false);
-        return;
-      }
+    if (success) {
+      setIsAuthStep(false);
+      setAuthError('');
+    } else {
+      setAuthError('Authentication failed. Please try again.');
     }
-
     setAuthLoading(false);
-
-    if (!success) {
-      setAuthError(authMode === 'login' ? 'Invalid email or password.' : 'Registration failed. Email might be in use.');
-      return;
-    }
-
-    setIsAuthStep(false);
-    setIsCheckoutStep(true);
   };
 
   const title = isAuthStep
@@ -201,28 +188,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
                   <form onSubmit={handleInlineAuth} className="space-y-4">
                     <div className="space-y-2">
-                      {authMode === 'register' && (
-                        <div>
-                          <label className="block text-sm font-medium text-ink mb-1">Username</label>
-                          <input
-                            type="text"
-                            value={authDetails.username}
-                            onChange={(e) => setAuthDetails(prev => ({ ...prev, username: e.target.value }))}
-                            className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
-                            placeholder="Choose a username"
-                            required
-                          />
-                        </div>
-                      )}
-                      
                       <div>
-                        <label className="block text-sm font-medium text-ink mb-1">Email</label>
+                        <label className="block text-sm font-medium text-ink mb-1">Phone Number *</label>
                         <input
-                          type="email"
-                          value={authDetails.email}
-                          onChange={(e) => setAuthDetails(prev => ({ ...prev, email: e.target.value }))}
+                          type="tel"
+                          value={authDetails.phoneNumber}
+                          onChange={(e) => setAuthDetails(prev => ({ ...prev, phoneNumber: e.target.value }))}
                           className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
-                          placeholder="your@email.com"
+                          placeholder="Enter your phone number"
                           required
                         />
                       </div>
@@ -241,11 +214,23 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     </div>
                     
                     {authError && (
-                      <div className="bg-red-50 border border-red-100 text-sm p-3 rounded-sm">
-                        <p className="text-red-700">{authError}</p>
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-sm text-sm">
+                        {authError}
                       </div>
                     )}
                     
+                    <div className="flex justify-center space-x-4 text-sm">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAuthMode(authMode === 'login' ? 'register' : 'login');
+                          setAuthError('');
+                        }}
+                        className="text-taupe hover:text-ink transition-colors"
+                      >
+                        {authMode === 'login' ? 'Create Account' : 'Sign In'}
+                      </button>
+                    </div>
                     <ShimmerButton
                       type="submit"
                       loading={authLoading}

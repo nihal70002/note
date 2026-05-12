@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 const Register = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { register } = useAuth();
@@ -15,12 +14,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const success = await register(username, email, password);
+    const success = await register(phoneNumber, password);
     if (success) {
       showToast('success', 'Registration successful. Please sign in.');
       navigate('/login');
     } else {
-      setError('Registration failed. Email might be in use.');
+      setError('Registration failed. Phone number might be in use.');
     }
   };
 
@@ -42,36 +41,19 @@ const Register = () => {
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-ink uppercase tracking-wider">
-                Username
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-ink uppercase tracking-wider">
+                Phone Number
               </label>
               <div className="mt-1">
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-taupe/30 rounded-sm shadow-sm placeholder-taupe/50 focus:outline-none focus:ring-ink focus:border-ink sm:text-sm bg-transparent"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-ink uppercase tracking-wider">
-                Email or Phone Number
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="text"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-taupe/30 rounded-sm shadow-sm placeholder-taupe/50 focus:outline-none focus:ring-ink focus:border-ink sm:text-sm bg-transparent"
+                  placeholder="Enter your phone number"
                 />
               </div>
             </div>

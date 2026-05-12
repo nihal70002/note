@@ -44,11 +44,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, [token, logout]);
 
-  const login = async (email, password, options = {}) => {
+  const login = async (phoneNumber, password, options = {}) => {
     const { redirect = true } = options;
 
     try {
-      const response = await axiosInstance.post('/auth/login', { email, password });
+      const response = await axiosInstance.post('/auth/login', { phoneNumber, password });
       const { token } = response.data;
       setToken(token);
       
@@ -70,9 +70,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (phoneNumber, password) => {
     try {
-      await axiosInstance.post('/auth/register', { username, email, password });
+      const response = await axiosInstance.post('/auth/register', { phoneNumber, password });
+      const { token } = response.data;
+      setToken(token);
+      
+      // Decode to check role for redirect
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.Role || payload.role || "User";
+      
+      if (role === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
       return true;
     } catch (error) {
       console.error('Register error:', error);

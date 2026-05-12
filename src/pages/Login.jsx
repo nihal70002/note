@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -15,10 +15,10 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    const success = await login(email, password);
+    const success = await login(phoneNumber, password);
 
     if (!success) {
-      setError("Invalid email or password");
+      setError("Invalid phone number or password");
       return;
     }
 
@@ -68,15 +68,16 @@ const Login = () => {
           {/* EMAIL */}
           <div>
             <label className="block text-xs uppercase tracking-widest text-taupe">
-              Email or Phone Number
+              Phone Number
             </label>
 
             <input
-              type="text"
+              type="tel"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
               className="mt-2 w-full border border-taupe/30 px-3 py-4 text-base rounded-md focus:outline-none focus:border-ink bg-transparent"
+              placeholder="Enter your phone number"
             />
           </div>
 
