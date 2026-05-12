@@ -41,6 +41,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
+  // Calculate original prices (double the current price for 50% discount)
+  const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price * 2), 0) || 0;
+  const totalSavings = totalOriginalPrice - totalPrice;
+
   // Check if cart qualifies for free shipping promotion based on shipping settings
   const showFreeShippingBanner = shippingSettings?.enabled 
     ? totalPrice >= shippingSettings.freeShippingAmount
@@ -371,7 +375,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           <Plus className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="font-medium text-ink">{formatINR(item.product?.price * item.quantity)}</p>
+                      <div className="text-right">
+                        <p className="text-xs text-taupe line-through">{formatINR(item.product?.price * item.quantity * 2)}</p>
+                        <p className="font-medium text-ink">{formatINR(item.product?.price * item.quantity)}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -383,6 +390,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
         {/* Footer */}
         {cart?.items?.length > 0 && !isAuthStep && (
           <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
+            <div className="flex justify-between items-center mb-2 text-sm">
+              <span className="text-taupe">Original Price</span>
+              <span className="text-taupe line-through">{formatINR(totalOriginalPrice)}</span>
+            </div>
+            <div className="flex justify-between items-center mb-2 text-sm">
+              <span className="text-green-600 font-medium">You Saved</span>
+              <span className="text-green-600 font-medium">{formatINR(totalSavings)}</span>
+            </div>
             <div className="flex justify-between items-center mb-4 text-lg">
               <span>Subtotal</span>
               <span>{formatINR(totalPrice)}</span>

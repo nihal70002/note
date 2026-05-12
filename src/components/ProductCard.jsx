@@ -5,6 +5,9 @@ import ShimmerButton from './ShimmerButton';
 
 const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addingToCart = false }) => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
+  const originalPrice = price * 2; // Original price is double the current price (50% discount)
+  const discountPercentage = 50;
+  
   return (
     <div className="group flex flex-col">
       <Link to={getProductPath({ id, name })} className="cursor-pointer">
@@ -14,6 +17,10 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
               New
             </span>
           )}
+          {/* Discount badge */}
+          <span className="absolute top-4 right-4 z-10 bg-red-500 text-white text-xs uppercase tracking-widest px-3 py-1 font-bold">
+            {discountPercentage}% OFF
+          </span>
           <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors z-10" />
           <img 
             src={image} 
@@ -28,7 +35,10 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
         <h3 className="font-serif text-lg text-ink tracking-wide mb-1 group-hover:text-taupe transition-colors">{name}</h3>
       </Link>
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-ink/70">{formatINR(price)}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-taupe line-through">{formatINR(originalPrice)}</span>
+          <span className="text-sm text-ink font-medium">{formatINR(price)}</span>
+        </div>
         {onAddToCart && (
           <ShimmerButton
             type="button"

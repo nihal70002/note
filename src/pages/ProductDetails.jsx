@@ -331,7 +331,11 @@ const ProductDetails = () => {
                  <Heart className="w-6 h-6" fill={wishlist ? 'currentColor' : 'none'} />
                </button>
              </div>
-             <p className="text-xl text-taupe mb-6">{formatINR(product.price)}</p>
+             <div className="flex items-center gap-3 mb-6">
+               <span className="text-xl text-taupe line-through">{formatINR(product.price * 2)}</span>
+               <span className="text-2xl text-ink font-medium">{formatINR(product.price)}</span>
+               <span className="bg-red-500 text-white text-xs uppercase tracking-widest px-3 py-1 font-bold">50% OFF</span>
+             </div>
              <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-taupe">
                <span>{product.averageRating > 0 ? `${product.averageRating.toFixed(1)} / 5` : 'No ratings yet'}</span>
                <span>{product.reviewCount || 0} reviews</span>
