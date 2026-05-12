@@ -148,6 +148,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
     ? authMode === 'login' ? 'Sign In' : 'Create Account'
     : isCheckoutStep ? 'Shipping Details' : 'Your Cart';
 
+  // Add SSR safety
+  if (typeof window === 'undefined') return null;
+
   return createPortal(
     <>
       {isOpen && (
@@ -622,7 +625,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
         </>
       )}
     </>
-  );
+  , document.body);
 };
 
 export default CartSidebar;

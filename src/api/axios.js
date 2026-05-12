@@ -28,7 +28,10 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Use a more React-friendly approach to avoid React error #299
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.replace('/login');
+      }
     }
     return Promise.reject(error);
   }
