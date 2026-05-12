@@ -128,7 +128,13 @@ const ShippingSettings = () => {
                     value={settings.standardShippingFee}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setSettings({ ...settings, standardShippingFee: value === '' ? 0 : parseFloat(value) || 0 });
+                      const numValue = value === '' ? 0 : parseFloat(value) || 0;
+                      setSettings({ ...settings, standardShippingFee: numValue });
+                    }}
+                    onBlur={(e) => {
+                      // Remove leading zeros when focus leaves the input
+                      const numValue = parseFloat(settings.standardShippingFee) || 0;
+                      setSettings({ ...settings, standardShippingFee: numValue });
                     }}
                     className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
                   />
@@ -198,7 +204,13 @@ const ShippingSettings = () => {
                       value={settings.freeShippingAmount}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setSettings({ ...settings, freeShippingAmount: value === '' ? 0 : parseFloat(value) || 0 });
+                        const numValue = value === '' ? 0 : parseFloat(value) || 0;
+                        setSettings({ ...settings, freeShippingAmount: numValue });
+                      }}
+                      onBlur={(e) => {
+                        // Remove leading zeros when focus leaves the input
+                        const numValue = parseFloat(settings.freeShippingAmount) || 0;
+                        setSettings({ ...settings, freeShippingAmount: numValue });
                       }}
                       className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
                     />
