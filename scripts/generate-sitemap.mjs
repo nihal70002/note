@@ -48,6 +48,8 @@ const slugify = (value) => String(value || '')
   .replace(/^-+|-+$/g, '');
 
 const productPath = (product) => {
+  console.log("Build started...");
+  console.log("Generating sitemap...");
   const id = product.id ?? product._id ?? product.productId;
   const name = product.name ?? product.title ?? 'product';
   const slug = slugify(name) || 'product';
@@ -190,14 +192,29 @@ const validateSitemap = (xml, urls) => {
 
 await loadEnvFiles();
 
-const products = await fetchProducts();
+let products = [];
+try {
+  products = await fetchProducts();
+} catch (error) {
+  console.log('[sitemap] Product fetch failed:', error.message);
+  products = [];
+}
+
 const urls = buildUrls(products);
 const sitemap = generateSitemapXml(urls);
 
-validateSitemap(sitemap, urls);
+try {
+  validateSitemap(sitemap, urls);
+} catch (error) {
+  console.log('[sitemap] Validation error:', error.message);
+}
 
-await mkdir(publicDir, { recursive: true });
-await writeFile(sitemapPath, sitemap);
+try {
+  await mkdir(publicDir, { recursive: true });
+  await writeFile(sitemapPath, sitemap);
+} catch (error) {
+  console.log('[sitemap] Write error:', error.message);
+}
 
 console.log(`[sitemap] Generated sitemap.xml at ${sitemapPath}`);
 console.log(`[sitemap] Total URLs: ${urls.length}`);

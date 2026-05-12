@@ -58,7 +58,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
     pincode: '',
     deliveryAddress: ''
   });
-  const [showShippingBanner, setShowShippingBanner] = useState(true);
+  const [showFreeShippingBanner, setShowFreeShippingBanner] = useState(true);
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   // Calculate original prices (double the current price for 50% discount)
@@ -173,7 +173,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
               {/* Free Shipping Banner for 3+ books */}
-              {showShippingBanner && !isCheckoutStep && !isAuthStep && (
+              {showFreeShippingBanner && !isCheckoutStep && !isAuthStep && (
                 <div className="mb-6">
                   <FreeShippingBanner compact={true} />
                 </div>
@@ -305,7 +305,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     </div>
                   )}
 
-                  <form onSubmit={handleInlineAuth} className="space-y-4">
+                  <form className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-ink mb-1">Full Name *</label>
