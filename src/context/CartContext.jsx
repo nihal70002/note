@@ -15,8 +15,6 @@ export const CartProvider = ({ children }) => {
   const [shippingSettings, setShippingSettings] = useState({
     enabled: true,
     standardShippingFee: 5,
-    freeShippingThreshold: 3,
-    freeShippingType: 'quantity',
     freeShippingAmount: 500
   });
   const { token } = useAuth();
@@ -148,9 +146,7 @@ export const CartProvider = ({ children }) => {
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
   
   const shippingCharge = shippingSettings?.enabled 
-    ? (shippingSettings.freeShippingType === 'quantity' 
-        ? (totalItems >= shippingSettings.freeShippingThreshold ? 0 : shippingSettings.standardShippingFee)
-        : (totalPrice >= shippingSettings.freeShippingAmount ? 0 : shippingSettings.standardShippingFee))
+    ? (totalPrice >= shippingSettings.freeShippingAmount ? 0 : shippingSettings.standardShippingFee)
     : 0;
   
   const totalAmount = totalPrice + shippingCharge;
