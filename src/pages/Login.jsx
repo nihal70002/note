@@ -8,21 +8,27 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    const success = await login(phoneNumber, password);
+    try {
+      const success = await login(phoneNumber, password);
 
-    if (!success) {
-      setError("Invalid phone number or password");
-      return;
+      if (!success) {
+        setError("Authentication failed. Please try again.");
+        return;
+      }
+
+      showToast("success", "Login successful. Welcome back!");
+    } finally {
+      setLoading(false);
     }
-
-    showToast("success", "Login successful. Welcome back!");
   };
 
   return (
@@ -123,9 +129,10 @@ const Login = () => {
           {/* BUTTON */}
           <button
             type="submit"
-            className="w-full bg-ink text-paper py-4 text-base rounded-md uppercase tracking-widest hover:bg-ink/90 transition"
+            disabled={loading}
+            className="w-full bg-ink text-paper py-4 text-base rounded-md uppercase tracking-widest hover:bg-ink/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
         </form>

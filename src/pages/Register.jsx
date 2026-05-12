@@ -7,6 +7,7 @@ const Register = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -14,12 +15,16 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const success = await register(phoneNumber, password);
-    if (success) {
-      showToast('success', 'Registration successful. Please sign in.');
-      navigate('/login');
-    } else {
-      setError('Registration failed. Phone number might be in use.');
+    setLoading(true);
+
+    try {
+      const success = await register(phoneNumber, password);
+      if (success) {
+        showToast('success', 'Registration successful. Please sign in.');
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,9 +84,10 @@ const Register = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-sm shadow-sm text-sm font-medium text-paper bg-ink hover:bg-ink/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ink uppercase tracking-widest transition-colors"
+                disabled={loading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-sm shadow-sm text-sm font-medium text-paper bg-ink hover:bg-ink/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ink uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Register
+                {loading ? 'Registering...' : 'Register'}
               </button>
             </div>
           </form>

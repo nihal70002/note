@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
         const payload = JSON.parse(atob(token.split('.')[1]));
         setUser({
           id: payload.sub || payload.nameid,
-          email: payload.email,
+          phoneNumber: payload.phoneNumber || payload.email,
           username: payload.unique_name || payload.name || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
           role: payload.Role || payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || "User"
         });
@@ -49,7 +49,15 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await axiosInstance.post('/auth/login', { phoneNumber, password });
+      console.log("Login response:", response);
+      console.log("Login response data:", response.data);
+      
       const { token } = response.data;
+      if (!token) {
+        console.error("No token in login response");
+        return false;
+      }
+      
       setToken(token);
       
       // Decode to check role for redirect
@@ -66,6 +74,12 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Authentication failed";
+      
       return false;
     }
   };
@@ -73,21 +87,20 @@ export const AuthProvider = ({ children }) => {
   const register = async (phoneNumber, password) => {
     try {
       const response = await axiosInstance.post('/auth/register', { phoneNumber, password });
-      const { token } = response.data;
-      setToken(token);
+      console.log("Register response:", response);
+      console.log("Register response data:", response.data);
       
-      // Decode to check role for redirect
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const role = payload.Role || payload.role || "User";
-      
-      if (role === 'Admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      // Registration returns success message, not token
+      // User needs to login after registration
       return true;
     } catch (error) {
       console.error('Register error:', error);
+      
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Registration failed";
+      
       return false;
     }
   };
