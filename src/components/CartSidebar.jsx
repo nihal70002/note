@@ -68,11 +68,17 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
   const showFreeShippingBanner = shippingSettings?.enabled 
-    ? totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)
+    ? (shippingSettings?.freeShippingType === 'quantity' 
+        ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 3)
+        : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500))
     : false;
 
   // Debug shipping calculation
-  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings?.freeShippingAmount, 'should be free:', totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
+  console.log('[Cart Debug] Shipping Settings:', shippingSettings);
+  console.log('[Cart Debug] Total Price:', totalPrice);
+  console.log('[Cart Debug] Total Items:', totalItems);
+  console.log('[Cart Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
+  console.log('[Cart Debug] Should show free shipping banner:', showFreeShippingBanner);
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);

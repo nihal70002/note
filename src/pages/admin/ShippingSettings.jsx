@@ -10,6 +10,8 @@ const ShippingSettings = () => {
   const [settings, setSettings] = useState({
     standardShippingFee: 5,
     freeShippingAmount: 500,
+    freeShippingThreshold: 3,
+    freeShippingType: 'amount',
     enabled: true
   });
 
@@ -140,35 +142,87 @@ const ShippingSettings = () => {
                 <p className="text-xs text-taupe mt-1">Amount charged for standard shipping</p>
               </div>
 
-              {/* Free Shipping Threshold (Amount) */}
+              {/* Free Shipping Type */}
               <div>
                 <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">
-                  Free Shipping Threshold (Amount)
+                  Free Shipping Type
                 </label>
-                <div className="flex items-center gap-2">
-                  <span className="text-taupe">₹</span>
+                <select
+                  value={settings.freeShippingType}
+                  onChange={(e) => setSettings({ ...settings, freeShippingType: e.target.value })}
+                  className="w-full px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                >
+                  <option value="amount">Based on Order Amount</option>
+                  <option value="quantity">Based on Item Count</option>
+                </select>
+                <p className="text-xs text-taupe mt-1">
+                  {settings.freeShippingType === 'amount' 
+                    ? 'Free shipping applies when order total exceeds the amount threshold'
+                    : 'Free shipping applies when cart contains enough items'
+                  }
+                </p>
+              </div>
+
+              {/* Free Shipping Threshold (Amount) */}
+              {settings.freeShippingType === 'amount' && (
+                <div>
+                  <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">
+                    Free Shipping Threshold (Amount)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-taupe">₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={settings.freeShippingAmount}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value === '' ? 0 : parseFloat(value) || 0;
+                        setSettings({ ...settings, freeShippingAmount: numValue });
+                      }}
+                      onBlur={(e) => {
+                        // Remove leading zeros when focus leaves the input
+                        const numValue = parseFloat(settings.freeShippingAmount) || 0;
+                        setSettings({ ...settings, freeShippingAmount: numValue });
+                      }}
+                      className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
+                    />
+                  </div>
+                  <p className="text-xs text-taupe mt-1">
+                    Minimum order amount for free shipping (current: {formatINR(settings.freeShippingAmount)}+)
+                  </p>
+                </div>
+              )}
+
+              {/* Free Shipping Threshold (Quantity) */}
+              {settings.freeShippingType === 'quantity' && (
+                <div>
+                  <label className="block text-sm font-medium text-ink uppercase tracking-wider mb-2">
+                    Free Shipping Threshold (Items)
+                  </label>
                   <input
                     type="number"
-                    min="0"
-                    step="0.01"
-                    value={settings.freeShippingAmount}
+                    min="1"
+                    step="1"
+                    value={settings.freeShippingThreshold}
                     onChange={(e) => {
                       const value = e.target.value;
-                      const numValue = value === '' ? 0 : parseFloat(value) || 0;
-                      setSettings({ ...settings, freeShippingAmount: numValue });
+                      const numValue = value === '' ? 0 : parseInt(value) || 0;
+                      setSettings({ ...settings, freeShippingThreshold: numValue });
                     }}
                     onBlur={(e) => {
                       // Remove leading zeros when focus leaves the input
-                      const numValue = parseFloat(settings.freeShippingAmount) || 0;
-                      setSettings({ ...settings, freeShippingAmount: numValue });
+                      const numValue = parseInt(settings.freeShippingThreshold) || 0;
+                      setSettings({ ...settings, freeShippingThreshold: numValue });
                     }}
                     className="w-32 px-3 py-2 border border-taupe/30 rounded-sm focus:outline-none focus:border-ink bg-transparent"
                   />
+                  <p className="text-xs text-taupe mt-1">
+                    Minimum number of items for free shipping (current: {settings.freeShippingThreshold}+ items)
+                  </p>
                 </div>
-                <p className="text-xs text-taupe mt-1">
-                  Minimum order amount for free shipping (current: {formatINR(settings.freeShippingAmount)}+)
-                </p>
-              </div>
+              )}
             </>
           )}
 
@@ -181,10 +235,15 @@ const ShippingSettings = () => {
                 {settings.enabled ? ` ${formatINR(settings.standardShippingFee)}` : ' Disabled'}
               </p>
               {settings.enabled && (
-                <p className="text-ink/70">
-                  <span className="font-medium">Free Shipping:</span> 
-                  Orders {formatINR(settings.freeShippingAmount)}+
-                </p>
+                <>
+                  <p className="text-ink/70">
+                    <span className="font-medium">Free Shipping:</span> 
+                    {settings.freeShippingType === 'quantity' 
+                      ? ` Orders with ${(settings.freeShippingThreshold ?? 3)}+ items`
+                      : ` Orders {formatINR(settings.freeShippingAmount)}+`
+                    }
+                  </p>
+                </>
               )}
             </div>
           </div>

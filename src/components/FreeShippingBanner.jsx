@@ -1,6 +1,8 @@
 import { X } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const FreeShippingBanner = ({ onClose, compact = false }) => {
+  const { totalPrice, totalItems, shippingSettings } = useCart();
   if (compact) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-sm p-3 relative">
@@ -20,7 +22,12 @@ const FreeShippingBanner = ({ onClose, compact = false }) => {
           </div>
           <div>
             <p className="font-medium text-green-900">🎉 FREE Shipping!</p>
-            <p className="text-sm text-green-700">On orders above ₹500</p>
+            <p className="text-sm text-green-700">
+              {shippingSettings?.freeShippingType === 'quantity' 
+                ? `On orders of ${(shippingSettings?.freeShippingThreshold ?? 3)}+ items`
+                : `On orders above ₹${(shippingSettings?.freeShippingAmount ?? 500)}`
+              }
+            </p>
           </div>
         </div>
       </div>
@@ -39,8 +46,18 @@ const FreeShippingBanner = ({ onClose, compact = false }) => {
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-serif text-green-900 mb-2">🚚 Free Shipping on Orders Above ₹500!</h3>
-            <p className="text-green-700 mb-3">Add more items to qualify for free shipping</p>
+            <h3 className="text-lg font-serif text-green-900 mb-2">
+              🚚 Free Shipping on {shippingSettings?.freeShippingType === 'quantity' 
+                ? `${(shippingSettings?.freeShippingThreshold ?? 3)}+ Items!`
+                : `Orders Above ₹${(shippingSettings?.freeShippingAmount ?? 500)}!`
+              }
+            </h3>
+            <p className="text-green-700 mb-3">
+              {shippingSettings?.freeShippingType === 'quantity' 
+                ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 3) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 3) - totalItems === 1 ? 'item' : 'items'} to qualify for free shipping`
+                : `Add ₹${Math.max(0, (shippingSettings?.freeShippingAmount ?? 500) - totalPrice).toFixed(2)} more to qualify for free shipping`
+              }
+            </p>
             <div className="flex items-center gap-2 text-sm text-green-600">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 0116 0zm-3.5-9a.5.5 0 00-.5.5v4a.5.5 0 001 0v-4a.5.5 0 00-.5-.5z" clipRule="evenodd"/>
