@@ -22,9 +22,9 @@ const FreeShippingBanner = ({ onClose, compact = false }) => {
           </div>
           <div>
             <p className="font-medium text-green-900">🎉 FREE Shipping!</p>
-            <p className="text-sm text-green-700">
+            <p className="text-sm text-green-700"> 
               {shippingSettings?.freeShippingType === 'quantity' 
-                ? `On orders of ${(shippingSettings?.freeShippingThreshold ?? 3)}+ items`
+                ? `On orders of ${(shippingSettings?.freeShippingThreshold ?? 2)}+ items`
                 : `On orders above ₹${(shippingSettings?.freeShippingAmount ?? 500)}`
               }
             </p>
