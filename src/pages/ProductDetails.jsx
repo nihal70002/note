@@ -427,10 +427,17 @@ const ProductDetails = () => {
                    <p className="text-sm text-ink/70 mb-3">{review.comment}</p>
                    
                    {/* Review Images */}
-                   {review.images && review.images.length > 0 && (
+                   {review.images && Array.isArray(review.images) && review.images.length > 0 && (
                      <div className="grid grid-cols-3 gap-2">
                        {review.images.map((image, index) => {
-                         const imageUrl = image.startsWith('http') ? image : `https://noteback-production.up.railway.app${image}`;
+                         // Handle both string URLs and potential Cloudinary objects
+                         let imageUrl = image;
+                         if (typeof image === 'object' && image.url) {
+                           imageUrl = image.url;
+                         } else if (typeof image === 'string') {
+                           imageUrl = image.startsWith('http') ? image : image;
+                         }
+                         
                          return (
                            <img
                              key={index}
@@ -439,8 +446,11 @@ const ProductDetails = () => {
                              className="w-full h-20 object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
                              onClick={() => window.open(imageUrl, '_blank')}
                              onError={(e) => {
-                               console.error('Image failed to load:', imageUrl);
+                               console.error('Image failed to load:', imageUrl, image);
                                e.target.style.display = 'none';
+                             }}
+                             onLoad={() => {
+                               console.log('Image loaded successfully:', imageUrl);
                              }}
                            />
                          );
