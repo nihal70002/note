@@ -385,6 +385,27 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         />
                       </div>
                   </form>
+                  
+                  {/* Mobile-friendly Order Summary appended to scrollable area */}
+                  <div className="mt-8 pt-6 border-t border-taupe/20 space-y-2">
+                    <h3 className="font-serif text-lg text-ink mb-4">Order Summary</h3>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-taupe">Subtotal</span>
+                      <span className="text-ink">{formatINR(totalPrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-taupe">Shipping</span>
+                      <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "text-ink"}>
+                        {shippingCharge === 0 ? "FREE" : formatINR(shippingCharge)}
+                      </span>
+                    </div>
+                    {totalSavings > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-green-600 font-medium">Total Savings</span>
+                        <span className="text-green-600 font-medium">{formatINR(totalSavings)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <>
@@ -461,33 +482,37 @@ const CartSidebar = ({ isOpen, onClose }) => {
             {/* Footer */}
             {(cart?.items?.length > 0 || isCheckoutStep) && !isAuthStep && (
               <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
-                <div className="flex justify-between items-center mb-2 text-sm">
-                  <span className="text-taupe">Original Price</span>
-                  <span className="text-taupe line-through">{formatINR(totalOriginalPrice)}</span>
-                </div>
-                <div className="flex justify-between items-center mb-2 text-sm">
-                  <span className="text-green-600 font-medium">You Saved</span>
-                  <span className="text-green-600 font-medium">{formatINR(totalSavings)}</span>
-                </div>
-                <div className="flex justify-between items-center mb-4 text-lg">
-                  <span>Subtotal</span>
-                  <span>{formatINR(totalPrice)}</span>
-                </div>
-                <div className="flex justify-between items-center mb-4 text-sm">
-                  <span className="text-taupe">Shipping</span>
-                  <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "text-taupe"}>
-                    {shippingCharge === 0 ? "FREE" : formatINR(shippingCharge)}
-                  </span>
-                </div>
-                {shippingCharge > 0 && shippingSettings?.enabled && (
-                  <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
-                    {shippingSettings?.freeShippingType === 'quantity' 
-                      ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 2) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 2) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
-                      : `Add ₹${Math.max(0, (shippingSettings?.freeShippingAmount ?? 500) - totalPrice).toFixed(2)} more for FREE shipping`
-                    }
-                  </p>
+                {!isCheckoutStep && (
+                  <>
+                    <div className="flex justify-between items-center mb-2 text-sm">
+                      <span className="text-taupe">Original Price</span>
+                      <span className="text-taupe line-through">{formatINR(totalOriginalPrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2 text-sm">
+                      <span className="text-green-600 font-medium">You Saved</span>
+                      <span className="text-green-600 font-medium">{formatINR(totalSavings)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-4 text-lg">
+                      <span>Subtotal</span>
+                      <span>{formatINR(totalPrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-4 text-sm">
+                      <span className="text-taupe">Shipping</span>
+                      <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "text-taupe"}>
+                        {shippingCharge === 0 ? "FREE" : formatINR(shippingCharge)}
+                      </span>
+                    </div>
+                    {shippingCharge > 0 && shippingSettings?.enabled && (
+                      <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
+                        {shippingSettings?.freeShippingType === 'quantity' 
+                          ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 2) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 2) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
+                          : `Add ₹${Math.max(0, (shippingSettings?.freeShippingAmount ?? 500) - totalPrice).toFixed(2)} more for FREE shipping`
+                        }
+                      </p>
+                    )}
+                  </>
                 )}
-                <div className="flex justify-between items-center mb-6 text-lg">
+                <div className={`flex justify-between items-center text-lg ${isCheckoutStep ? 'mb-4' : 'mb-6'}`}>
                   <span>Total</span>
                   <span>{formatINR(totalAmount)}</span>
                 </div>
