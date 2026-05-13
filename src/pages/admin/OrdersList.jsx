@@ -307,6 +307,7 @@ const OrdersList = () => {
                 <tr className="bg-cream/50 border-b border-taupe/20 text-xs uppercase tracking-widest text-taupe">
                   <th className="p-4 font-medium">Order ID</th>
                   <th className="p-4 font-medium">Date</th>
+                  <th className="p-4 font-medium">Products</th>
                   <th className="p-4 font-medium">Shipping Details</th>
                   <th className="p-4 font-medium">Total</th>
                   <th className="p-4 font-medium">Status</th>
@@ -318,17 +319,29 @@ const OrdersList = () => {
                   <tr key={order.id} className="hover:bg-cream/20 transition-colors">
                     <td className="p-4 text-sm font-medium text-ink">#{order.id}</td>
                     <td className="p-4 text-sm text-ink">{new Date(order.orderDate).toLocaleDateString()}</td>
-                    <td className="p-4 text-sm text-taupe max-w-[250px]">
-                      {order.fullName ? (
-                        <>
-                          <div className="font-medium text-ink">{order.fullName}</div>
-                          <div className="text-xs truncate">{getAddress(order)}</div>
-                          <div className="text-xs">{order.phoneNumber}{order.alternatePhoneNumber ? ` / ${order.alternatePhoneNumber}` : ''}</div>
-                        </>
-                      ) : (
-                        <span className="italic text-taupe/50">No details</span>
-                      )}
-                    </td>
+                    <td className="p-4 text-sm">
+  <div className="space-y-2">
+    {order.items?.map((item) => (
+      <div key={item.id} className="flex items-center gap-2">
+        <img
+          src={item.product?.image}
+          alt={item.product?.name}
+          className="w-10 h-10 object-cover rounded border"
+        />
+
+        <div>
+          <div className="font-medium text-ink text-xs">
+            {item.product?.name}
+          </div>
+
+          <div className="text-xs text-taupe">
+            Qty: {item.quantity}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</td>
                     <td className="p-4 text-sm text-ink">{formatINR(order.totalAmount)}</td>
                     <td className="p-4">
                       <span className={`inline-block px-3 py-1 text-[10px] font-medium uppercase tracking-wider rounded-full ${
