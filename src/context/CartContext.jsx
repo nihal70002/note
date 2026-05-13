@@ -7,6 +7,11 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
+const getEffectiveProductPrice = (product) => {
+  if (!product) return 0;
+  return product.isPack || product.name?.toLowerCase().includes('combo') ? 499 : product.price;
+};
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [cartId, setCartId] = useState(null);
@@ -175,12 +180,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const replaceWithCombo = async (comboProductId, selectedChoices = []) => {
+  const replaceWithCombo = async (comboProductId, selectedChoices = null) => {
     try {
-      const response = await axiosInstance.post(`/cart/${cartId}/replace-with-combo`, { 
-        comboProductId, 
-        selectedChoices 
-      });
+      const payload = { comboProductId };
+      if (selectedChoices?.length) {
+        payload.selectedChoices = selectedChoices;
+      }
+
+      const response = await axiosInstance.post(`/cart/${cartId}/replace-with-combo`, payload);
       setCart(response.data);
       setCartMessage('');
       return { success: true };
@@ -232,7 +239,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-  const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
+  const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * getEffectiveProductPrice(item.product)), 0) || 0;
   
   // Check if cart has combo products (pack products) or meets free shipping criteria
   const hasComboProduct = cart?.items?.some(item => item.product?.isPack);

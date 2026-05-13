@@ -7,6 +7,11 @@ import axiosInstance from '../api/axios';
 import FreeShippingBanner from './FreeShippingBanner';
 import ShimmerButton from './ShimmerButton';
 
+const getEffectiveProductPrice = (product) => {
+  if (!product) return 0;
+  return product.isPack || product.name?.toLowerCase().includes('combo') ? 499 : product.price;
+};
+
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, checkout, clearCartAfterPayment, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
@@ -63,7 +68,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   // Calculate original prices (double the current price for 50% discount)
-  const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price * 2), 0) || 0;
+  const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * getEffectiveProductPrice(item.product) * 2), 0) || 0;
   const totalSavings = totalOriginalPrice - totalPrice;
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
@@ -455,7 +460,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
-                          <p className="text-sm text-taupe mt-1">{formatINR(item.product?.price)}</p>
+                          <p className="text-sm text-taupe mt-1">{formatINR(getEffectiveProductPrice(item.product))}</p>
                           <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-5 border border-taupe/30 rounded-full px-4 py-2">
                                 <button 
@@ -474,8 +479,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                 </button>
                               </div>
                             <div className="text-right">
-                              <p className="text-xs text-taupe line-through">{formatINR(item.product?.price * item.quantity * 2)}</p>
-                              <p className="font-medium text-ink">{formatINR(item.product?.price * item.quantity)}</p>
+                              <p className="text-xs text-taupe line-through">{formatINR(getEffectiveProductPrice(item.product) * item.quantity * 2)}</p>
+                              <p className="font-medium text-ink">{formatINR(getEffectiveProductPrice(item.product) * item.quantity)}</p>
                             </div>
                           </div>
                         </div>
