@@ -643,14 +643,32 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           description: 'Order Payment',
                           order_id: result.razorpayOrderId,
                           handler: async function (response) {
-                            try {
-                              const verification = await axiosInstance.post('/orders/verify-payment', {
-                                cartId: result.cartId,
-                                razorpayPaymentId: response.razorpay_payment_id,
-                                razorpayOrderId: response.razorpay_order_id,
-                                razorpaySignature: response.razorpay_signature,
-                                shippingDetails: finalShippingDetails
-                              });
+  try {
+
+    const token = localStorage.getItem('token');
+
+    console.log('Verify payment payload:', {
+      cartId: result.cartId,
+      razorpayPaymentId: response.razorpay_payment_id,
+      razorpayOrderId: response.razorpay_order_id,
+      shippingDetails: finalShippingDetails
+    });
+
+    const verification = await axiosInstance.post(
+      '/orders/verify-payment',
+      {
+        cartId: result.cartId,
+        razorpayPaymentId: response.razorpay_payment_id,
+        razorpayOrderId: response.razorpay_order_id,
+        razorpaySignature: response.razorpay_signature,
+        shippingDetails: finalShippingDetails
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
                               const verifiedOrderId = verification.data.orderId;
                               await clearCartAfterPayment();
                               
