@@ -35,7 +35,11 @@ const SEO = ({ title, description, path = '/', image, type = 'website', jsonLd }
     setMeta('meta[property="og:image"]', { identity: { property: 'og:image' }, values: { content: ogImage } });
     setMeta('meta[property="og:url"]', { identity: { property: 'og:url' }, values: { content: canonical } });
     setMeta('meta[property="og:type"]', { identity: { property: 'og:type' }, values: { content: type } });
+    setMeta('meta[name="robots"]', { identity: { name: 'robots' }, values: { content: 'index, follow, max-image-preview:large' } });
     setMeta('meta[name="twitter:card"]', { identity: { name: 'twitter:card' }, values: { content: 'summary_large_image' } });
+    setMeta('meta[name="twitter:title"]', { identity: { name: 'twitter:title' }, values: { content: pageTitle } });
+    setMeta('meta[name="twitter:description"]', { identity: { name: 'twitter:description' }, values: { content: pageDescription } });
+    setMeta('meta[name="twitter:image"]', { identity: { name: 'twitter:image' }, values: { content: ogImage } });
     setLink('canonical', canonical);
 
     document.head.querySelectorAll('script[data-seo-json-ld="true"]').forEach((element) => element.remove());

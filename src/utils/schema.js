@@ -1,4 +1,4 @@
-import { SITE_URL, absoluteUrl, productDescription } from './seo';
+import { SITE_URL, absoluteImageUrl, absoluteUrl, productDescription, productTitle } from './seo';
 
 export const organizationSchema = {
   '@context': 'https://schema.org',
@@ -38,9 +38,16 @@ export const breadcrumbSchema = (items) => ({
 export const productSchema = (product, path) => ({
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: product.name,
+  name: productTitle(product),
   description: productDescription(product),
-  image: [product.image, product.image2, product.image3, product.image4, product.image5].filter(Boolean).map((image) => absoluteUrl(image)),
+  image: [product.image, product.image2, product.image3, product.image4, product.image5].filter(Boolean).map((image) => absoluteImageUrl(image)),
+  sku: String(product.id || ''),
+  category: product.category || 'Aesthetic notebooks',
+  brand: {
+    '@type': 'Brand',
+    name: 'Papercues',
+  },
+  review: Number(product.reviewCount || 0) > 0 ? undefined : [],
   offers: {
     '@type': 'Offer',
     url: absoluteUrl(path),
@@ -54,10 +61,6 @@ export const productSchema = (product, path) => ({
     ratingValue: String(product.averageRating),
     reviewCount: String(product.reviewCount || 1),
   } : undefined,
-  brand: {
-    '@type': 'Brand',
-    name: 'Papercues',
-  },
 });
 
 export const reviewSchema = (product, reviews = []) => ({

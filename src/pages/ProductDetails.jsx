@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Plus, Minus, Heart, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -8,7 +8,15 @@ import axiosInstance from '../api/axios';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import ShimmerButton from '../components/ShimmerButton';
-import { getProductIdFromSlug, getProductPath, productDescription } from '../utils/seo';
+import {
+  getProductIdFromLegacySlug,
+  getProductPath,
+  isLegacyProductSlug,
+  productDescription,
+  productImageAlt,
+  productMetaDescription,
+  productTitle
+} from '../utils/seo';
 import { breadcrumbSchema, productSchema } from '../utils/schema';
 
 const normalizeReviewImages = (review) => {
@@ -50,8 +58,9 @@ const getReviewImageUrl = (image) => {
 };
 
 const ProductDetails = () => {
-  const { id, slug } = useParams();
-  const productId = id || getProductIdFromSlug(slug);
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const legacyProductId = isLegacyProductSlug(slug) ? getProductIdFromLegacySlug(slug) : null;
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,19 +78,29 @@ const ProductDetails = () => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
-    axiosInstance.get(`/products/${productId}`)
+    const productRequest = legacyProductId
+      ? axiosInstance.get(`/products/${legacyProductId}`)
+      : axiosInstance.get(`/products/slug/${slug}`);
+
+    productRequest
       .then(res => {
         setProduct(res.data);
+        const cleanPath = getProductPath(res.data);
+        if (legacyProductId && cleanPath !== window.location.pathname) {
+          navigate(cleanPath, { replace: true });
+        }
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
       });
-  }, [productId]);
+  }, [legacyProductId, navigate, slug]);
 
   useEffect(() => {
-    axiosInstance.get(`/products/${productId}/reviews`)
+    if (!product?.id) return;
+
+    axiosInstance.get(`/products/${product.id}/reviews`)
       .then(res => {
         console.log('Reviews API response:', res.data);
         const normalizedReviews = normalizeReviews(res.data);
@@ -89,24 +108,24 @@ const ProductDetails = () => {
         setReviews(normalizedReviews);
       })
       .catch(err => console.error(err));
-  }, [productId]);
+  }, [product?.id]);
 
   useEffect(() => {
     axiosInstance.get('/products')
       .then(res => {
         const products = Array.isArray(res.data) ? res.data : [];
-        setRelatedProducts(products.filter((item) => String(item.id) !== String(productId)).slice(0, 3));
+        setRelatedProducts(products.filter((item) => String(item.id) !== String(product?.id)).slice(0, 6));
       })
       .catch(err => console.error(err));
-  }, [productId]);
+  }, [product?.id]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !product?.id) return;
 
-    axiosInstance.get(`/wishlist/${productId}/exists`)
+    axiosInstance.get(`/wishlist/${product.id}/exists`)
       .then(res => setWishlist(res.data.exists || res.data.Exists))
       .catch(err => console.error(err));
-  }, [productId, token]);
+  }, [product?.id, token]);
 
   const handleAddToCart = async () => {
     if (product) {
@@ -213,7 +232,7 @@ const ProductDetails = () => {
       setReviewImages([]);
       setImagePreviews([]);
       showToast('success', 'Review saved.');
-      const nextReviews = await axiosInstance.get(`/products/${productId}/reviews`);
+      const nextReviews = await axiosInstance.get(`/products/${product.id}/reviews`);
       console.log('Reviews API response after save:', nextReviews.data);
       const normalizedReviews = normalizeReviews(nextReviews.data);
       console.log('Normalized reviews after save:', normalizedReviews);
@@ -240,6 +259,8 @@ const ProductDetails = () => {
     .filter(Boolean);
   const seoPath = getProductPath(product);
   const seoDescription = productDescription(product);
+  const metaDescription = productMetaDescription(product);
+  const seoTitle = productTitle(product);
   const breadcrumbs = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
@@ -257,8 +278,8 @@ const ProductDetails = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20 pb-32 md:pb-20">
       <SEO
-        title={`${product.name} | Papercues`}
-        description={seoDescription}
+        title={seoTitle}
+        description={metaDescription}
         path={seoPath}
         image={product.image || '/logo.png'}
         type="product"
@@ -283,7 +304,15 @@ const ProductDetails = () => {
         {/* Images */}
         <div className="flex-1 space-y-6">
           <div className="aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden relative group">
-             <img src={displayImage} alt={`${product.name} premium aesthetic journal or notebook by Papercues`} fetchPriority="high" decoding="async" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+             <img
+               src={displayImage}
+               alt={productImageAlt(product)}
+               fetchPriority="high"
+               decoding="async"
+               width="960"
+               height="1200"
+               className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+             />
              
              {availableImages.length > 1 && (
                <>
@@ -310,7 +339,15 @@ const ProductDetails = () => {
                   className={`aspect-[4/5] bg-cream/50 rounded-sm overflow-hidden cursor-pointer border-2 transition-all ${currentImageIndex === idx ? 'border-ink' : 'border-transparent hover:border-taupe/30'}`}
                   onClick={() => setCurrentImageIndex(idx)}
                 >
-                  <img src={img} alt={`${product.name} product detail image ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  <img
+                    src={img}
+                    alt={productImageAlt(product, `detail image ${idx + 1}`)}
+                    loading="lazy"
+                    decoding="async"
+                    width="240"
+                    height="300"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -346,9 +383,11 @@ const ProductDetails = () => {
                  Write a review
                </a>
              </div>
-             <p className="text-ink/80 leading-relaxed mb-8">
-               {product.description || "A meticulously crafted daily journal featuring high-grade, acid-free 120gsm paper. The subtle 5mm dot grid provides structure without constraint, perfect for bullet journaling, sketching, or structured noting. Encased in a premium linen finish hard cover."}
-             </p>
+             <div className="text-ink/80 leading-relaxed mb-8 space-y-4">
+               {seoDescription.split(/\s+(?=The cover artwork|Use it for)/).map((paragraph) => (
+                 <p key={paragraph}>{paragraph}</p>
+               ))}
+             </div>
              <div className="mb-8">
                <label className="block text-sm uppercase tracking-widest text-taupe mb-3">Quantity</label>
                <div className="inline-flex items-center gap-4 border border-taupe/30 rounded-sm px-4 py-3">
@@ -370,7 +409,7 @@ const ProductDetails = () => {
             >
               {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
             </ShimmerButton>
-             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹500</p>
+             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over Rs 450</p>
           </div>
           
           {specifications.length > 0 && (
