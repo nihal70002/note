@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -11,6 +12,7 @@ const Register = () => {
   const { register } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,22 +67,38 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-ink uppercase tracking-wider">
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-taupe/30 rounded-sm shadow-sm placeholder-taupe/50 focus:outline-none focus:ring-ink focus:border-ink sm:text-sm bg-transparent"
-                />
-              </div>
-            </div>
+  <label
+    htmlFor="password"
+    className="block text-sm font-medium text-ink uppercase tracking-wider"
+  >
+    Password
+  </label>
+
+  <div className="mt-1 relative">
+    <input
+      id="password"
+      name="password"
+      type={showPassword ? 'text' : 'password'}
+      autoComplete="new-password"
+      required
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="appearance-none block w-full px-3 py-2 pr-10 border border-taupe/30 rounded-sm shadow-sm placeholder-taupe/50 focus:outline-none focus:ring-ink focus:border-ink sm:text-sm bg-transparent"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute inset-y-0 right-0 pr-3 flex items-center text-taupe hover:text-ink"
+    >
+      {showPassword ? (
+        <EyeOff className="w-5 h-5" />
+      ) : (
+        <Eye className="w-5 h-5" />
+      )}
+    </button>
+  </div>
+</div>
 
             <div>
               <button
