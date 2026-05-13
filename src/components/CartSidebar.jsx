@@ -106,7 +106,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const resetCheckout = () => {
     setIsCheckoutStep(false);
     setIsAuthStep(false);
-    setAuthMode('login');
+    setAuthMode('register');
     setAuthError('');
     setAuthLoading(false);
     setCheckoutMessage({ type: '', text: '' });
