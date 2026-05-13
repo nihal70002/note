@@ -66,10 +66,10 @@ export const AuthProvider = ({ children }) => {
       
       if (redirect) {
         if (role === 'Admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+  navigate('/admin');
+} else {
+  navigate('/shop');
+}
       }
       return true;
     } catch (error) {
