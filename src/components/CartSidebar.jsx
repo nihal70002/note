@@ -459,7 +459,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            {cart?.items?.length > 0 && !isAuthStep && (
+            {(cart?.items?.length > 0 || isCheckoutStep) && !isAuthStep && (
               <div className="p-4 sm:p-6 border-t border-taupe/20 bg-cream/30">
                 <div className="flex justify-between items-center mb-2 text-sm">
                   <span className="text-taupe">Original Price</span>

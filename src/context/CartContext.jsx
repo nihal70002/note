@@ -23,30 +23,48 @@ export const CartProvider = ({ children }) => {
   // Initialize cart
   useEffect(() => {
     try {
-      // Create user-specific cart ID based on token to prevent sharing between users
       let id = null;
+      const guestCartId = sessionStorage.getItem('cartId');
+
       if (token) {
         // For logged-in users, create cart ID based on user ID from token
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           const userId = payload.sub || payload.nameid;
           id = `cart_${userId}`;
+
+          // Migrate guest cart if it exists
+          if (guestCartId && guestCartId !== id && !guestCartId.startsWith('cart_')) {
+            axiosInstance.get(`/cart/${guestCartId}`).then(res => {
+              if (res.data && res.data.items && res.data.items.length > 0) {
+                Promise.all(res.data.items.map(item => 
+                  axiosInstance.post(`/cart/${id}/items`, { 
+                    productId: item.productId, 
+                    quantity: item.quantity 
+                  }).catch(e => console.error("Error migrating item:", e))
+                )).then(() => {
+                  sessionStorage.removeItem('cartId');
+                  fetchCart(id);
+                });
+              } else {
+                sessionStorage.removeItem('cartId');
+              }
+            }).catch(e => console.error("Guest cart fetch error:", e));
+          }
         } catch (e) {
           console.error('Failed to decode token for cart ID:', e);
           id = localStorage.getItem('cartId');
         }
       } else {
         // For guest users, use session storage instead of local storage
-        id = sessionStorage.getItem('cartId');
+        id = guestCartId;
       }
       
       if (!id) {
         id = crypto.randomUUID();
         if (token) {
-          // For logged-in users, we could associate cart with user on backend
           console.log('[Cart] Creating new cart for logged-in user:', id);
         } else {
-          // For guest users, use session storage
           sessionStorage.setItem('cartId', id);
           console.log('[Cart] Creating new cart for guest user:', id);
         }
