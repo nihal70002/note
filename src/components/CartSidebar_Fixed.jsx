@@ -9,7 +9,7 @@ import ShimmerButton from './ShimmerButton';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
+  const { cart, updateQuantity, removeFromCart, checkout, clearCartAfterPayment, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
   const { user, login, register } = useAuth();
 
   // Guard against undefined shipping settings
@@ -578,17 +578,20 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           order_id: result.razorpayOrderId,
                           handler: async function (response) {
                             try {
-                              await axiosInstance.post('/orders/verify-payment', {
-                                orderId: result.orderId,
+                              const verification = await axiosInstance.post('/orders/verify-payment', {
+                                cartId: result.cartId,
                                 razorpayPaymentId: response.razorpay_payment_id,
                                 razorpayOrderId: response.razorpay_order_id,
-                                razorpaySignature: response.razorpay_signature
+                                razorpaySignature: response.razorpay_signature,
+                                shippingDetails: finalShippingDetails
                               });
+                              const verifiedOrderId = verification.data.orderId;
+                              await clearCartAfterPayment();
                               
                               setCheckoutMessage({ type: 'success', text: 'Payment successful! Order placed.' });
                               setTimeout(() => {
                                 onClose();
-                                navigate(`/order-success/${result.orderId}`);
+                                navigate(`/order-success/${verifiedOrderId}`);
                                 setTimeout(() => {
                                   setIsCheckoutStep(false);
                                   setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
@@ -603,8 +606,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
                             }
                           },
                           prefill: {
-                            name: shippingDetails.fullName,
-                            contact: shippingDetails.phoneNumber,
+                            name: finalShippingDetails.fullName,
+                            contact: finalShippingDetails.phoneNumber,
                             email: user?.email || ''
                           },
                           theme: {

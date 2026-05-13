@@ -210,15 +210,10 @@ export const CartProvider = ({ children }) => {
           }
         }
       );
-      setCart(null);
-      // Generate new cart ID
-      const newId = crypto.randomUUID();
-      localStorage.setItem('cartId', newId);
-      setCartId(newId);
       
       return { 
         success: true, 
-        orderId: response.data.orderId,
+        cartId,
         razorpayOrderId: response.data.razorpayOrderId,
         amount: response.data.amount,
         currency: response.data.currency || 'INR'
@@ -226,6 +221,13 @@ export const CartProvider = ({ children }) => {
     } catch (error) {
       console.error('Checkout error:', error);
       return { success: false, message: error.response?.data?.message || error.response?.data?.Message || 'Checkout failed. Please try again.' };
+    }
+  };
+
+  const clearCartAfterPayment = async () => {
+    setCart({ id: cartId, items: [] });
+    if (cartId) {
+      await fetchCart(cartId);
     }
   };
 
@@ -257,7 +259,7 @@ export const CartProvider = ({ children }) => {
   const totalAmount = totalPrice + shippingCharge;
 
   return (
-    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, replaceWithCombo, checkout, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
+    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, replaceWithCombo, checkout, clearCartAfterPayment, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
       {children}
     </CartContext.Provider>
   );
