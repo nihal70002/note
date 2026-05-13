@@ -84,26 +84,50 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (phoneNumber, password) => {
-    try {
-      const response = await axiosInstance.post('/auth/register', { phoneNumber, password });
-      console.log("Register response:", response);
-      console.log("Register response data:", response.data);
-      
-      // Registration returns success message, not token
-      // User needs to login after registration
-      return true;
-    } catch (error) {
-      console.error('Register error:', error);
-      
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Registration failed";
-      
+const register = async (phoneNumber, password, options = {}) => {
+  const { redirect = true } = options;
+
+  try {
+    // Create account
+    await axiosInstance.post('/auth/register', {
+      phoneNumber,
+      password
+    });
+
+    // Automatically login after registration
+    const loginResponse = await axiosInstance.post('/auth/login', {
+      phoneNumber,
+      password
+    });
+
+    const { token } = loginResponse.data;
+
+    if (!token) {
+      console.error("No token received after auto-login");
       return false;
     }
-  };
+
+    setToken(token);
+
+    // Decode token for role redirect
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const role = payload.Role || payload.role || "User";
+
+    if (redirect) {
+      if (role === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error('Register error:', error);
+    return false;
+  }
+};
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
