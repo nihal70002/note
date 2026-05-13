@@ -20,8 +20,11 @@ const Home = () => {
     axiosInstance.get('/products')
       .then(res => {
         const data = res.data;
+        // Show all products including combo products, prioritize new arrivals
         const arrivals = data.filter(p => p.isNew);
-        setNewArrivals(arrivals.length > 0 ? arrivals : data);
+        const comboProducts = data.filter(p => p.name?.toLowerCase().includes('combo') || p.category?.toLowerCase().includes('combo'));
+        const displayProducts = [...comboProducts, ...arrivals].slice(0, 6); // Show up to 6 products
+        setNewArrivals(displayProducts.length > 0 ? displayProducts : data.slice(0, 6));
       })
       .catch(err => console.error(err));
 
