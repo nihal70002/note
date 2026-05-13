@@ -255,7 +255,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20">
+    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-10 sm:py-12 lg:py-20 pb-32 md:pb-20">
       <SEO
         title={`${product.name} | Papercues`}
         description={seoDescription}
@@ -340,7 +340,7 @@ const ProductDetails = () => {
                <span>{product.averageRating > 0 ? `${product.averageRating.toFixed(1)} / 5` : 'No ratings yet'}</span>
                <span>{product.reviewCount || 0} reviews</span>
                <span className={product.stock > 0 ? 'text-green-700' : 'text-red-600'}>
-                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                 {product.stock > 0 ? 'In stock' : 'Out of stock'}
                </span>
                <a href="#customer-reviews" className="basis-full sm:basis-auto text-ink underline underline-offset-4">
                  Write a review
@@ -368,7 +368,7 @@ const ProductDetails = () => {
               loading={addingProductId === product.id}
               className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4"
             >
-              {addingProductId === product.id ? 'Adding...' : 'Add to Cart'}
+              {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
             </ShimmerButton>
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over ₹500</p>
           </div>
@@ -522,6 +522,24 @@ const ProductDetails = () => {
           </div>
         </section>
       )}
+
+      {/* Mobile Sticky Buy Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-paper/95 backdrop-blur-md border-t border-taupe/20 z-40 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.1)]">
+        <div className="flex gap-4 items-center max-w-md mx-auto">
+          <div className="flex-1 flex flex-col justify-center overflow-hidden">
+            <p className="text-xs font-serif text-taupe truncate leading-tight mb-0.5">{product.name}</p>
+            <p className="font-medium text-ink leading-tight">{formatINR(product.price * quantity)}</p>
+          </div>
+          <ShimmerButton 
+            onClick={handleAddToCart} 
+            disabled={product.stock <= 0} 
+            loading={addingProductId === product.id}
+            className="btn-primary py-3 px-6 text-sm tracking-widest uppercase flex-shrink-0"
+          >
+            {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
+          </ShimmerButton>
+        </div>
+      </div>
     </div>
   );
 };
