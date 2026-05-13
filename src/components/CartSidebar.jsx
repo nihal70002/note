@@ -80,11 +80,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
   }, [cart?.items?.length]);
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
-
-  // Check if cart qualifies for free shipping promotion based on shipping settings
   const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
   const showFreeShippingBanner = shippingSettings?.enabled 
     ? (hasComboProduct || 
+        totalPrice >= 450 || // Free shipping for orders above ₹450
         (shippingSettings?.freeShippingType === 'quantity' 
           ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
           : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)))
@@ -95,6 +94,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   console.log('[Cart Debug] Total Price:', totalPrice);
   console.log('[Cart Debug] Total Items:', totalItems);
   console.log('[Cart Debug] Has Combo Product:', hasComboProduct);
+  console.log('[Cart Debug] Price >= 450:', totalPrice >= 450);
   console.log('[Cart Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
   console.log('[Cart Debug] Should show free shipping banner:', showFreeShippingBanner);
 
