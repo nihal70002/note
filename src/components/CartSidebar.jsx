@@ -163,7 +163,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">SAVE ₹219</span>
                   </div>
                   <p className="text-xs text-taupe mb-3">
-                    Get 2 journals for only ₹500 (Save ₹219 vs individual purchase)
+                    Get 3 journals for only ₹500 (Save ₹219 vs individual purchase)
                   </p>
                   <button 
                     onClick={() => navigate('/shop')}
