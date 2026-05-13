@@ -71,12 +71,7 @@ const About = () => {
               </p>
             </div>
             
-            <div>
-              <h3 className="font-serif text-xl text-ink mb-3">Can I return or exchange products?</h3>
-              <p className="text-ink/80 leading-relaxed">
-                We offer a 7-day return policy for unused items in original packaging. If you receive a damaged product, please contact us within 48 hours for a free replacement.
-              </p>
-            </div>
+            
           </div>
           
           <div className="space-y-8">
