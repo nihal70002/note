@@ -527,7 +527,11 @@ const ProductDetails = () => {
                            >
                              <img
                                src={imageUrl}
-                               alt="review"
+                              alt={`${product.name} customer review photo ${index + 1}`}
+                              loading="lazy"
+                              decoding="async"
+                              width="80"
+                              height="80"
                                className="w-20 h-20 object-cover rounded-lg border border-taupe/20"
                                onError={(e) => {
                                  console.error('Review image failed to load:', imageUrl, image);

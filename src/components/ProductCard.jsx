@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { getProductPath } from '../utils/seo';
+import { getProductPath, productImageAlt } from '../utils/seo';
 import ShimmerButton from './ShimmerButton';
 
 const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addingToCart = false }) => {
@@ -24,7 +24,7 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
           <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors z-10" />
           <img 
             src={image} 
-            alt={`${name} premium aesthetic journal by Papercues India`}
+            alt={productImageAlt({ name })}
             loading="lazy"
             decoding="async"
             width="640"
