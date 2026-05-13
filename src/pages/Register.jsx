@@ -21,7 +21,7 @@ const Register = () => {
       const success = await register(phoneNumber, password);
       if (success) {
         showToast('success', 'Registration successful. Please sign in.');
-        navigate('/login');
+        navigate('/shop');
       }
     } finally {
       setLoading(false);
