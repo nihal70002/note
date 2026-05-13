@@ -94,17 +94,26 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthError('');
     setAuthLoading(true);
 
-    const success = authMode === 'login'
-      ? await login(authDetails.phoneNumber, authDetails.password, { redirect: false })
-      : await register(authDetails.phoneNumber, authDetails.password);
+    let success = false;
+    if (authMode === 'login') {
+      success = await login(authDetails.phoneNumber, authDetails.password, { redirect: false });
+      if (!success) setAuthError('Invalid phone number or password.');
+    } else {
+      const regSuccess = await register(authDetails.phoneNumber, authDetails.password);
+      if (regSuccess) {
+        success = await login(authDetails.phoneNumber, authDetails.password, { redirect: false });
+        if (!success) setAuthError('Account created. Please sign in to continue.');
+      } else {
+        setAuthError('Registration failed. Phone number might be in use.');
+      }
+    }
+
+    setAuthLoading(false);
 
     if (success) {
       setIsAuthStep(false);
-      setAuthError('');
-    } else {
-      setAuthError('Authentication failed. Please try again.');
+      setIsCheckoutStep(true);
     }
-    setAuthLoading(false);
   };
 
   const title = isAuthStep
