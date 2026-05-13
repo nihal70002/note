@@ -1,4 +1,4 @@
-import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { X, Plus, Minus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -36,6 +36,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const [authMode, setAuthMode] = useState('login');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [authDetails, setAuthDetails] = useState({
     username: '',
     email: '',
@@ -250,14 +251,24 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       
                       <div>
                         <label className="block text-sm font-medium text-ink mb-1">Password</label>
-                        <input
-                          type="password"
-                          value={authDetails.password}
-                          onChange={(e) => setAuthDetails(prev => ({ ...prev, password: e.target.value }))}
-                          className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50"
-                          placeholder="•••••"
-                          required
-                        />
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={authDetails.password}
+                            onChange={(e) => setAuthDetails(prev => ({ ...prev, password: e.target.value }))}
+                            className="w-full px-3 py-2 border border-taupe/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-taupe/50 pr-10"
+                            placeholder="•••••"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-taupe hover:text-ink transition-colors"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                     

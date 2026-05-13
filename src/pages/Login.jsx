@@ -81,7 +81,8 @@ const Login = () => {
               type="tel"
               required
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              maxLength={10}
               className="mt-2 w-full border border-taupe/30 px-3 py-4 text-base rounded-md focus:outline-none focus:border-ink bg-transparent"
               placeholder="Enter your phone number"
             />

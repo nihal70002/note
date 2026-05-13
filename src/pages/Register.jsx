@@ -56,7 +56,8 @@ const Register = () => {
                   type="tel"
                   required
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  maxLength={10}
                   className="appearance-none block w-full px-3 py-2 border border-taupe/30 rounded-sm shadow-sm placeholder-taupe/50 focus:outline-none focus:ring-ink focus:border-ink sm:text-sm bg-transparent"
                   placeholder="Enter your phone number"
                 />
