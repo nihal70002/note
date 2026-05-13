@@ -43,7 +43,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   }
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
+  const [authMode, setAuthMode] = useState('register');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
