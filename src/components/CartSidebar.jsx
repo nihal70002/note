@@ -197,9 +197,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div className="mb-6 bg-gradient-to-r from-ink/5 to-taupe/5 border border-taupe/20 p-4 rounded-sm">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-serif text-sm text-ink font-medium">Upgrade to Combo & Save!</h4>
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                      SAVE ₹{Math.max(0, (totalPrice * 3) - 500)}
-                    </span>
                   </div>
                   <p className="text-xs text-taupe mb-4">
                     Get 3 journals for only ₹500 + FREE Shipping and save money!
