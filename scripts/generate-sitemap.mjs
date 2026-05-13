@@ -2,9 +2,16 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  DEFAULT_API_BASE_URL,
+  SITE_URL,
+  escapeXml,
+  productImages,
+  productPath,
+  productTitle,
+  absoluteImageUrl
+} from './product-seo.mjs';
 
-const SITE_URL = 'https://papercues.in';
-const DEFAULT_API_BASE_URL = 'https://noteback-production.up.railway.app';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
 const publicDir = resolve(rootDir, 'public');
@@ -32,28 +39,6 @@ const loadEnvFiles = async () => {
       }
     });
   }
-};
-
-const escapeXml = (value) => String(value || '')
-  .replaceAll('&', '&amp;')
-  .replaceAll('<', '&lt;')
-  .replaceAll('>', '&gt;')
-  .replaceAll('"', '&quot;')
-  .replaceAll("'", '&apos;');
-
-const slugify = (value) => String(value || '')
-  .toLowerCase()
-  .trim()
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '');
-
-const productPath = (product) => {
-  console.log("Build started...");
-  console.log("Generating sitemap...");
-  const id = product.id ?? product._id ?? product.productId;
-  const name = product.name ?? product.title ?? 'product';
-  const slug = slugify(name) || 'product';
-  return `/product/${slug}--${id}`;
 };
 
 const staticPages = [
@@ -146,6 +131,7 @@ const buildUrls = (products) => {
     path: productPath(product),
     changefreq: 'weekly',
     priority: '0.8',
+    product,
   }));
 
   const dedupedUrls = new Map();
@@ -159,12 +145,18 @@ const buildUrls = (products) => {
   return [...dedupedUrls.values()];
 };
 
+const imageXml = (product) => productImages(product).map((image) => `    <image:image>
+      <image:loc>${escapeXml(absoluteImageUrl(image))}</image:loc>
+      <image:title>${escapeXml(productTitle(product))}</image:title>
+      <image:caption>${escapeXml(`${product?.name || 'Papercues'} aesthetic A5 notebook by Papercues`)}</image:caption>
+    </image:image>`).join('\n');
+
 const generateSitemapXml = (urls) => `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.map((url) => `  <url>
     <loc>${escapeXml(url.loc)}</loc>
     <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
+    <priority>${url.priority}</priority>${url.product ? `\n${imageXml(url.product)}` : ''}
   </url>`).join('\n')}
 </urlset>
 `;
@@ -174,7 +166,7 @@ const validateSitemap = (xml, urls) => {
     throw new Error('Sitemap must start with an XML declaration.');
   }
 
-  if (!xml.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')) {
+  if (!xml.includes('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"')) {
     throw new Error('Sitemap must include the standard sitemap.org urlset namespace.');
   }
 
