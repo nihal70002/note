@@ -175,6 +175,23 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const replaceWithCombo = async (comboProductId, selectedChoices = []) => {
+    try {
+      const response = await axiosInstance.post(`/cart/${cartId}/replace-with-combo`, { 
+        comboProductId, 
+        selectedChoices 
+      });
+      setCart(response.data);
+      setCartMessage('');
+      return { success: true };
+    } catch (error) {
+      console.error('Error replacing with combo:', error);
+      const message = error.response?.data?.message || error.response?.data?.Message || 'Could not upgrade to combo.';
+      setCartMessage(message);
+      return { success: false, message };
+    }
+  };
+
   const checkout = async (shippingDetails) => {
     if (!token) {
       return { success: false, message: 'Please login to checkout.' };
@@ -215,23 +232,30 @@ export const CartProvider = ({ children }) => {
   const totalItems = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const totalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price), 0) || 0;
   
+  // Check if cart has combo products (pack products) or meets free shipping criteria
+  const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
+  const qualifiesForFreeShipping = hasComboProduct || 
+    (shippingSettings?.freeShippingType === 'quantity' 
+      ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
+      : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
+
   const shippingCharge = shippingSettings?.enabled 
-    ? (shippingSettings?.freeShippingType === 'quantity' 
-        ? (totalItems >= (shippingSettings?.freeShippingThreshold ?? 2) ? 0 : (shippingSettings?.standardShippingFee ?? 5))
-        : (totalPrice >= (shippingSettings?.freeShippingAmount ?? 500) ? 0 : (shippingSettings?.standardShippingFee ?? 5)))
+    ? (qualifiesForFreeShipping ? 0 : (shippingSettings?.standardShippingFee ?? 5))
     : 0;
   
   // Debug shipping calculation
   console.log('[CartContext Debug] Shipping Settings:', shippingSettings);
   console.log('[CartContext Debug] Total Price:', totalPrice);
   console.log('[CartContext Debug] Total Items:', totalItems);
+  console.log('[CartContext Debug] Has Combo Product:', hasComboProduct);
   console.log('[CartContext Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
+  console.log('[CartContext Debug] Qualifies For Free Shipping:', qualifiesForFreeShipping);
   console.log('[CartContext Debug] Shipping Charge:', shippingCharge);
   
   const totalAmount = totalPrice + shippingCharge;
 
   return (
-    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, checkout, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
+    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, replaceWithCombo, checkout, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
       {children}
     </CartContext.Provider>
   );

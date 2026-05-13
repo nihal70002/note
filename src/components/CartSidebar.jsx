@@ -1,6 +1,7 @@
 import { X, Plus, Minus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +11,11 @@ import ShimmerButton from './ShimmerButton';
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
+  const { cart, updateQuantity, removeFromCart, replaceWithCombo, checkout, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
   const { user, login, register } = useAuth();
+  const { showToast } = useToast();
+  const [comboProducts, setComboProducts] = useState([]);
+  const [loadingCombo, setLoadingCombo] = useState(false);
 
   // Guard against undefined shipping settings
   if (!shippingSettings) {
@@ -63,19 +67,34 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * item.product.price * 2), 0) || 0;
   const totalSavings = totalOriginalPrice - totalPrice;
 
+  // Fetch combo products when cart has 1 item
+  useEffect(() => {
+    if (cart?.items?.length === 1) {
+      axiosInstance.get('/products')
+        .then(res => {
+          const combos = res.data.filter(p => p.isPack || p.name?.toLowerCase().includes('combo'));
+          setComboProducts(combos);
+        })
+        .catch(err => console.error('Failed to fetch combo products', err));
+    }
+  }, [cart?.items?.length]);
+
   // Check if cart qualifies for free shipping promotion based on shipping settings
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
+  const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
   const showFreeShippingBanner = shippingSettings?.enabled 
-    ? (shippingSettings?.freeShippingType === 'quantity' 
-        ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
-        : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500))
+    ? (hasComboProduct || 
+        (shippingSettings?.freeShippingType === 'quantity' 
+          ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
+          : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)))
     : false;
 
   // Debug shipping calculation
   console.log('[Cart Debug] Shipping Settings:', shippingSettings);
   console.log('[Cart Debug] Total Price:', totalPrice);
   console.log('[Cart Debug] Total Items:', totalItems);
+  console.log('[Cart Debug] Has Combo Product:', hasComboProduct);
   console.log('[Cart Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
   console.log('[Cart Debug] Should show free shipping banner:', showFreeShippingBanner);
 
@@ -86,6 +105,24 @@ const CartSidebar = ({ isOpen, onClose }) => {
     setAuthError('');
     setAuthLoading(false);
     setCheckoutMessage({ type: '', text: '' });
+  };
+
+  const handleReplaceWithCombo = async (comboProductId) => {
+    setLoadingCombo(true);
+    try {
+      const result = await replaceWithCombo(comboProductId, []);
+      
+      if (result.success) {
+        showToast('success', 'Upgraded to combo successfully!');
+      } else {
+        showToast('error', result.message || 'Failed to upgrade to combo.');
+      }
+    } catch (error) {
+      console.error('Failed to replace with combo:', error);
+      showToast('error', 'Failed to upgrade to combo. Please try again.');
+    } finally {
+      setLoadingCombo(false);
+    }
   };
 
 
@@ -156,20 +193,47 @@ const CartSidebar = ({ isOpen, onClose }) => {
               )}
 
               {/* Combo Advertisement */}
-              {!isCheckoutStep && !isAuthStep && cart?.items?.length === 1 && (
+              {!isCheckoutStep && !isAuthStep && cart?.items?.length === 1 && comboProducts.length > 0 && (
                 <div className="mb-6 bg-gradient-to-r from-ink/5 to-taupe/5 border border-taupe/20 p-4 rounded-sm">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <h4 className="font-serif text-sm text-ink font-medium">Upgrade to Combo & Save!</h4>
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">SAVE ₹219</span>
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                      SAVE ₹{Math.max(0, (totalPrice * 3) - 500)}
+                    </span>
                   </div>
-                  <p className="text-xs text-taupe mb-3">
-                    Get 3 journals for only ₹500 (Save ₹219 vs individual purchase)
+                  <p className="text-xs text-taupe mb-4">
+                    Get 3 journals for only ₹500 + FREE Shipping and save money!
                   </p>
+                  
+                  {/* Show available combo products */}
+                  <div className="space-y-3">
+                    {comboProducts.slice(0, 2).map((combo) => (
+                      <div key={combo.id} className="flex items-center gap-3 p-2 bg-paper/50 rounded-sm">
+                        <img 
+                          src={combo.image} 
+                          alt={combo.name}
+                          className="w-12 h-12 object-cover rounded-sm"
+                        />
+                        <div className="flex-1">
+                          <h5 className="text-xs font-medium text-ink">{combo.name}</h5>
+                          <p className="text-xs text-taupe">{formatINR(combo.price)}</p>
+                        </div>
+                        <ShimmerButton
+                          loading={loadingCombo}
+                          onClick={() => handleReplaceWithCombo(combo.id)}
+                          className="px-3 py-1 text-xs bg-ink text-paper hover:bg-taupe transition-colors"
+                        >
+                          Add
+                        </ShimmerButton>
+                      </div>
+                    ))}
+                  </div>
+                  
                   <button 
                     onClick={() => navigate('/shop')}
-                    className="w-full bg-ink text-paper py-2 px-3 text-xs uppercase tracking-widest hover:bg-taupe transition-colors"
+                    className="w-full mt-3 border border-taupe/30 py-2 px-3 text-xs uppercase tracking-widest hover:bg-cream transition-colors"
                   >
-                    View Combo Deals
+                    View All Combos
                   </button>
                 </div>
               )}
