@@ -20,4 +20,94 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://papercues.in/shipping-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://papercues.in/returns-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://papercues.in/product/combo-aesthetic-notebook</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1778248491/note/products/w1kdfm1mq9yvxxpobcnc.png</image:loc>
+      <image:title>COMBO  Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>COMBO  aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://papercues.in/I</image:loc>
+      <image:title>COMBO  Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>COMBO  aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://papercues.in/product/floral-affair-aesthetic-notebook</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777885096/note/products/h19khprlqchicwvzw729.png</image:loc>
+      <image:title>FLORAL AFFAIR Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FLORAL AFFAIR aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777885120/note/products/yzampb5as7ttgnoxab7z.png</image:loc>
+      <image:title>FLORAL AFFAIR Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FLORAL AFFAIR aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777916119/note/products/m90zes5qseyiejmmkeop.png</image:loc>
+      <image:title>FLORAL AFFAIR Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FLORAL AFFAIR aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://papercues.in/product/fresh-lemon-aesthetic-notebook</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1778247809/note/products/cnyfjf5bsfxxuaig8ikz.png</image:loc>
+      <image:title>FRESH LEMON Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FRESH LEMON aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777875467/note/products/sicd1graays8wustpykp.png</image:loc>
+      <image:title>FRESH LEMON Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FRESH LEMON aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777875471/note/products/kkco5lvf5wiayiiajoqh.png</image:loc>
+      <image:title>FRESH LEMON Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FRESH LEMON aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777875455/note/products/euy1yc9pc9va0nx7t4j1.png</image:loc>
+      <image:title>FRESH LEMON Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>FRESH LEMON aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://papercues.in/product/girl-and-toucan-aesthetic-notebook</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777885328/note/products/xv9mdqhfoxthtmn7eyhi.png</image:loc>
+      <image:title>GIRL AND TOUCAN Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>GIRL AND TOUCAN aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777885312/note/products/rg3olncaesokom3i6dlk.png</image:loc>
+      <image:title>GIRL AND TOUCAN Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>GIRL AND TOUCAN aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/diybhyxwi/image/upload/v1777885349/note/products/bdpubsnqx2mihkd5t9nn.jpg</image:loc>
+      <image:title>GIRL AND TOUCAN Aesthetic A5 Notebook - 100 GSM Paper Journal | Papercues</image:title>
+      <image:caption>GIRL AND TOUCAN aesthetic A5 notebook by Papercues</image:caption>
+    </image:image>
+  </url>
 </urlset>

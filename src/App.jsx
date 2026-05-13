@@ -25,7 +25,8 @@ const OrdersList = lazy(() => import('./pages/admin/OrdersList'));
 const UsersList = lazy(() => import('./pages/admin/UsersList'));
 const Expenses = lazy(() => import('./pages/admin/Expenses'));
 const ShippingSettings = lazy(() => import('./pages/admin/ShippingSettings'));
-const StorefrontSettings = lazy(() => import('./pages/admin/StorefrontSettings'));
+const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
+const ReturnsPolicy = lazy(() => import('./pages/ReturnsPolicy'));
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
             <Route path="payment-failed" element={<PaymentFailed />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="shipping-policy" element={<ShippingPolicy />} />
+            <Route path="returns-policy" element={<ReturnsPolicy />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />

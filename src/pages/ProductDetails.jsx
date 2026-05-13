@@ -405,10 +405,13 @@ const ProductDetails = () => {
               onClick={handleAddToCart} 
               disabled={product.stock <= 0} 
               loading={addingProductId === product.id}
-              className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-4"
+              className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-2"
             >
               {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
             </ShimmerButton>
+             <p className="text-xs text-center text-taupe uppercase tracking-wider mb-4">
+               Prepaid orders only • No COD • No returns or exchanges
+             </p>
              <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over Rs 450</p>
           </div>
           

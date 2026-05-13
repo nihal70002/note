@@ -38,7 +38,8 @@ const Footer = () => {
           <ul className="flex flex-col gap-3 text-sm">
             <li><Link to="/about" className="hover:text-paper transition-colors">Our Story</Link></li>
             <li><Link to="/contact" className="hover:text-paper transition-colors">Contact</Link></li>
-            <li><Link to="/contact" className="hover:text-paper transition-colors">Shipping Returns</Link></li>
+            <li><Link to="/shipping-policy" className="hover:text-paper transition-colors">Shipping Policy</Link></li>
+            <li><Link to="/returns-policy" className="hover:text-paper transition-colors">Returns Policy</Link></li>
             <li><Link to="/#faq" className="hover:text-paper transition-colors">FAQ</Link></li>
           </ul>
         </div>
@@ -47,6 +48,8 @@ const Footer = () => {
       <div className="container mx-auto px-4 sm:px-6 md:px-12 border-t border-paper/10 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left text-xs tracking-wider gap-4">
         <p>&copy; {new Date().getFullYear()} AESTHETIC DIARIES. ALL RIGHTS RESERVED.</p>
         <div className="flex flex-wrap justify-center gap-4">
+          <Link to="/shipping-policy" className="hover:text-paper transition-colors">SHIPPING POLICY</Link>
+          <Link to="/returns-policy" className="hover:text-paper transition-colors">RETURNS POLICY</Link>
           <Link to="/contact" className="hover:text-paper transition-colors">PRIVACY POLICY</Link>
           <Link to="/contact" className="hover:text-paper transition-colors">TERMS OF SERVICE</Link>
         </div>

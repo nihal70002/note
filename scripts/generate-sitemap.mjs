@@ -46,6 +46,8 @@ const staticPages = [
   { path: '/shop', changefreq: 'weekly', priority: '0.9' },
   { path: '/about', changefreq: 'monthly', priority: '0.7' },
   { path: '/contact', changefreq: 'monthly', priority: '0.7' },
+  { path: '/shipping-policy', changefreq: 'monthly', priority: '0.6' },
+  { path: '/returns-policy', changefreq: 'monthly', priority: '0.6' },
 ];
 
 const normalizeBaseUrl = (url) => String(url || '')

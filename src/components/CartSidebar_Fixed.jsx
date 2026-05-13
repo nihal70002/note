@@ -2,7 +2,7 @@ import { X, Plus, Minus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import FreeShippingBanner from './FreeShippingBanner';
 import ShimmerButton from './ShimmerButton';
@@ -66,15 +66,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
   });
   const [showFreeShippingBanner, setShowFreeShippingBanner] = useState(true);
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
+  const [policyAgreed, setPolicyAgreed] = useState(false);
 
   // Calculate original prices (double the current price for 50% discount)
-  const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * getEffectiveProductPrice(item.product) * 2), 0) || 0;
-  const totalSavings = totalOriginalPrice - totalPrice;
-
-  // Check if cart qualifies for free shipping promotion based on shipping settings
-  const showFreeShippingBanner = shippingSettings?.enabled 
-    ? totalPrice >= 450 || totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)
-    : false;
 
   // Debug shipping calculation
   console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings?.freeShippingAmount, 'should be free:', totalPrice >= 450 || totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
@@ -383,7 +377,6 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           placeholder="Apt 4B"
                         />
                       </div>
-                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
@@ -541,6 +534,32 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   <span>Total</span>
                   <span>{formatINR(totalAmount)}</span>
                 </div>
+                
+                {isCheckoutStep && (
+                  <div className="mb-6">
+                    <label className="flex items-start gap-3 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={policyAgreed}
+                        onChange={(e) => setPolicyAgreed(e.target.checked)}
+                        className="mt-1"
+                        required
+                      />
+                      <span className="text-ink/80 leading-relaxed">
+                        By placing this order, you agree to our{' '}
+                        <Link to="/shipping-policy" className="text-ink underline underline-offset-4 hover:text-ink/80" target="_blank">
+                          shipping policy
+                        </Link>
+                        {' '}and{' '}
+                        <Link to="/returns-policy" className="text-ink underline underline-offset-4 hover:text-ink/80" target="_blank">
+                          no-return policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                  </div>
+                )}
+                
                 <ShimmerButton 
                   loading={isProcessingCheckout}
                   onClick={async () => {
@@ -558,6 +577,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           setCheckoutMessage({ type: 'error', text: 'Please fill all required shipping fields.' });
                           return;
                         }
+                      }
+                      
+                      if (!policyAgreed) {
+                        setCheckoutMessage({ type: 'error', text: 'Please agree to our shipping and returns policy to continue.' });
+                        return;
                       }
                       
                       setIsProcessingCheckout(true);
