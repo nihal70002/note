@@ -308,6 +308,8 @@ const OrdersList = () => {
                   <th className="p-4 font-medium">Order ID</th>
                   <th className="p-4 font-medium">Date</th>
                   <th className="p-4 font-medium">Products</th>
+                  <th className="p-4 font-medium">Customer</th>
+
                   <th className="p-4 font-medium">Shipping Details</th>
                   <th className="p-4 font-medium">Total</th>
                   <th className="p-4 font-medium">Status</th>
@@ -342,7 +344,31 @@ const OrdersList = () => {
     ))}
   </div>
 </td>
-                    <td className="p-4 text-sm text-ink">{formatINR(order.totalAmount)}</td>
+                    <td className="p-4 text-sm text-ink">
+  <div className="font-medium">
+    {order.fullName || 'N/A'}
+  </div>
+
+  <div className="text-xs text-taupe">
+    {order.phoneNumber || 'No phone'}
+  </div>
+</td>
+
+<td className="p-4 text-sm text-ink">
+  <div>
+    {getAddress(order) || 'No address'}
+  </div>
+
+  {order.landmark && (
+    <div className="text-xs text-taupe mt-1">
+      Landmark: {order.landmark}
+    </div>
+  )}
+</td>
+
+<td className="p-4 text-sm font-medium text-ink">
+  {formatINR(order.totalAmount)}
+</td>
                     <td className="p-4">
                       <span className={`inline-block px-3 py-1 text-[10px] font-medium uppercase tracking-wider rounded-full ${
                         order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
