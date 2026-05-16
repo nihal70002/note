@@ -411,9 +411,9 @@ const ProductDetails = () => {
               className="btn-primary w-full py-4 text-sm tracking-widest uppercase mb-2"
             >
               {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
-            </ShimmerButton>
+             </ShimmerButton>
              <div className="mb-4 flex justify-center">
-               <UrgencyBadge message={urgency.message} hook={urgency.hook} />
+               <UrgencyBadge message={urgency.message} />
              </div>
              <p className="text-xs text-center text-taupe uppercase tracking-wider mb-4">
                Prepaid orders only • No COD • No returns or exchanges

@@ -7,12 +7,6 @@ const productCardTemplates = [
   () => 'Limited Time Offer',
 ];
 
-const productDetailTemplates = [
-  (count) => `🔥 Only ${count} left — order soon`,
-  () => '⚡ Selling quickly',
-  () => 'High demand product',
-];
-
 const conversionHookTemplates = [
   () => '23 people viewed this today',
   () => 'Trending product',
@@ -35,11 +29,10 @@ export const createProductCardUrgency = () => {
 };
 
 export const createProductDetailUrgency = () => {
-  const fakeStock = getFakeStockCount();
-  const message = pickRandom(productDetailTemplates)(fakeStock);
-  const hook = pickRandom(conversionHookTemplates)();
+  const fakeStock = 2;
+  const message = `Only ${fakeStock} item left`;
 
-  return { fakeStock, message, hook };
+  return { fakeStock, message };
 };
 
 export const createCartUrgencyMessage = () => pickRandom(cartBannerTemplates);
