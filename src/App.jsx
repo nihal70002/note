@@ -22,6 +22,7 @@ const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
 const ProductsList = lazy(() => import('./pages/admin/ProductsList'));
 const AddProduct = lazy(() => import('./pages/admin/AddProduct'));
 const OrdersList = lazy(() => import('./pages/admin/OrdersList'));
+const CartAnalytics = lazy(() => import('./pages/admin/CartAnalytics'));
 const UsersList = lazy(() => import('./pages/admin/UsersList'));
 const Expenses = lazy(() => import('./pages/admin/Expenses'));
 const ShippingSettings = lazy(() => import('./pages/admin/ShippingSettings'));
@@ -64,6 +65,7 @@ function App() {
           }>
             <Route index element={<Dashboard />} />
             <Route path="orders" element={<OrdersList />} />
+            <Route path="cart-analytics" element={<CartAnalytics />} />
             <Route path="users" element={<UsersList />} />
             <Route path="expenses" element={<Expenses />} />
             <Route path="products" element={<ProductsList />} />
