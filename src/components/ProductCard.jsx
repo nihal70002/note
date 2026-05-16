@@ -1,12 +1,15 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProductPath, productImageAlt } from '../utils/seo';
+import { createProductCardUrgency } from '../utils/urgency';
 import ShimmerButton from './ShimmerButton';
+import UrgencyBadge from './UrgencyBadge';
 
 const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addingToCart = false }) => {
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
   const originalPrice = price * 2; // Original price is double the current price (50% discount)
   const discountPercentage = 50;
+  const [urgency] = useState(() => createProductCardUrgency());
   
   return (
     <div className="group flex flex-col">
@@ -21,6 +24,10 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
           <span className="absolute top-4 right-4 z-10 bg-red-500 text-white text-xs uppercase tracking-widest px-3 py-1 font-bold">
             {discountPercentage}% OFF
           </span>
+          <UrgencyBadge
+            message={urgency.message}
+            className="absolute bottom-4 left-4 right-4 z-20 sm:right-auto"
+          />
           <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors z-10" />
           <img 
             src={image} 
@@ -39,6 +46,7 @@ const ProductCard = ({ id, name, price, image, isNew = false, onAddToCart, addin
           <span className="text-sm text-taupe line-through">{formatINR(originalPrice)}</span>
           <span className="text-sm text-ink font-medium">{formatINR(price)}</span>
         </div>
+        <p className="text-xs uppercase tracking-widest text-orange-700">{urgency.hook}</p>
         {onAddToCart && (
           <ShimmerButton
             type="button"

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import FreeShippingBanner from './FreeShippingBanner';
 import ShimmerButton from './ShimmerButton';
+import UrgencyBanner from './UrgencyBanner';
 
 const getEffectiveProductPrice = (product) => {
   if (!product) return 0;
@@ -195,6 +196,10 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div className="mb-6">
                   <FreeShippingBanner compact={true} />
                 </div>
+              )}
+
+              {!isCheckoutStep && !isAuthStep && cart?.items?.length > 0 && (
+                <UrgencyBanner />
               )}
 
               {/* Combo Advertisement */}

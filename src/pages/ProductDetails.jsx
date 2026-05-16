@@ -8,6 +8,8 @@ import axiosInstance from '../api/axios';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
 import ShimmerButton from '../components/ShimmerButton';
+import UrgencyBadge from '../components/UrgencyBadge';
+import { createProductDetailUrgency } from '../utils/urgency';
 import {
   getProductIdFromLegacySlug,
   getProductPath,
@@ -75,6 +77,7 @@ const ProductDetails = () => {
   const { addToCart } = useCart();
   const { user, token } = useAuth();
   const { showToast } = useToast();
+  const [urgency] = useState(() => createProductDetailUrgency());
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
 
   useEffect(() => {
@@ -409,6 +412,9 @@ const ProductDetails = () => {
             >
               {addingProductId === product.id ? 'Adding...' : 'Buy Now'}
             </ShimmerButton>
+             <div className="mb-4 flex justify-center">
+               <UrgencyBadge message={urgency.message} hook={urgency.hook} />
+             </div>
              <p className="text-xs text-center text-taupe uppercase tracking-wider mb-4">
                Prepaid orders only • No COD • No returns or exchanges
              </p>
@@ -575,6 +581,7 @@ const ProductDetails = () => {
           <div className="flex-1 flex flex-col justify-center overflow-hidden">
             <p className="text-xs font-serif text-taupe truncate leading-tight mb-0.5">{product.name}</p>
             <p className="font-medium text-ink leading-tight">{formatINR(product.price * quantity)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-orange-700 truncate">{urgency.message}</p>
           </div>
           <ShimmerButton 
             onClick={handleAddToCart} 

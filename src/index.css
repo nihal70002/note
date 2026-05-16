@@ -41,4 +41,20 @@
   .nav-link:hover::after {
     @apply w-full;
   }
+
+  .urgency-glow {
+    animation: urgency-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes urgency-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(249, 115, 22, 0), 0 10px 24px rgba(249, 115, 22, 0.16);
+    transform: translateZ(0) scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 22px rgba(249, 115, 22, 0.34), 0 14px 30px rgba(220, 38, 38, 0.18);
+    transform: translateZ(0) scale(1.015);
+  }
 }
