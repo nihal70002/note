@@ -418,7 +418,7 @@ const ProductDetails = () => {
              <p className="text-xs text-center text-taupe uppercase tracking-wider mb-4">
                Prepaid orders only • No COD • No returns or exchanges
              </p>
-             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over Rs 450</p>
+             <p className="text-xs text-center text-taupe uppercase tracking-wider">Free shipping over Rs 650</p>
           </div>
           
           {specifications.length > 0 && (

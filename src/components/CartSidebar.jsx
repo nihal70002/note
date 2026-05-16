@@ -89,7 +89,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
   const showFreeShippingBanner = shippingSettings?.enabled 
     ? (hasComboProduct || 
-        totalPrice >= 450 || // Free shipping for orders above ₹450
+        totalPrice >= 650 || // Free shipping for orders above ₹650
         (shippingSettings?.freeShippingType === 'quantity' 
           ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
           : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500)))
@@ -100,7 +100,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   console.log('[Cart Debug] Total Price:', totalPrice);
   console.log('[Cart Debug] Total Items:', totalItems);
   console.log('[Cart Debug] Has Combo Product:', hasComboProduct);
-  console.log('[Cart Debug] Price >= 450:', totalPrice >= 450);
+  console.log('[Cart Debug] Price >= 650:', totalPrice >= 650);
   console.log('[Cart Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
   console.log('[Cart Debug] Should show free shipping banner:', showFreeShippingBanner);
 
@@ -585,7 +585,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                         <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
                           {shippingSettings?.freeShippingType === 'quantity' 
                             ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 2) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 2) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
-                            : `Add ₹${Math.max(0, Math.min((shippingSettings?.freeShippingAmount ?? 500), 450) - totalPrice).toFixed(2)} more for FREE shipping`
+                            : `Add ₹${Math.max(0, Math.min((shippingSettings?.freeShippingAmount ?? 500), 650) - totalPrice).toFixed(2)} more for FREE shipping`
                           }
                         </p>
                       )}

@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 
 const FreeShippingBanner = ({ onClose, compact = false }) => {
   const { totalPrice, totalItems, shippingSettings } = useCart();
-  const freeShippingAmount = Math.min(Number(shippingSettings?.freeShippingAmount ?? 500), 450);
+  const freeShippingAmount = Math.min(Number(shippingSettings?.freeShippingAmount ?? 500), 650);
   const freeShippingThreshold = shippingSettings?.freeShippingThreshold ?? (compact ? 2 : 3);
   const usesQuantityRule = shippingSettings?.freeShippingType === 'quantity';
 

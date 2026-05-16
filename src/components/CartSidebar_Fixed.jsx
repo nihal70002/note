@@ -71,7 +71,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   // Calculate original prices (double the current price for 50% discount)
 
   // Debug shipping calculation
-  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings?.freeShippingAmount, 'should be free:', totalPrice >= 450 || totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
+  console.log('[Cart Debug] totalPrice:', totalPrice, 'freeShippingAmount:', shippingSettings?.freeShippingAmount, 'should be free:', totalPrice >= 650 || totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
 
   const resetCheckout = () => {
     setIsCheckoutStep(false);
@@ -526,7 +526,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   <p className="text-xs text-taupe uppercase tracking-wider text-center mb-4">
                     {shippingSettings?.freeShippingType === 'quantity' 
                       ? `Add ${Math.max(0, (shippingSettings?.freeShippingThreshold ?? 3) - totalItems)} more ${(shippingSettings?.freeShippingThreshold ?? 3) - totalItems === 1 ? 'item' : 'items'} for FREE shipping`
-                      : `Add ₹${Math.max(0, Math.min((shippingSettings?.freeShippingAmount ?? 500), 450) - totalPrice).toFixed(2)} more for FREE shipping`
+                      : `Add ₹${Math.max(0, Math.min((shippingSettings?.freeShippingAmount ?? 500), 650) - totalPrice).toFixed(2)} more for FREE shipping`
                     }
                   </p>
                 )}

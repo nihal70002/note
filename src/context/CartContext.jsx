@@ -244,7 +244,7 @@ export const CartProvider = ({ children }) => {
   // Check if cart has combo products (pack products) or meets free shipping criteria
   const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
   const qualifiesForFreeShipping = hasComboProduct || 
-    totalPrice >= 450 || // Free shipping for orders above ₹450
+    totalPrice >= 650 || // Free shipping for orders above ₹650
     (shippingSettings?.freeShippingType === 'quantity' 
       ? totalItems >= (shippingSettings?.freeShippingThreshold ?? 2)
       : totalPrice >= (shippingSettings?.freeShippingAmount ?? 500));
@@ -258,7 +258,7 @@ export const CartProvider = ({ children }) => {
   console.log('[CartContext Debug] Total Price:', totalPrice);
   console.log('[CartContext Debug] Total Items:', totalItems);
   console.log('[CartContext Debug] Has Combo Product:', hasComboProduct);
-  console.log('[CartContext Debug] Price >= 450:', totalPrice >= 450);
+  console.log('[CartContext Debug] Price >= 650:', totalPrice >= 650);
   console.log('[CartContext Debug] Free Shipping Type:', shippingSettings?.freeShippingType);
   console.log('[CartContext Debug] Qualifies For Free Shipping:', qualifiesForFreeShipping);
   console.log('[CartContext Debug] Shipping Charge:', shippingCharge);
