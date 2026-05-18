@@ -1,8 +1,8 @@
-import { X, Plus, Minus, Trash2, Eye, EyeOff } from 'lucide-react';
+import { X, Plus, Minus, Trash2, Eye, EyeOff, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
@@ -12,36 +12,40 @@ import UrgencyBanner from './UrgencyBanner';
 
 const getEffectiveProductPrice = (product) => {
   if (!product) return 0;
-  return product.isPack || product.name?.toLowerCase().includes('combo') ? 499 : product.price;
+  return product.discountPrice || (product.isPack || product.name?.toLowerCase().includes('combo') ? 499 : product.price);
+};
+
+const getRecentProductIds = () => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    return JSON.parse(localStorage.getItem('recentProductIds') || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const trackRecommendationEvent = (eventType, productId, cartId, sourceProductIds = []) => {
+  axiosInstance.post('/products/recommended/events', {
+    eventType,
+    productId,
+    cartId,
+    sourceProductIds
+  }).catch(() => {});
 };
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, replaceWithCombo, checkout, clearCartAfterPayment, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
+  const { cart, cartId, updateQuantity, removeFromCart, replaceWithCombo, addToCart, checkout, clearCartAfterPayment, totalPrice, shippingCharge, totalAmount, totalItems, cartMessage, setCartMessage, shippingSettings } = useCart();
   const { user, login, register } = useAuth();
   const { showToast } = useToast();
   const [comboProducts, setComboProducts] = useState([]);
   const [loadingCombo, setLoadingCombo] = useState(false);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [addingRecommendedId, setAddingRecommendedId] = useState('');
+  const [recommendationMessage, setRecommendationMessage] = useState('');
 
-  // Guard against undefined shipping settings
-  if (!shippingSettings) {
-    console.warn('[Cart Warning] Shipping settings not available, cart may not display correctly');
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-        <div className="bg-paper rounded-lg shadow-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
-            <h2 className="font-serif text-xl text-ink">Your Cart</h2>
-            <button onClick={onClose} className="text-taupe hover:text-ink transition-colors">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-4 sm:p-6">
-            <p className="text-taupe text-center">Loading shipping information...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isAuthStep, setIsAuthStep] = useState(false);
   const [authMode, setAuthMode] = useState('register');
@@ -66,8 +70,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
     pincode: '',
     deliveryAddress: ''
   });
-  const [showShippingBanner, setShowShippingBanner] = useState(true);
+  const [showShippingBanner] = useState(true);
   const formatINR = (value) => `₹${Number(value || 0).toFixed(2)}`;
+
+  const cartProductIds = useMemo(() => cart?.items?.map((item) => item.productId) || [], [cart?.items]);
+  const cartProductKey = useMemo(() => cartProductIds.join(','), [cartProductIds]);
 
   // Calculate original prices (double the current price for 50% discount)
   const totalOriginalPrice = cart?.items?.reduce((sum, item) => sum + (item.quantity * getEffectiveProductPrice(item.product) * 2), 0) || 0;
@@ -84,6 +91,47 @@ const CartSidebar = ({ isOpen, onClose }) => {
         .catch(err => console.error('Failed to fetch combo products', err));
     }
   }, [cart?.items?.length]);
+
+  useEffect(() => {
+    const currentCartProductIds = cartProductKey ? cartProductKey.split(',') : [];
+
+    if (!isOpen || isCheckoutStep || isAuthStep || !cartId || currentCartProductIds.length === 0) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const recentProductIds = getRecentProductIds()
+      .filter((id) => !currentCartProductIds.includes(id))
+      .slice(0, 8);
+    const params = new URLSearchParams({ cartId, take: '6' });
+
+    if (recentProductIds.length > 0) {
+      params.set('recentProductIds', recentProductIds.join(','));
+    }
+
+    const loadingTimer = window.setTimeout(() => setLoadingRecommendations(true), 0);
+    axiosInstance.get(`/products/recommended?${params.toString()}`, { signal: controller.signal })
+      .then((res) => {
+        const products = (res.data || []).filter((product) => !currentCartProductIds.includes(product.id));
+        setRecommendedProducts(products);
+
+        products.forEach((product) => {
+          trackRecommendationEvent('impression', product.id, cartId, currentCartProductIds);
+        });
+      })
+      .catch((err) => {
+        if (err.name !== 'CanceledError') {
+          console.error('Failed to fetch recommended products', err);
+          setRecommendedProducts([]);
+        }
+      })
+      .finally(() => setLoadingRecommendations(false));
+
+    return () => {
+      window.clearTimeout(loadingTimer);
+      controller.abort();
+    };
+  }, [isOpen, isCheckoutStep, isAuthStep, cartId, cartProductKey]);
 
   // Check if cart qualifies for free shipping promotion based on shipping settings
   const hasComboProduct = cart?.items?.some(item => item.product?.isPack);
@@ -131,6 +179,28 @@ const CartSidebar = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleAddRecommendedProduct = async (product) => {
+    setAddingRecommendedId(product.id);
+    setRecommendationMessage('');
+    trackRecommendationEvent('click', product.id, cartId, cartProductIds);
+
+    try {
+      const result = await addToCart(product.id, 1);
+
+      if (result.success) {
+        trackRecommendationEvent('add_to_cart', product.id, cartId, cartProductIds);
+        setRecommendationMessage(`${product.name} added to cart.`);
+        showToast('success', `${product.name} added to cart.`);
+        setRecommendedProducts((items) => items.filter((item) => item.id !== product.id));
+        setTimeout(() => setRecommendationMessage(''), 2500);
+      } else {
+        showToast('error', result.message || 'Could not add item to cart.');
+      }
+    } finally {
+      setAddingRecommendedId('');
+    }
+  };
+
 
   const handleInlineAuth = async (e) => {
     e.preventDefault();
@@ -165,6 +235,25 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
   // Add SSR safety
   if (typeof window === 'undefined') return null;
+
+  if (!shippingSettings) {
+    console.warn('[Cart Warning] Shipping settings not available, cart may not display correctly');
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+        <div className="bg-paper rounded-lg shadow-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-taupe/20">
+            <h2 className="font-serif text-xl text-ink">Your Cart</h2>
+            <button onClick={onClose} className="text-taupe hover:text-ink transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="p-4 sm:p-6">
+            <p className="text-taupe text-center">Loading shipping information...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return createPortal(
     <>
@@ -559,6 +648,85 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     </div>
                   )}
 
+                  {cart?.items?.length > 0 && (loadingRecommendations || recommendedProducts.length > 0) && (
+                    <div className="mt-6 pt-6 border-t border-taupe/20">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <h3 className="font-serif text-lg text-ink">You May Also Like</h3>
+                          {recommendationMessage && (
+                            <p className="mt-1 text-xs text-green-700">{recommendationMessage}</p>
+                          )}
+                        </div>
+                        <span className="text-[11px] uppercase tracking-widest text-taupe">Quick add</span>
+                      </div>
+
+                      <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible">
+                        {loadingRecommendations
+                          ? Array.from({ length: 4 }).map((_, index) => (
+                              <div key={index} className="min-w-[150px] rounded-sm border border-taupe/15 bg-cream/20 p-3 sm:min-w-0">
+                                <div className="mb-3 aspect-[4/5] animate-pulse rounded-sm bg-taupe/15" />
+                                <div className="mb-2 h-3 w-4/5 animate-pulse rounded bg-taupe/15" />
+                                <div className="mb-4 h-3 w-1/2 animate-pulse rounded bg-taupe/15" />
+                                <div className="h-9 animate-pulse rounded-sm bg-taupe/15" />
+                              </div>
+                            ))
+                          : recommendedProducts.map((product) => {
+                              const effectivePrice = getEffectiveProductPrice(product);
+                              const originalPrice = product.discountPrice ? product.price : product.price * 2;
+                              const hasDiscount = originalPrice > effectivePrice;
+
+                              return (
+                                <div key={product.id} className="min-w-[150px] rounded-sm border border-taupe/15 bg-paper p-3 shadow-sm sm:min-w-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      trackRecommendationEvent('click', product.id, cartId, cartProductIds);
+                                      navigate(`/product/${product.slug}`);
+                                      onClose();
+                                    }}
+                                    className="block w-full text-left"
+                                  >
+                                    <div className="relative mb-3 aspect-[4/5] overflow-hidden rounded-sm bg-cream">
+                                      <img
+                                        src={product.image || '/product.png'}
+                                        alt={product.name}
+                                        loading="lazy"
+                                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                                      />
+                                      {hasDiscount && (
+                                        <span className="absolute left-2 top-2 bg-green-700 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
+                                          Save
+                                        </span>
+                                      )}
+                                    </div>
+                                    <h4 className="line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-5 text-ink">
+                                      {product.name}
+                                    </h4>
+                                  </button>
+
+                                  <div className="mt-2 flex items-baseline gap-2">
+                                    <span className="text-sm font-semibold text-ink">{formatINR(effectivePrice)}</span>
+                                    {hasDiscount && (
+                                      <span className="text-xs text-taupe line-through">{formatINR(originalPrice)}</span>
+                                    )}
+                                  </div>
+
+                                  <ShimmerButton
+                                    loading={addingRecommendedId === product.id}
+                                    disabled={addingRecommendedId === product.id || product.stock <= 0}
+                                    onClick={() => handleAddRecommendedProduct(product)}
+                                    className="mt-3 flex w-full items-center justify-center gap-2 bg-ink px-3 py-2 text-xs uppercase tracking-widest text-paper transition-colors hover:bg-taupe disabled:cursor-not-allowed disabled:opacity-60"
+                                  >
+                                    <ShoppingCart className="h-3.5 w-3.5" />
+                                    {product.stock <= 0 ? 'Sold Out' : 'Add'}
+                                  </ShimmerButton>
+                                </div>
+                              );
+                            })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Order Summary for Cart */}
                   {cart?.items?.length > 0 && (
                     <div className="mt-6 pt-6 border-t border-taupe/20">
@@ -686,7 +854,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                   setShippingDetails({ fullName: '', phoneNumber: '', alternatePhoneNumber: '', addressLine1: '', addressLine2: '', city: '', state: '', deliveryAddress: '', landmark: '', pincode: '' });
                                 }, 300);
                               }, 1500);
-                            } catch (err) {
+                            } catch {
                               setCheckoutMessage({ type: 'error', text: 'Payment verification failed. Please contact support.' });
                               setTimeout(() => {
                                 onClose();

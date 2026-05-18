@@ -103,6 +103,18 @@ const ProductDetails = () => {
   useEffect(() => {
     if (!product?.id) return;
 
+    try {
+      const recentIds = JSON.parse(localStorage.getItem('recentProductIds') || '[]');
+      const nextRecentIds = [product.id, ...recentIds.filter((id) => id !== product.id)].slice(0, 12);
+      localStorage.setItem('recentProductIds', JSON.stringify(nextRecentIds));
+    } catch {
+      localStorage.setItem('recentProductIds', JSON.stringify([product.id]));
+    }
+  }, [product?.id]);
+
+  useEffect(() => {
+    if (!product?.id) return;
+
     axiosInstance.get(`/products/${product.id}/reviews`)
       .then(res => {
         console.log('Reviews API response:', res.data);

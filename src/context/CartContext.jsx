@@ -266,7 +266,7 @@ export const CartProvider = ({ children }) => {
   const totalAmount = totalPrice + shippingCharge;
 
   return (
-    <CartContext.Provider value={{ cart, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, replaceWithCombo, checkout, clearCartAfterPayment, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
+    <CartContext.Provider value={{ cart, cartId, loading, cartMessage, setCartMessage, addToCart, updateQuantity, removeFromCart, replaceWithCombo, checkout, clearCartAfterPayment, totalItems, totalPrice, shippingCharge, totalAmount, shippingSettings, shouldOpenCart, setShouldOpenCart }}>
       {children}
     </CartContext.Provider>
   );
